@@ -1,9 +1,8 @@
-
 import os
 from django.core.wsgi import get_wsgi_application
 
-# تأكد أن 'core.settings' تطابق اسم مجلد إعداداتك
+# إعداد ملف الإعدادات الافتراضي للمشروع
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
-# Gunicorn يبحث عن هذا المتغير 'application' تحديداً
+# هذا هو المتغير الذي يبحث عنه Gunicorn (يجب أن يكون اسمه application)
 application = get_wsgi_application()
