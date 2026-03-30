@@ -28,3 +28,19 @@ def supplier_login(request):
             messages.error(request, "كلمة المرور التي أدخلتها غير صحيحة.")
     
     return render(request, 'suppliers/login.html')
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Product  # استيراد نموذج المنتج من نفس المجلد
+
+@login_required
+def supplier_dashboard(request):
+    # حساب المنتجات التي حالتها مسودة (Draft) والخاصة بالمورد الحالي فقط
+    draft_count = Product.objects.filter(supplier=request.user.supplier, status='draft').count()
+    
+    context = {
+        'draft_count': draft_count,
+    }
+    return render(request, 'suppliers/dashboard.html', context)
