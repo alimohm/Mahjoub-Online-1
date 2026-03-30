@@ -2,49 +2,80 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>دخول الموردين | محجوب أونلاين</title>
     <style>
+        :root {
+            --primary: #8a2be2;
+            --accent: #bc13fe;
+            --bg: #0a0a0c;
+            --card-bg: #141417;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: radial-gradient(circle, #240046 0%, #000000 100%);
-            height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0;
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 2px 2px, #1a1a1a 1px, transparent 0);
+            background-size: 40px 40px; /* خلفية منقطة خفيفة توحي بالذكاء التقني */
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0;
         }
-        .login-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px; border-radius: 20px; border: 1px solid #7b2cbf;
-            width: 350px; text-align: center; backdrop-filter: blur(10px);
+        .login-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 15px rgba(138, 43, 226, 0.1);
+            width: 100%; max-width: 400px;
+            border: 1px solid #222;
+            text-align: center;
         }
-        h2 { color: #9d4edd; margin-bottom: 5px; }
-        p { color: #888; font-size: 13px; margin-bottom: 25px; }
-        .input-group { text-align: right; margin-bottom: 15px; }
-        label { color: #fff; font-size: 14px; display: block; margin-bottom: 5px; }
+        .logo-area { margin-bottom: 30px; }
+        .logo-area h1 {
+            font-size: 22px; font-weight: 700; letter-spacing: 1px;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .logo-area p { color: #666; font-size: 13px; margin-top: 5px; }
+        
+        .input-group { text-align: right; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
         input {
-            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444;
-            background: rgba(0,0,0,0.5); color: #fff; box-sizing: border-box;
+            width: 100%; padding: 14px; background: #000; border: 1px solid #333;
+            color: white; border-radius: 12px; font-size: 16px; box-sizing: border-box;
+            transition: all 0.3s ease;
         }
-        .btn {
-            background: #7b2cbf; color: #fff; border: none; width: 100%;
-            padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px;
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 8px rgba(138, 43, 226, 0.4); }
+        
+        .login-btn {
+            width: 100%; padding: 16px; background: var(--primary); color: white;
+            border: none; border-radius: 12px; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
         }
-        .btn:hover { background: #9d4edd; }
+        .login-btn:hover { background: var(--accent); transform: translateY(-2px); }
+        
+        footer { margin-top: 25px; font-size: 12px; color: #444; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h2>محجوب أونلاين</h2>
-        <p>المنصة اللامركزية - بوابة الموردين</p>
+    <div class="login-container">
+        <div class="logo-area">
+            <h1>MAHJOUB ONLINE</h1>
+            <p>سوقك الذكي - إدارة سلسلة التوريد</p>
+        </div>
         <form method="post">
             {% csrf_token %}
             <div class="input-group">
-                <label>اسم المستخدم</label>
-                <input type="text" name="username" required>
+                <label>معرف المورد</label>
+                <input type="text" name="username" placeholder="اسم المستخدم" required>
             </div>
             <div class="input-group">
                 <label>كلمة المرور</label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="btn">دخول المنصة</button>
+            <button type="submit" class="login-btn">دخول النظام</button>
         </form>
+        <footer>© 2026 Mahjoub Online. All Rights Reserved.</footer>
     </div>
 </body>
 </html>
