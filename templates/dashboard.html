@@ -1,24 +1,41 @@
-<div class="content">
-    <h2>مرحباً، {{ session['vendor_name'] }} 👋</h2>
-    
-    <form action="/upload_product" method="POST">
-        <input type="text" name="name" placeholder="اسم المنتج" required>
-        <input type="number" step="0.01" name="price" placeholder="السعر" required>
-        <textarea name="description" placeholder="الوصف"></textarea>
-        <button type="submit">تأكيد الرفع والمزامنة</button>
-    </form>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة التحكم - محجوب أونلاين</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .btn-logout { color: red; text-decoration: none; float: left; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <a href="/logout" class="btn-logout">تسجيل الخروج</a>
+        <h2>أهلاً بك، {{ vendor.owner_name }} 👋</h2>
+        <p>المحفظة: <strong>{{ vendor.wallet_address if vendor.wallet_address else 'لا يوجد عنوان' }}</strong></p>
+    </div>
 
-    <hr>
+    <div class="card">
+        <h3>إضافة منتج جديد</h3>
+        <form action="/upload_product" method="POST">
+            <input type="text" name="name" placeholder="اسم المنتج" required>
+            <input type="number" name="price" placeholder="السعر" required>
+            <button type="submit">رفع المنتج</button>
+        </form>
+    </div>
 
-    <h3>منتجاتك المرفوعة:</h3>
-    <div class="product-list">
+    <h3>منتجاتك الحالية:</h3>
+    <div class="product-grid">
         {% for product in products %}
             <div class="card">
                 <h4>{{ product.name }}</h4>
-                <p>السعر: {{ product.price }} $</p>
+                <p>السعر: {{ product.price }}$</p>
             </div>
         {% else %}
-            <p>لا توجد منتجات حالياً.</p>
+            <p>لا توجد منتجات حالياً في "سوقك الذكي".</p>
         {% endfor %}
     </div>
-</div>
+</body>
+</html>
