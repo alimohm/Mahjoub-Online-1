@@ -1,6 +1,5 @@
-Django>=4.2
+django
 gunicorn
+dj-database-url
 whitenoise
-Pillow
-graphene-django
-requests
+psycopg2-binary
