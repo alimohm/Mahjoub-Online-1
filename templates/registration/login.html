@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | محجوب أونلاين</title>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #0a0a0a;
+            height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0;
+            background-image: radial-gradient(circle at 50% 50%, #2c0a4d 0%, #0a0a0a 100%);
+        }
+        .login-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px; border-radius: 20px;
+            box-shadow: 0 0 30px rgba(123, 44, 191, 0.3);
+            width: 100%; max-width: 400px; text-align: center;
+            backdrop-filter: blur(15px); border: 1px solid rgba(123, 44, 191, 0.2);
+        }
+        .logo { color: #9d4edd; font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .slogan { color: #ccc; font-size: 14px; margin-bottom: 30px; }
+        .form-group { text-align: right; margin-bottom: 20px; }
+        label { color: #9d4edd; display: block; margin-bottom: 8px; font-size: 14px; }
+        input {
+            width: 100%; padding: 12px; background: rgba(255,255,255,0.08);
+            border: 1px solid #444; border-radius: 10px; color: white; outline: none; box-sizing: border-box;
+        }
+        input:focus { border-color: #9d4edd; box-shadow: 0 0 10px rgba(157, 78, 221, 0.5); }
+        .btn-submit {
+            width: 100%; padding: 12px; background: #7b2cbf; border: none; border-radius: 10px;
+            color: white; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-submit:hover { background: #9d4edd; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="logo">[ Mahjoub Online ]</div>
+        <div class="slogan">سوقك الذكي - المنصة اللامركزية</div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>اسم المستخدم (المورد)</label>
+                <input type="text" name="username" placeholder="أدخل اسم المستخدم" required>
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور</label>
+                <input type="password" name="password" placeholder="أدخل كلمة المرور" required>
+            </div>
+            <button type="submit" class="btn-submit">دخول المنصة</button>
+        </form>
+    </div>
+</body>
+</html>
