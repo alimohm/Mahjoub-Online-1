@@ -1,17 +1,26 @@
 import os
+import dj_database_url
 from pathlib import Path
-import dj_database_url  # لربط قاعدة بيانات Postgres تلقائياً
 
-# ... (الإعدادات الافتراضية)
+BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = 'django-insecure-mahjoub-online-key-2026'
+DEBUG = True # اجعلها False عند النشر النهائي
+ALLOWED_HOSTS = ['*'] # للسماح برابط Railway بالعمل
 
-# أهم سطر ليفتح الرابط في المتصفح
-ALLOWED_HOSTS = ['*']  # مؤقتاً للسماح بجميع الروابط، أو ضع رابط Railway الخاص بك
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'suppliers', # تطبيق الموردين الخاص بك
+]
 
-# إعدادات قاعدة البيانات من Railway
+# ربط قاعدة بيانات Railway
 DATABASES = {
     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
-# إعدادات الملفات الساكنة (Static Files) لتظهر الواجهة بشكل صحيح
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
