@@ -2,17 +2,46 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>دخول الموردين | محجوب أونلاين</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* إضافة لمسات إضافية لضمان الأناقة */
+        body {
+            background: #0a0a0c; color: white; font-family: 'Segoe UI', sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
+            background-image: radial-gradient(circle at 2px 2px, #1a1a1a 1px, transparent 0);
+            background-size: 30px 30px;
+        }
+        .ai-card {
+            background: #141417; padding: 40px; border-radius: 24px;
+            border: 1px solid #8a2be2; width: 340px; text-align: center;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.15);
+        }
+        .logo { font-size: 24px; font-weight: bold; color: #bc13fe; margin-bottom: 8px; letter-spacing: 1px; }
+        .subtitle { color: #666; font-size: 13px; margin-bottom: 30px; }
+        input {
+            width: 100%; padding: 14px; margin: 10px 0; background: #000;
+            border: 1px solid #333; color: white; border-radius: 12px; box-sizing: border-box;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #8a2be2; outline: none; box-shadow: 0 0 10px rgba(138, 43, 226, 0.3); }
+        .btn-glow {
+            width: 100%; padding: 15px; background: #8a2be2; color: white;
+            border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
+            margin-top: 15px; transition: 0.3s;
+        }
+        .btn-glow:hover { background: #bc13fe; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(188, 19, 254, 0.4); }
+    </style>
 </head>
 <body>
     <div class="ai-card">
         <div class="logo">MAHJOUB ONLINE</div>
-        <p>Smart Market - نظام الموردين</p>
+        <div class="subtitle">Smart Market - Supplier Portal</div>
         <form method="post">
             <input type="text" name="username" placeholder="معرف المورد" required>
-            <input type="password" name="password" placeholder="••••••••" required>
-            <button type="submit" class="btn-glow">دخول النظام</button>
+            <input type="password" name="password" placeholder="كلمة المرور" required>
+            <button type="submit" class="btn-glow">دخول ذكي</button>
         </form>
     </div>
 </body>
