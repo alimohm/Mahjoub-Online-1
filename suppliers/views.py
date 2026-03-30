@@ -1,5 +1,4 @@
 from django.shortcuts import render
 
-def home(request):
-    # هنا يتم استدعاء بيانات سلاسل التوريد مستقبلاً
+def home_view(request):
     return render(request, 'home.html')
