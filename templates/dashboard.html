@@ -2,56 +2,30 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة الموردين | محجوب أونلاين</title>
+    <title>لوحة المورد | محجوب أونلاين</title>
     <style>
-        :root { --purple: #7b2cbf; --black: #0a0a0a; }
-        body { font-family: sans-serif; background: var(--black); color: white; margin: 0; }
-        .top-bar { background: #1a1a1a; padding: 15px; border-bottom: 2px solid var(--purple); display: flex; justify-content: space-between; }
-        .container { padding: 20px; max-width: 1200px; margin: auto; }
-        .card { background: #151515; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #333; }
-        .btn { background: var(--purple); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #222; padding: 10px; text-align: right; }
-        td { padding: 10px; border-bottom: 1px solid #222; }
+        body { font-family: sans-serif; background: #0f0f0f; color: white; margin: 0; display: flex; }
+        .sidebar { width: 250px; background: #1a1a1a; height: 100vh; border-left: 2px solid #7b2cbf; padding: 20px; box-sizing: border-box; }
+        .content { flex-grow: 1; padding: 30px; }
+        .card { background: #151515; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; }
+        .menu-item { padding: 15px; border-bottom: 1px solid #333; cursor: pointer; color: #ccc; }
+        .menu-item:hover { color: #9d4edd; }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <span>[ Mahjoub Online ] Smart Market</span>
-        <span>مرحباً، المورد رقم #1</span>
+    <div class="sidebar">
+        <h3 style="color: #9d4edd;">إدارة التوريد</h3>
+        <div class="menu-item">📊 ملخص العمليات</div>
+        <div class="menu-item">📦 المنتجات (قُمرة)</div>
+        <div class="menu-item">💰 المحفظة الرقمية</div>
+        <div class="menu-item">🚪 خروج</div>
     </div>
-
-    <div class="container">
+    <div class="content">
+        <h1>مرحباً بك في جسر الإدارة الذكي</h1>
         <div class="card">
-            <h3>المحفظة اللامركزية</h3>
-            <h2 style="color: var(--purple);">0.00 YER</h2>
-            <p style="font-size: 12px; color: #888;">الرصيد مربوط تلقائياً بطلبات قُمرة</p>
+            <h3 style="color: #888;">حالة الربط مع متجر قُمرة</h3>
+            <div style="color: #4caf50;">● متصل بنجاح (API Active)</div>
         </div>
-
-        <div class="card">
-            <h3>إضافة منتج جديد للمتجر</h3>
-            <button class="btn" onclick="alert('فتح نموذج الإضافة')">+ إضافة منتج جديد</button>
         </div>
-
-        <div class="card">
-            <h3>حالة المنتجات على قُمرة</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>المنتج</th>
-                        <th>المخزون</th>
-                        <th>الحالة على المتجر</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>معوز بيضاني</td>
-                        <td>15</td>
-                        <td style="color: #4caf50;">منشور (Live)</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 </body>
 </html>
