@@ -3,63 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم محجوب ستور - المنصة اللامركزية</title>
+    <title>لوحة التحكم | محجوب أونلاين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root { --royal-purple: #6A0DAD; --gold: #D4AF37; --deep-black: #0a0a0a; }
-        body { background-color: #000; color: #fff; font-family: 'Cairo', sans-serif; margin: 0; display: flex; }
-        
-        /* القائمة الجانبية (Sidebar) */
-        .sidebar { width: 250px; background: var(--deep-black); border-left: 2px solid var(--gold); height: 100vh; padding: 20px; }
-        .sidebar h2 { color: var(--gold); font-size: 1.2rem; border-bottom: 1px solid var(--royal-purple); padding-bottom: 10px; }
-        .nav-link { display: block; color: #ccc; padding: 12px; text-decoration: none; border-radius: 5px; margin: 5px 0; }
-        .nav-link:hover { background: var(--royal-purple); color: #fff; }
-        .active { background: var(--royal-purple); color: gold; font-weight: bold; }
+        :root {
+            --royal-purple: #6A0DAD;
+            --gold: #D4AF37;
+            --dark-bg: #050505;
+            --card-bg: #111111;
+            --sidebar-width: 260px;
+        }
 
-        /* المحتوى الرئيسي */
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .header-card { background: linear-gradient(135deg, #1a1a1a, #000); border: 1px solid var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; }
-        
-        /* نوافذ المنتجات */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .product-card { background: #111; border: 1px solid #333; padding: 15px; border-radius: 10px; transition: 0.3s; }
-        .product-card:hover { border-color: var(--royal-purple); transform: translateY(-5px); }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; background: var(--gold); color: #000; }
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body {
+            margin: 0;
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--dark-bg);
+            color: #fff;
+            display: flex;
+        }
+
+        /* --- شريط الجانب الاحترافي --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #000;
+            border-left: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #222;
+        }
+
+        .logo-text {
+            color: var(--gold);
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #aaa;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item i { margin-left: 15px; font-size: 1.2rem; width: 25px; text-align: center; }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--royal-purple);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(106, 13, 173, 0.3);
+        }
+
+        .nav-item.active i { color: var(--gold); }
+
+        /* --- المحتوى الرئيسي --- */
+        .main-content {
+            margin-right: var(--sidebar-width);
+            width: 100%;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            background: linear-gradient(90deg, #111, #000);
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .user-info h1 { margin: 0; font-size: 1.4rem; color: var(--gold); }
+        .wallet-pill {
+            background: rgba(106, 13, 173, 0.2);
+            border: 1px solid var(--royal-purple);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--gold);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #222;
+            padding: 25px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); }
+
+        .card h3 { margin-top: 0; color: #888; font-size: 1rem; }
+        .card .value { font-size: 1.8rem; font-weight: bold; color: #fff; }
+
+        .status-dot {
+            height: 10px;
+            width: 100%;
+            background: var(--gold);
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        /* --- التوافق مع الجوال (Responsive) --- */
+        @media (max-width: 992px) {
+            .sidebar { width: 80px; }
+            .logo-text, .nav-item span { display: none; }
+            .main-content { margin-right: 80px; padding: 20px; }
+        }
+
+        @media (max-width: 576px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100%; height: auto; bottom: 0; top: auto;
+                flex-direction: row; border-left: none; border-top: 2px solid var(--gold);
+            }
+            .sidebar-header { display: none; }
+            .nav-menu { display: flex; justify-content: space-around; padding: 10px; }
+            .nav-item { margin-bottom: 0; flex-direction: column; font-size: 0.7rem; }
+            .nav-item i { margin-left: 0; margin-bottom: 5px; }
+            .main-content { margin-right: 0; margin-bottom: 80px; padding: 15px; }
+            .top-bar { flex-direction: column; text-align: center; gap: 15px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h2>سوقك الذكي</h2>
-        <a href="#" class="nav-link active">🏠 الرئيسية</a>
-        <a href="#" class="nav-link">📦 منتجاتي</a>
-        <a href="#" class="nav-link">💰 المحفظة الرقمية</a>
-        <a href="#" class="nav-link">⚙️ الإعدادات</a>
-        <hr style="border-color: #333;">
-        <a href="/logout" class="nav-link" style="color: #ff4444;">🚪 تسجيل الخروج</a>
-    </div>
-
-    <div class="main-content">
-        <div class="header-card">
-            <h1 style="color: var(--gold); margin: 0;">مرحباً، {{ session['vendor_name'] }} 👋</h1>
-            <p>المحفظة: <span style="color: var(--royal-purple);">{{ session['wallet'] }}</span></p>
-            <p>الحالة اللامركزية: <span class="status-badge">عضو نشط</span></p>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-text">سوقك الذكي</div>
         </div>
+        <div class="nav-menu">
+            <a href="#" class="nav-item active"><i class="fas fa-home"></i> <span>الرئيسية</span></a>
+            <a href="#" class="nav-item"><i class="fas fa-box"></i> <span>منتجاتي</span></a>
+            <a href="#" class="nav-item"><i class="fas fa-wallet"></i> <span>المحفظة</span></a>
+            <a href="#" class="nav-item"><i class="fas fa-cog"></i> <span>الإعدادات</span></a>
+            <a href="/logout" class="nav-item" style="margin-top: auto; color: #ff4444;"><i class="fas fa-sign-out-alt"></i> <span>خروج</span></a>
+        </div>
+    </nav>
 
-        <h2>📦 حالة المنتجات المرفوعة</h2>
-        <div class="grid-container">
-            {% for p in products %}
-            <div class="product-card">
-                <h3>{{ p.name }}</h3>
-                <p>السعر: {{ p.price }} $</p>
-                <span class="status-badge" style="background: {% if p.status == 'draft' %}#555{% else %}var(--gold){% endif %};">
-                    {{ 'مسودة (قيد المراجعة)' if p.status == 'draft' else 'منشور' }}
+    <main class="main-content">
+        <div class="top-bar">
+            <div class="user-info">
+                <h1>مرحباً، {{ session['vendor_name'] }} 👋</h1>
+                <div style="margin-top: 10px;">
+                    <span class="wallet-pill"><i class="fas fa-id-card"></i> {{ session['wallet'] }}</span>
+                </div>
+            </div>
+            <div class="status-badge">
+                <span style="color: var(--gold); background: rgba(212, 175, 55, 0.1); padding: 8px 20px; border-radius: 10px; border: 1px solid var(--gold);">
+                    <i class="fas fa-check-circle"></i> مورد معتمد
                 </span>
             </div>
-            {% else %}
-            <p style="color: #666;">لا توجد منتجات مرفوعة حالياً. ابدأ برفع أول منتج!</p>
-            {% endfor %}
         </div>
-    </div>
 
-</body>
-</html>
+        <div class="stats-grid">
+            <div class="card">
+                <h3>إجمالي المنتجات</h3>
+                <div class="value">{{ products|length }}</div>
+                <p style="color: #666; font-size: 0.8rem;">بانتظار المراجعة أو النشر</p>
+                <div class="status-dot"></div>
+            </div>
+            
+            <div class="card">
+                <h3>حالة النظام</h3>
+                <div class="value" style="color: #00FF00; font-size: 1.2rem;">متصل لامركزياً</div>
