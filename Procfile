@@ -1,1 +1,1 @@
-web: gunicorn core.wsgi:application
+web: gunicorn --pythonpath . core.wsgi:application
