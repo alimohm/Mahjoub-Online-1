@@ -3,23 +3,32 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-# استخدام مفتاح سري من البيئة أو قيمة افتراضية قوية
+
+# إعداد المفتاح السري (Secret Key) للأمان والجلسات
 app.secret_key = os.environ.get('SECRET_KEY', 'mahjoub_online_private_key_2026')
 
-# --- إعدادات قاعدة البيانات الجديدة ---
-# سحب الرابط من متغيرات Railway (الذي يبدأ بـ postgresql://)
+# --- إعدادات قاعدة البيانات الذكية ---
+# سحب الرابط المرجعي من Railway (DATABASE_URL)
 database_url = os.environ.get('DATABASE_URL')
 
-# معالجة الرابط لضمان عمله مع SQLAlchemy (تحويل postgres:// إلى postgresql:// إذا وجد)
+# تصحيح تنسيق الرابط ليتوافق مع SQLAlchemy 
+# (تحويل postgres:// إلى postgresql:// إذا لزم الأمر)
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
+# تعيين الرابط في إعدادات التطبيق
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# خيارات إضافية لاستقرار الاتصال في البيئات السحابية
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
+
 db = SQLAlchemy(app)
 
-# --- جدول الموردين الشامل ---
+# --- نموذج جدول الموردين (Vendors Table) ---
 class Vendor(db.Model):
     __tablename__ = 'vendors'
     
@@ -34,24 +43,27 @@ class Vendor(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-# --- إنشاء الجداول وحساب تجريبي ---
+# --- تهيئة الجداول وحساب المسؤول الرئيسي ---
 with app.app_context():
-    db.create_all()
-    # إضافة حسابك (علي) تلقائياً في القاعدة الجديدة
-    if not Vendor.query.filter_by(username='ali').first():
-        admin = Vendor(
-            username='ali',
-            password='123', # كلمة المرور التجريبية
-            owner_name='علي محجوب',
-            brand_name='محجوب ستور',
-            phone_number='777777777',
-            email='admin@mahjoub.online'
-        )
-        db.session.add(admin)
-        db.session.commit()
-        print("✅ تم إنشاء الجداول وإضافة حساب المورد الرئيسي!")
+    try:
+        db.create_all()
+        # إضافة حسابك (ali) تلقائياً إذا لم يكن موجوداً
+        if not Vendor.query.filter_by(username='ali').first():
+            admin = Vendor(
+                username='ali',
+                password='123', # كلمة المرور التجريبية
+                owner_name='علي محجوب',
+                brand_name='محجوب ستور',
+                phone_number='777777777',
+                email='admin@mahjoub.online'
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("✅ تم إنشاء الجداول وإضافة حساب المورد بنجاح!")
+    except Exception as e:
+        print(f"⚠️ فشل الاتصال بقاعدة البيانات: {e}")
 
-# --- مسارات التطبيق ---
+# --- المسارات البرمجية (Routes) ---
 
 @app.route('/')
 def home():
@@ -60,15 +72,15 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_in = request.form.get('username').strip()
-        pass_in = request.form.get('password').strip()
+        user_in = request.form.get('username', '').strip()
+        pass_in = request.form.get('password', '').strip()
         
         vendor = Vendor.query.filter_by(username=user_in).first()
         
         if not vendor:
-            flash("عذراً، هذا المورد غير مسجل في المنصة اللامركزية.", "danger")
+            flash("عذراً، هذا المورد غير مسجل في المنصة.", "danger")
         elif vendor.password != pass_in:
-            flash("كلمة المرور غير صحيحة، تأكد وحاول مجدداً.", "warning")
+            flash("كلمة المرور غير صحيحة، حاول مجدداً.", "warning")
         else:
             session['vendor_id'] = vendor.id
             session['vendor_name'] = vendor.owner_name
@@ -81,8 +93,14 @@ def login():
 def dashboard():
     if 'vendor_id' not in session:
         return redirect(url_for('login'))
-    return f"مرحباً بك يا {session['vendor_name']} في لوحة تحكم [ {session['brand_name']} ] - سوقك الذكي"
+    return render_template('dashboard.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
+    # الحصول على المنفذ من Railway أو استخدام 5000 افتراضياً
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
