@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, session
 import os
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
-app.secret_key = "mahjoub_2026"
+app.secret_key = "mahjoub_online_2026"
 
 @app.route('/')
 def home():
@@ -12,9 +12,7 @@ def home():
 def login():
     return render_template('login.html')
 
-@app.route('/dashboard')
-def dashboard():
-    return render_template('dashboard.html')
-
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    # هذا السطر ضروري جداً لـ Railway ليتعرف على المنفذ (Port)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
