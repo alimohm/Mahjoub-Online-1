@@ -3,60 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم | سوقك الذكي</title>
+    <title>لوحة التحكم | محجوب أونلاين</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --royal-purple: #6A0DAD; --gold: #D4AF37; --bg: #000; }
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg); color: #fff; display: flex; }
+        :root { --royal-purple: #6A0DAD; --gold: #D4AF37; --bg: #000; --card-bg: #0a0a0a; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg); color: #fff; display: flex; overflow-x: hidden; }
         
         /* شريط جانبي احترافي متجاوب */
-        .sidebar { width: 260px; height: 100vh; background: #0a0a0a; border-left: 1px solid var(--gold); position: fixed; right: 0; display: flex; flex-direction: column; }
-        .main-content { margin-right: 260px; width: 100%; padding: 30px; min-height: 100vh; }
+        .sidebar { width: 260px; height: 100vh; background: var(--card-bg); border-left: 1px solid var(--gold); position: fixed; right: 0; display: flex; flex-direction: column; z-index: 1000; }
+        .main-content { margin-right: 260px; width: 100%; padding: 30px; min-height: 100vh; transition: 0.3s; }
         
-        .nav-item { padding: 15px 25px; color: #aaa; text-decoration: none; display: flex; align-items: center; }
-        .nav-item.active { background: var(--royal-purple); color: #fff; }
-        .nav-item i { margin-left: 15px; }
+        .nav-item { padding: 15px 25px; color: #aaa; text-decoration: none; display: flex; align-items: center; transition: 0.3s; }
+        .nav-item.active { background: var(--royal-purple); color: #fff; border-radius: 10px 0 0 10px; margin-left: 10px; }
+        .nav-item:hover { color: var(--gold); }
+        .nav-item i { margin-left: 15px; width: 20px; text-align: center; }
 
-        .profile-card { border: 1px solid var(--gold); border-radius: 15px; padding: 25px; background: rgba(212, 175, 55, 0.05); margin-bottom: 30px; }
-        .status-badge { background: var(--gold); color: #000; padding: 4px 12px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; }
+        .profile-card { border: 1px solid var(--gold); border-radius: 20px; padding: 25px; background: rgba(212, 175, 55, 0.05); margin-bottom: 30px; position: relative; }
+        .status-badge { background: var(--gold); color: #000; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: bold; }
+
+        /* أزرار الرفع والتحكم */
+        .btn-add { position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; border-radius: 50%; background: var(--gold); color: #000; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 25px rgba(212,175,55,0.4); z-index: 2000; transition: 0.3s; }
+        .btn-add:hover { transform: scale(1.1) rotate(90deg); }
+
+        /* تصميم النافذة المنبثقة (Modal) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #111; border: 1px solid var(--gold); padding: 30px; border-radius: 25px; width: 90%; max-width: 450px; position: relative; animation: fadeIn 0.4s; }
+        
+        input, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 10px; margin-top: 8px; font-family: 'Cairo'; }
+        input:focus { border-color: var(--gold); outline: none; }
+        .submit-btn { width: 100%; padding: 15px; background: var(--royal-purple); color: #fff; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* التوافق مع الجوال */
         @media (max-width: 768px) {
-            .sidebar { width: 100%; height: 65px; bottom: 0; top: auto; flex-direction: row; border-left: none; border-top: 1px solid var(--gold); }
+            .sidebar { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; border-left: none; border-top: 1px solid var(--gold); }
             .sidebar .nav-item { flex: 1; justify-content: center; padding: 10px; font-size: 0.8rem; flex-direction: column; }
             .sidebar .nav-item i { margin-left: 0; margin-bottom: 5px; }
-            .sidebar span { font-size: 0.6rem; }
-            .main-content { margin-right: 0; margin-bottom: 70px; padding: 15px; }
+            .main-content { margin-right: 0; margin-bottom: 80px; padding: 20px; }
+            .hide-mobile { display: none; }
+            .btn-add { bottom: 90px; left: 20px; width: 55px; height: 55px; }
         }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <div style="padding: 20px; text-align: center; border-bottom: 1px solid #222;" class="hide-mobile">
-            <h2 style="color: var(--gold); font-size: 1.2rem; margin: 0;">سوقك الذكي</h2>
+        <div style="padding: 25px; text-align: center; border-bottom: 1px solid #222;" class="hide-mobile">
+            <h2 style="color: var(--gold); font-size: 1.3rem; margin: 0; letter-spacing: 1px;">سوقك الذكي</h2>
         </div>
-        <a href="#" class="nav-item active"><i class="fas fa-home"></i> <span>الرئيسية</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-box"></i> <span>منتجاتي</span></a>
+        <a href="#" class="nav-item active"><i class="fas fa-th-large"></i> <span>الرئيسية</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-box-open"></i> <span>منتجاتي</span></a>
         <a href="#" class="nav-item"><i class="fas fa-wallet"></i> <span>المحفظة</span></a>
-        <a href="/logout" class="nav-item" style="color: #ff4444; margin-top: auto;"><i class="fas fa-sign-out-alt"></i> <span>تسجيل الخروج</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-cog"></i> <span>الإعدادات</span></a>
+        <a href="/logout" class="nav-item" style="color: #ff4d4d; margin-top: auto; border-top: 1px solid #222;"><i class="fas fa-power-off"></i> <span>تسجيل الخروج</span></a>
     </nav>
 
     <main class="main-content">
         <div class="profile-card">
-            <h1 style="margin: 0; font-size: 1.5rem;">مرحباً، {{ session['vendor_name'] }} 👋</h1>
-            <p style="color: #888; margin: 10px 0;">المحفظة الرقمية: <span style="color: var(--gold);">{{ session['wallet'] }}</span></p>
-            <span class="status-badge">عضو نشط في النظام اللامركزي</span>
+            <h1 style="margin: 0; font-size: 1.6rem;">مرحباً، {{ session['vendor_name'] or 'علي محجوب' }} 👋</h1>
+            <p style="color: #888; margin: 12px 0;">المحفظة: <span style="color: var(--gold); font-family: monospace;">{{ session['wallet'] or 'MQ-5035D99C' }}</span></p>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span class="status-badge">عضو نشط</span>
+                <span style="font-size: 0.8rem; color: #555;">الربط مع قمرة: <span style="color: #2ecc71;">متصل ✅</span></span>
+            </div>
         </div>
 
-        <h3 style="border-right: 4px solid var(--gold); padding-right: 15px; margin-top: 40px;">📦 حالة المنتجات المرفوعة</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+            <h3 style="border-right: 4px solid var(--gold); padding-right: 15px; margin: 0;">📦 حالة المنتجات المرفوعة</h3>
+        </div>
         
-        <div style="text-align: center; padding: 50px; border: 1px dashed #333; border-radius: 20px; color: #666;">
-            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; margin-bottom: 15px;"></i>
-            <p>لا توجد منتجات مرفوعة حالياً. ابدأ برفع أول منتج إلى متجر قمرة عبر زر الإضافة.</p>
+        <div style="text-align: center; padding: 60px 20px; border: 1px dashed #333; border-radius: 25px; color: #555; margin-top: 20px;">
+            <i class="fas fa-cloud-arrow-up" style="font-size: 3.5rem; margin-bottom: 20px; color: #222;"></i>
+            <p style="font-size: 1.1rem;">لا توجد منتجات مرفوعة حالياً.</p>
+            <p style="font-size: 0.9rem;">اضغط على الزر الذهبي بالأسفل لإضافة أول منتج إلى "سوقك الذكي".</p>
         </div>
     </main>
+
+    <button class="btn-add" onclick="openModal()">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content" dir="rtl">
+            <span onclick="closeModal()" style="position: absolute; top: 20px; left: 20px; cursor: pointer; color: #888;"><i class="fas fa-times"></i></span>
+            <h2 style="color: var(--gold); text-align: center; margin-bottom: 30px;">رفع منتج جديد</h2>
+            
+            <form action="/upload_product" method="POST">
+                <div style="margin-bottom: 18px;">
+                    <label style="color: var(--royal-purple); font-weight: bold; font-size: 0.9rem;">اسم المنتج</label>
+                    <input type="text" name="name" placeholder="مثال: لوح طاقة شمسية 500 واط" required>
+                </div>
+                <div style="margin-bottom: 18px;">
+                    <label style="color: var(--royal-purple); font-weight: bold; font-size: 0.9rem;">السعر بالدولار ($)</label>
+                    <input type="number" step="0.01" name="price" placeholder="0.00" required>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label style="color: var(--royal-purple); font-weight: bold; font-size: 0.9rem;">الوصف المختصر</label>
+                    <textarea name="description" rows="3" placeholder="اكتب تفاصيل المنتج هنا..."></textarea>
+                </div>
+                <p style="font-size: 0.7rem; color: #666; margin-bottom: 20px;">* سيتم مزامنة هذا المنتج تلقائياً مع متجر قمرة</p>
+                <button type="submit" class="submit-btn">تأكيد الرفع والمزامنة</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('productModal');
+        function openModal() { modal.style.display = 'flex'; }
+        function closeModal() { modal.style.display = 'none'; }
+        
+        // إغلاق النافذة عند الضغط خارجها
+        window.onclick = function(event) {
+            if (event.target == modal) { closeModal(); }
+        }
+    </script>
 
 </body>
 </html>
