@@ -4,28 +4,26 @@
     <meta charset="UTF-8">
     <title>لوحة التحكم | رفع المنتجات</title>
     <style>
-        body { background: #0a0a0a; color: white; font-family: sans-serif; padding: 30px; }
-        .container { max-width: 600px; margin: auto; background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #7b2cbf; }
-        .header { color: #9d4edd; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px; }
-        label { display: block; margin: 15px 0 5px; color: #aaa; }
-        input { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 10px; box-sizing: border-box; }
-        .note { font-size: 12px; color: #7b2cbf; margin-top: 10px; }
-        .btn-send { background: #7b2cbf; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 30px; cursor: pointer; }
+        body { background: #0a0a0a; color: white; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 500px; margin: 40px auto; background: #151515; padding: 30px; border-radius: 15px; border: 1px solid #7b2cbf; }
+        h2 { color: #9d4edd; text-align: center; }
+        label { display: block; margin: 15px 0 5px; color: #888; }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; }
+        .note { font-size: 11px; color: #7b2cbf; margin-top: 5px; }
+        .btn { background: #7b2cbf; color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-weight: bold; margin-top: 25px; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">اهلا بك في بوابة التوريد الذكية</div>
+        <h2>رفع منتج جديد</h2>
         <form method="post">
             {% csrf_token %}
-            <label>اسم المنتج (مثل: معوز صبري درجة أولى)</label>
-            <input type="text" name="product_name" required>
-            
-            <label>سعر التوريد الخاص بك (بالعملة المحلية)</label>
+            <label>اسم المنتج</label>
+            <input type="text" name="name" required>
+            <label>سعر التوريد الخاص بك</label>
             <input type="number" name="price" required>
-            <div class="note">سيتم إضافة 40% عمولة المنصة آلياً قبل النشر.</div>
-            
-            <button type="submit" class="btn-send">إرسال المنتج للمراجعة</button>
+            <p class="note">* سيتم إضافة 40% عمولة المنصة آلياً.</p>
+            <button type="submit" class="btn">إرسال كمسودة لقُمرة</button>
         </form>
     </div>
 </body>
