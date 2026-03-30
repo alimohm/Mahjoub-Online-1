@@ -58,3 +58,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default='postgresql://postgres:aNAkUjEswZOHdTaWPQdjUlmPCwIaKtWG@hopper.proxy.rlwy.net:26
+
+
+        # هذا السطر يجعل الملفات "ديناميكية" وغير ثابتة في الذاكرة القديمة
+STATICFILES_STORAGE = 'whitenoise.storage.ManifestStaticFilesStorage'
