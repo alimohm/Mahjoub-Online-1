@@ -1,31 +1,13 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>لوحة المورد | محجوب أونلاين</title>
-    <style>
-        body { font-family: sans-serif; background: #0f0f0f; color: white; margin: 0; display: flex; }
-        .sidebar { width: 250px; background: #1a1a1a; height: 100vh; border-left: 2px solid #7b2cbf; padding: 20px; box-sizing: border-box; }
-        .content { flex-grow: 1; padding: 30px; }
-        .card { background: #151515; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; }
-        .menu-item { padding: 15px; border-bottom: 1px solid #333; cursor: pointer; color: #ccc; }
-        .menu-item:hover { color: #9d4edd; }
-    </style>
-</head>
-<body>
-    <div class="sidebar">
-        <h3 style="color: #9d4edd;">إدارة التوريد</h3>
-        <div class="menu-item">📊 ملخص العمليات</div>
-        <div class="menu-item">📦 المنتجات (قُمرة)</div>
-        <div class="menu-item">💰 المحفظة الرقمية</div>
-        <div class="menu-item">🚪 خروج</div>
+<div style="display: flex; height: 100vh; background: #0f0f0f; color: white;">
+    <div style="width: 250px; background: #151515; border-left: 2px solid #7b2cbf; padding: 20px;">
+        <h3 style="color: #9d4edd;">لوحة التحكم</h3>
+        <p>📦 إدارة المنتجات</p>
+        <p>💰 المحفظة الرقمية</p>
     </div>
-    <div class="content">
-        <h1>مرحباً بك في جسر الإدارة الذكي</h1>
-        <div class="card">
-            <h3 style="color: #888;">حالة الربط مع متجر قُمرة</h3>
-            <div style="color: #4caf50;">● متصل بنجاح (API Active)</div>
+    <div style="flex: 1; padding: 40px;">
+        <h1>مرحباً بك في جسر الإدارة</h1>
+        <div style="background: #1a1a1a; padding: 20px; border-radius: 10px;">
+            <p>حالة الربط مع قمرة: <span style="color: #4caf50;">متصل ●</span></p>
         </div>
-        </div>
-</body>
-</html>
+    </div>
+</div>
