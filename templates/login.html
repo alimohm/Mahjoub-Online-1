@@ -4,145 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>دخول الموردين | محجوب أونلاين</title>
-    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
     <style>
-        /* إضافة لمسات تصميم عالمية بسيطة وفخمة */
-        :root {
-            --primary-color: #8a2be2; /* البنفسجي المميز */
-            --bg-dark: #0a0a0c;
-            --card-bg: #141417;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 2px 2px, #1a1a1a 1px, transparent 0);
-            background-size: 32px 32px;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .login-card {
-            background: var(--card-bg);
-            padding: 45px;
-            border-radius: 28px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 15px rgba(138, 43, 226, 0.1);
-            width: 100%;
-            max-width: 380px;
-            border: 1px solid #222;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .login-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-color);
-        }
-
-        .logo-section h1 {
-            font-size: 24px;
-            font-weight: 800;
-            margin: 0;
-            background: linear-gradient(to right, #ffffff, var(--primary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 1.5px;
-        }
-
-        .logo-section p {
-            color: #666;
-            font-size: 13px;
-            margin-top: 8px;
-            margin-bottom: 35px;
-        }
-
-        .input-box {
-            text-align: right;
-            margin-bottom: 22px;
-        }
-
-        .input-box label {
-            display: block;
-            margin-bottom: 10px;
-            color: #aaa;
-            font-size: 14px;
-        }
-
-        .input-box input {
-            width: 100%;
-            padding: 15px;
-            background: #000;
-            border: 1px solid #333;
-            color: white;
-            border-radius: 14px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-
-        .input-box input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 12px rgba(138, 43, 226, 0.4);
-        }
-
-        .login-button {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 15px;
-        }
-
-        .login-button:hover {
-            background: #bc13fe;
-            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.4);
-        }
-
-        footer {
-            margin-top: 30px;
-            font-size: 11px;
-            color: #444;
-            letter-spacing: 0.5px;
-        }
+        body { background: #0a0a0c; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #141417; padding: 40px; border-radius: 25px; border: 1px solid #8a2be2; width: 320px; text-align: center; box-shadow: 0 0 20px rgba(138, 43, 226, 0.2); }
+        .logo { font-size: 22px; font-weight: bold; color: #bc13fe; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 10px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 14px; background: #8a2be2; border: none; color: white; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .btn:hover { background: #bc13fe; }
     </style>
 </head>
 <body>
-
-    <div class="login-card">
-        <div class="logo-section">
-            <h1>MAHJOUB ONLINE</h1>
-            <p>Smart Market - بوابة الموردين الذكية</p>
-        </div>
-
-        <form method="POST" action="/login">
-            <div class="input-box">
-                <label>اسم المستخدم</label>
-                <input type="text" name="username" placeholder="أدخل المعرف الخاص بك" required>
-            </div>
-
-            <div class="input-box">
-                <label>كلمة المرور</label>
-                <input type="password" name="password" placeholder="••••••••" required>
-            </div>
-
-            <button type="submit" class="login-button">دخول المنصة</button>
+    <div class="card">
+        <div class="logo">MAHJOUB ONLINE</div>
+        <form method="POST">
+            <input type="text" name="username" placeholder="معرف المورد" required>
+            <input type="password" name="password" placeholder="كلمة المرور" required>
+            <button type="submit" class="btn">دخول المنصة</button>
         </form>
-
-        <footer>© 2026 [ Mahjoub Online ] - Decentralized Digital Supply Chain</footer>
     </div>
-
 </body>
 </html>
