@@ -1,1 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | محجوب أونلاين</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        /* تعريف الألوان الملكية والمريحة */
+        :root {
+            --royal-purple: #7b2cbf; /* البنفسجي الملكي الملكي الغامق */
+            --bg-comfort: #fdfdfd; /* أبيض نقي مريح جداً */
+            --beige-light: #fdfcf9; /* بيج فاتح وهادئ */
+            --text-dark: #222; /* نصوص داكنة بوضوح */
+            --accent-glow: rgba(123, 44, 191, 0.15); /* هالة خفيفة */
+        }
 
+        body {
+            background-color: var(--beige-light); /* خلفية بيج هادئة */
+            color: var(--text-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        /* تنسيق القائمة الجانبية الفخمة */
+        .sidebar {
+            width: 260px;
+            background-color: #ffffff;
+            height: 100vh;
+            border-left: 1px solid rgba(123, 44, 191, 0.1);
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+        }
+
+        .sidebar .brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--royal-purple);
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background-color: var(--accent-glow);
+            color: var(--royal-purple);
+        }
+
+        /* المحتوى الرئيسي للمنصة */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            background-color: var(--bg-comfort);
+        }
+
+        /* الهيدر الاحترافي */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(123, 44, 191, 0.1);
+            padding-bottom: 25px;
+            margin-bottom: 40px;
+        }
+
+        .header .titles h1 {
+            font-size: 24px;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .header .titles p {
+            font-size: 13px;
+            color: #777;
+            margin: 5px 0 0;
+        }
+
+        .header .user-info {
+            font-size: 15px;
+            color: var(--royal-purple);
+            font-weight: bold;
+        }
+
+        /* تنسيق البطاقات (Cards) */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            border: 1px solid rgba(123, 44, 191, 0.08);
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--royal-purple);
+            box-shadow: 0 10px 25px rgba(123, 44, 191, 0.05);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: var(--royal-purple);
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* تنسيق نموذج رفع المنتج */
+        .input-group {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-sizing: border-box;
+            background-color: #fafafa;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--royal-purple);
+            outline: none;
+            box-shadow: 0 0 8px rgba(123, 44, 191, 0.1);
+            background-color: #fff;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--royal-purple);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #bc13fe;
+            box-shadow: 0 5px 15px rgba(188, 19, 254, 0.2);
+        }
+
+        /* رسالة التأكيد */
+        .flash-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand">محجوب أونلاين</div>
+        <a href="/dashboard" class="active">لوحة التحكم</a>
+        <a href="#">المنتجات</a>
+        <a href="#">الطلبات</a>
+        <a href="#">التقارير</a>
+        <a href="/logout">تسجيل الخروج</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="titles">
+                <h1>محجوب أونلاين | سوقك الذكي</h1>
+                <p>المنصة الأولى لحوكمة سلاسل التوريد الرقمية بأسلوب اللامركزية الذكي.</p>
+            </div>
+            <div class="user-info">أهلاً، المورد {{ session['user'] }} </div>
+        </div>
+
+        {% if message %}
+        <div class="flash-message">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <div class="card-container">
+            <div class="card">
+                <h2>إضافة منتج ذكي جديد</h2>
+                <p style="color: #666; font-size: 13px; margin-bottom: 25px;">سيتم إضافة نسبة حوكمة 40% تلقائياً للسعر النهائي في قمرة.</p>
+                
+                <form method="POST" action="/dashboard">
+                    <div class="input-group">
+                        <label>اسم المنتج (مثل: معوز تهامي فخيم)</label>
+                        <input type="text" name="p_name" placeholder="أدخل اسم المنتج" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>السعر الأساسي (ريال يمني)</label>
+                        <input type="number" name="p_price" placeholder="أدخل السعر الأساسي" step="0.01" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit">حوكمة ورفع لمتجر قمرة</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>ملخص المخزون الذكي</h2>
+                <div style="font-size: 32px; font-weight: bold; color: var(--royal-purple); text-align: center; margin: 30px 0;">
+                    34
+                    <span style="font-size: 14px; color: #777;">منتجاً نشطاً</span>
+                </div>
+                <p style="color: #666; font-size: 13px;">جاري مراقبة الجودة والحوكمة آلياً.</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
