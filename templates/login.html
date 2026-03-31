@@ -2,21 +2,43 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>دخول - محجوب أونلاين</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محجوب أونلاين | تسجيل الدخول</title>
     <style>
-        body { background: #0d001a; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
-        .card { background: #1a0033; padding: 40px; border-radius: 20px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #4b0082; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        body { 
+            background: #0d001a; height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: radial-gradient(circle at center, #1a0033 0%, #0d001a 100%);
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.02); padding: 50px; border-radius: 30px; width: 380px;
+            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        }
+        .logo-main { width: 130px; filter: brightness(0) invert(1); margin-bottom: 25px; }
+        h1 { color: #ffd700; font-size: 1.5rem; margin-bottom: 10px; font-weight: 400; }
+        p { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-bottom: 30px; }
+        input { 
+            width: 100%; padding: 16px; margin-bottom: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3); color: white; box-sizing: border-box; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: #4b0082; background: rgba(75, 0, 130, 0.1); }
+        button { 
+            width: 100%; padding: 16px; border-radius: 12px; border: none; background: #4b0082; 
+            color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.4s;
+        }
+        button:hover { background: #6a0dad; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(75, 0, 130, 0.4); }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2 style="color: #ffd700;">سوقك الذكي</h2>
+    <div class="login-card">
+        <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-main">
+        <h1>محجوب أونلاين</h1>
+        <p>سوقك الذكي | المنصة الأولى للموردين</p>
         <form method="POST">
             <input type="text" name="username" placeholder="اسم المستخدم" required>
             <input type="password" name="password" placeholder="كلمة المرور" required>
-            <button type="submit">دخول</button>
+            <button type="submit">دخول للمنصة</button>
         </form>
     </div>
 </body>
