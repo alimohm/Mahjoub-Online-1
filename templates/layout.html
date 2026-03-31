@@ -3,29 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محجوب أونلاين - الإدارة الملكية</title>
+    <title>{{ vendor.brand_name }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --royal-dark: #0a001a; --p-color: #632C8F; }
-        body { margin: 0; display: flex; font-family: 'Cairo', sans-serif; background: #f8f9fa; }
-        
-        /* Sidebar المتجاوب */
-        .sidebar { width: 260px; background: var(--royal-dark); height: 100vh; position: fixed; color: white; transition: 0.3s; }
-        .logo-box { padding: 30px; text-align: center; }
-        .logo-box img { width: 100px; filter: brightness(0) invert(1); } /* اللوجو باللون الأبيض */
-        
-        .main-content { margin-right: 260px; width: 100%; transition: 0.3s; }
-        
-        /* تنبيهات الحالة */
-        .alert { padding: 15px; margin: 10px; border-radius: 8px; font-weight: bold; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
+        :root { --royal-bg: #0f001f; --p-color: #632C8F; }
+        body { margin: 0; display: flex; font-family: 'Cairo', sans-serif; background: #f4f4f9; }
+        .sidebar { width: 260px; background: var(--royal-bg); height: 100vh; position: fixed; color: white; transition: 0.3s; z-index: 100; }
+        .logo-box { padding: 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-box img { width: 90px; filter: brightness(0) invert(1); } /* لوجو أبيض */
+        .main { margin-right: 260px; width: 100%; }
+        .alert { padding: 15px; margin: 15px; border-radius: 10px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
         @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .sidebar span, .logo-box h3 { display: none; }
-            .main-content { margin-right: 70px; }
-            .logo-box img { width: 40px; }
+            .sidebar { width: 70px; } .sidebar span, .brand-name { display: none; }
+            .main { margin-right: 70px; }
         }
     </style>
 </head>
@@ -33,27 +25,22 @@
     <div class="sidebar">
         <div class="logo-box">
             <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" alt="Logo">
-            <h3 style="font-size: 14px;">{{ vendor.brand_name }}</h3>
+            <div class="brand-name" style="margin-top:10px; font-weight:bold;">{{ vendor.brand_name }}</div>
         </div>
-        <nav style="padding: 10px;">
+        <nav style="padding: 20px;">
             <a href="#" style="color:white; text-decoration:none; display:block; padding:15px;"><i class="fas fa-home"></i> <span>الرئيسية</span></a>
-            <a href="#" style="color:white; text-decoration:none; display:block; padding:15px;"><i class="fas fa-box"></i> <span>المنتجات</span></a>
+            <a href="#" style="color:white; text-decoration:none; display:block; padding:15px;"><i class="fas fa-wallet"></i> <span>المحفظة</span></a>
         </nav>
     </div>
-
-    <div class="main-content">
-        <div style="background:white; padding:20px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between;">
-            <strong><i class="fas fa-user-circle"></i> {{ vendor.owner_name }}</strong>
-            <span style="color: var(--p-color); font-weight:bold;">محجوب أونلاين - 2026</span>
+    <div class="main">
+        <div style="background:white; padding:15px 30px; box-shadow:0 2px 5px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center;">
+            <span><i class="fas fa-user"></i> {{ vendor.owner_name }}</span>
+            <span style="color:var(--p-color); font-weight:bold;">نظام محجوب الذكي</span>
         </div>
-
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}{% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-          {% endfor %}{% endif %}
+            {% if messages %}{% for cat, msg in messages %}<div class="alert {{ cat }}">{{ msg }}</div>{% endfor %}{% endif %}
         {% endwith %}
-
-        {% block content %}{% endblock %}
+        <div style="padding: 30px;">{% block content %}{% endblock %}</div>
     </div>
 </body>
 </html>
