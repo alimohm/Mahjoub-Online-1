@@ -1,0 +1,46 @@
+<div class="product-upload-container" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: 20px auto;">
+    
+    <h3 style="color: #4a0072; border-bottom: 2px solid #ffd700; padding-bottom: 10px; margin-bottom: 20px;">
+        <i class="fas fa-box-open"></i> إضافة منتج جديد لسوقك الذكي
+    </h3>
+
+    <form action="/add_product" method="POST" enctype="multipart/form-data">
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; color: #4a0072; font-weight: bold;">اسم المنتج:</label>
+            <input type="text" name="name" required placeholder="مثال: سماعة بلوتوث احترافية" 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; color: #4a0072; font-weight: bold;">وصف المنتج:</label>
+            <textarea name="description" rows="3" placeholder="اكتب تفاصيل المنتج هنا..." 
+                      style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 2;">
+                <label style="display: block; margin-bottom: 5px; color: #4a0072; font-weight: bold;">السعر:</label>
+                <input type="number" name="price" step="0.01" required placeholder="0.00" 
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; margin-bottom: 5px; color: #4a0072; font-weight: bold;">العملة:</label>
+                <select name="currency" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+                    <option value="SAR">ريال سعودي (SAR)</option>
+                    <option value="USD">دولار أمريكي (USD)</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 5px; color: #4a0072; font-weight: bold;">صورة المنتج (أي صيغة):</label>
+            <input type="file" name="image" accept="image/*" required 
+                   style="width: 100%; padding: 8px; border: 1px dashed #4a0072; border-radius: 8px; background: #f3e5f5;">
+            <small style="color: #666;">سيتم تحويل الصورة تلقائياً لـ WebP لسرعة المتجر.</small>
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #4a0072, #6a1b9a); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;">
+            <i class="fas fa-cloud-upload-alt"></i> إرسال المنتج للمراجعة
+        </button>
+    </form>
+</div>
