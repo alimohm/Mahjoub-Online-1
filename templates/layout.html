@@ -1,46 +1,38 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ vendor.brand_name }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --royal-bg: #0f001f; --p-color: #632C8F; }
-        body { margin: 0; display: flex; font-family: 'Cairo', sans-serif; background: #f4f4f9; }
-        .sidebar { width: 260px; background: var(--royal-bg); height: 100vh; position: fixed; color: white; transition: 0.3s; z-index: 100; }
-        .logo-box { padding: 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .logo-box img { width: 90px; filter: brightness(0) invert(1); } /* لوجو أبيض */
-        .main { margin-right: 260px; width: 100%; }
-        .alert { padding: 15px; margin: 15px; border-radius: 10px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
+        :root { --main-bg: #0a001a; --p-purple: #632C8F; }
+        body { margin: 0; display: flex; background: #f4f7f6; font-family: sans-serif; }
+        .sidebar { width: 250px; background: var(--main-bg); height: 100vh; position: fixed; color: white; transition: 0.3s; z-index: 1000; }
+        .sidebar img { width: 80px; filter: brightness(0) invert(1); padding: 25px; display: block; margin: 0 auto; }
+        .main { margin-right: 250px; width: 100%; transition: 0.3s; }
         @media (max-width: 768px) {
-            .sidebar { width: 70px; } .sidebar span, .brand-name { display: none; }
+            .sidebar { width: 70px; } .sidebar span { display: none; }
             .main { margin-right: 70px; }
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <div class="logo-box">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" alt="Logo">
-            <div class="brand-name" style="margin-top:10px; font-weight:bold;">{{ vendor.brand_name }}</div>
-        </div>
-        <nav style="padding: 20px;">
-            <a href="#" style="color:white; text-decoration:none; display:block; padding:15px;"><i class="fas fa-home"></i> <span>الرئيسية</span></a>
-            <a href="#" style="color:white; text-decoration:none; display:block; padding:15px;"><i class="fas fa-wallet"></i> <span>المحفظة</span></a>
+        <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp">
+        <nav style="padding: 15px;">
+            <p><i class="fas fa-home"></i> <span>الرئيسية</span></p>
+            <p><i class="fas fa-wallet"></i> <span>المحفظة</span></p>
+            <p><i class="fas fa-box"></i> <span>المنتجات</span></p>
         </nav>
     </div>
     <div class="main">
-        <div style="background:white; padding:15px 30px; box-shadow:0 2px 5px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center;">
-            <span><i class="fas fa-user"></i> {{ vendor.owner_name }}</span>
-            <span style="color:var(--p-color); font-weight:bold;">نظام محجوب الذكي</span>
-        </div>
+        <header style="background:white; padding:15px 30px; display:flex; justify-content:space-between; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+            <b>{{ vendor.brand_name }}</b>
+            <span>مرحباً، {{ vendor.owner_name }}</span>
+        </header>
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}{% for cat, msg in messages %}<div class="alert {{ cat }}">{{ msg }}</div>{% endfor %}{% endif %}
+            {% if messages %}{% for cat, msg in messages %}<div style="padding:15px; margin:10px; border-radius:8px; background:{% if cat=='success' %}#d4edda{% else %}#f8d7da{% endif %};">{{ msg }}</div>{% endfor %}{% endif %}
         {% endwith %}
-        <div style="padding: 30px;">{% block content %}{% endblock %}</div>
+        <div style="padding: 20px;">{% block content %}{% endblock %}</div>
     </div>
 </body>
 </html>
