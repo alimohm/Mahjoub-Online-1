@@ -1,37 +1,18 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="dashboard-wrapper" style="padding: 30px; background: #f8f9fa;">
-    <div class="header-section" style="margin-bottom: 30px;">
-        <h2 style="color: #632C8F;">لوحة الإدارة الملكية - محجوب أونلاين</h2>
+<div class="dashboard-header" style="margin-bottom: 30px;">
+    <h1>لوحة التحكم الإدارية</h1>
+    <p>مرحباً علي محجوب، حالة النظام: <span style="color: green;">نشط</span></p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="section-card">
+        {% include 'wallet_card.html' %}
     </div>
 
-    <div class="row" style="display: flex; gap: 20px;">
-        <div style="flex: 1;">
-            {% include 'wallet_card.html' %}
-        </div>
-
-        <div style="flex: 2;">
-            {% include 'product_upload.html' %}
-        </div>
-    </div>
-
-    <div class="products-list" style="margin-top: 40px; background: white; padding: 20px; border-radius: 12px;">
-        <h4>المنتجات النشطة في المنصة</h4>
-        <table style="width: 100%; margin-top: 15px; border-collapse: collapse;">
-            <tr style="background: #eee;">
-                <th style="padding: 10px;">المنتج</th>
-                <th style="padding: 10px;">السعر النهائي</th>
-                <th style="padding: 10px;">الحالة</th>
-            </tr>
-            {% for p in vendor.products %}
-            <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ p.name }}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #eee;">${{ p.final_price }}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #eee; color: green;">متصل بالويب هوك</td>
-            </tr>
-            {% endfor %}
-        </table>
+    <div class="section-card">
+        {% include 'product_upload.html' %}
     </div>
 </div>
 {% endblock %}
