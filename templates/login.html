@@ -9,115 +9,207 @@
         :root {
             --royal-purple: #4b0082; /* البنفسجي الملكي */
             --pure-white: #ffffff;
-            --gold: #ffd700;
+            --text-dark: #2d0056;
+            --gold-accent: #ffd700;
         }
 
         body {
-            margin: 0; padding: 0; display: flex; height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
             font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--pure-white); /* خلفية بيضاء للفورم */
+            overflow: hidden;
+        }
+
+        /* القسم البنفسجي الملكي العميق (التبادل اللوني) */
+        .brand-section {
+            flex: 1.2;
+            background: linear-gradient(135deg, #3b0066 0%, var(--royal-purple) 50%, #0d001a 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        /* التعديل الجوهري: تحويل اللوجو للأبيض الناصع */
+        .logo-login {
+            width: 150px;
+            /* هذا الكود يحول أي لوجو ملون لأبيض نقي */
+            filter: brightness(0) invert(1) !important;
+            margin-bottom: 30px;
+        }
+
+        .brand-section h1 {
+            font-size: 2.8rem;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        .brand-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 450px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        /* بطاقات الميزات بنفسجي داكن */
+        .features-list {
+            text-align: right;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.1); /* تباين خفيف على البنفسجي */
+            padding: 18px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-item i {
+            font-size: 1.6rem;
+            margin-left: 18px;
+            color: var(--gold-accent); /* لمسة ذهبية للميزات */
+        }
+        .feature-item span { font-size: 1.1rem; }
+
+        /* القسم الأبيض للفورم: نظيف واحترافي */
+        .login-section {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             background-color: var(--pure-white);
         }
 
-        /* تنسيق الشاشات الكبيرة (كمبيوتر وتابلت عريض) */
-        .main-wrapper { display: flex; width: 100%; height: 100%; }
-
-        .brand-side {
-            flex: 1.2;
-            background: linear-gradient(135deg, #1a0033 0%, var(--royal-purple) 100%);
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; color: white; padding: 40px; text-align: center;
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
         }
 
-        .logo-login {
-            width: 140px; filter: brightness(0) invert(1) !important; /* لوجو أبيض ناصع */
-            margin-bottom: 20px;
+        .login-card h2 {
+            color: var(--text-dark);
+            font-size: 2.2rem;
+            margin-bottom: 12px;
         }
 
-        .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px; border-radius: 12px; margin-bottom: 15px;
-            width: 100%; max-width: 400px; display: flex; align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .feature-card i { color: var(--gold); margin-left: 15px; font-size: 1.2rem; }
-
-        .login-side {
-            flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px;
+        .login-card p {
+            color: #666;
+            margin-bottom: 35px;
+            font-size: 1rem;
         }
 
-        .login-box { width: 100%; max-width: 380px; }
-        .login-box h2 { color: #2d0056; font-size: 2rem; margin-bottom: 10px; }
+        /* تنسيق خانات الإدخال مع الأيقونات على اليمين */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
 
-        .input-container { position: relative; margin-bottom: 20px; }
-        .input-container i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--royal-purple); }
-        
+        .form-group i {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--royal-purple);
+            font-size: 1.1rem;
+        }
+
         input {
-            width: 100%; padding: 15px 45px 15px 15px; border: 2px solid #f0f0f0;
-            border-radius: 10px; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.3s;
+            width: 100%;
+            padding: 16px 50px 16px 16px; /* مسافة للأيقونة على اليمين */
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+            background-color: #fcfcfc;
         }
-        input:focus { border-color: var(--royal-purple); background: #f9f5ff; }
 
+        input:focus {
+            border-color: var(--royal-purple);
+            background-color: #f0e6f7; /* خلفية بنفسجية فاتحة عند التركيز */
+        }
+
+        /* زر الدخول البنفسجي */
         button {
-            width: 100%; padding: 15px; background: var(--royal-purple); color: white;
-            border: none; border-radius: 10px; font-size: 1.1rem; font-weight: bold;
-            cursor: pointer; transition: 0.3s; box-shadow: 0 8px 15px rgba(75,0,130,0.2);
+            width: 100%;
+            padding: 16px;
+            background-color: var(--royal-purple);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(75, 0, 130, 0.2);
         }
 
-        /* --- التنسيق الذكي للهواتف (Responsive) --- */
-        @media (max-width: 850px) {
-            body { height: auto; overflow-y: auto; }
-            .main-wrapper { flex-direction: column; } /* تحويل الهيكل من أفقي لعمودي */
-            
-            .brand-side {
-                padding: 40px 20px; min-height: 30vh;
-                border-radius: 0 0 40px 40px; /* انحناء أنيق للأسفل */
-            }
-            .brand-side p, .feature-card { display: none; } /* إخفاء التفاصيل لتقليل التمرير */
-            .brand-side h1 { font-size: 1.8rem; margin-top: 10px; }
-            
-            .login-side { padding: 40px 20px; }
-            .login-box { text-align: center; }
+        button:hover {
+            background-color: #3b0066;
+            transform: translateY(-2px);
+        }
+
+        /* التجاوب مع الجوال */
+        @media (max-width: 900px) {
+            .brand-section { display: none; }
+            .login-section { flex: 1; width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <div class="main-wrapper">
-        <div class="brand-side">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-login">
-            <h1>محجوب أونلاين</h1>
-            <p>حوكمة رقمية متطورة وسوق ذكي للموردين</p>
-            
-            <div class="feature-card">
-                <i class="fas fa-microchip"></i>
+    <div class="brand-section">
+        <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-login">
+        <h1>محجوب أونلاين</h1>
+        <p>المنصة الأولى لدعم الموردين والنمو الرقمي</p>
+        
+        <div class="features-list">
+            <div class="feature-item">
+                <i class="fas fa-network-wired"></i>
                 <span>اللامركزية متطورة وحوكمة رقمية</span>
             </div>
-            <div class="feature-card">
-                <i class="fas fa-shipping-fast"></i>
+            <div class="feature-item">
+                <i class="fas fa-truck-loading"></i>
                 <span>إدارة ذكية لسلاسل الإمداد</span>
             </div>
+            <div class="feature-item">
+                <i class="fas fa-chart-line"></i>
+                <span>سوقك الذكي للنمو المتسارع</span>
+            </div>
         </div>
+    </div>
 
-        <div class="login-side">
-            <div class="login-box">
-                <h2>تسجيل الدخول</h2>
-                <p style="color: #777; margin-bottom: 30px;">مرحباً بك في نظامك الإداري</p>
-                
-                <form method="POST">
-                    <div class="input-container">
-                        <i class="fas fa-user"></i>
-                        <input type="text" name="username" placeholder="اسم المستخدم" required>
-                    </div>
-                    <div class="input-container">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="password" placeholder="كلمة المرور" required>
-                    </div>
-                    <button type="submit">دخول للمنصة</button>
-                </form>
-                
-                <p style="margin-top: 30px; font-size: 0.8rem; color: #ccc;">
-                    © 2026 محجوب أونلاين - حوكمة رقمية رائدة
-                </p>
+    <div class="login-section">
+        <div class="login-card">
+            <h2>تسجيل الدخول</h2>
+            <p>مرحباً بك مجدداً في نظامك الإداري الملكي</p>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="اسم المستخدم" required>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="كلمة المرور" required>
+                </div>
+                <button type="submit">دخول للمنصة</button>
+            </form>
+            
+            <div style="margin-top: 35px; text-align: center; color: #aaa; font-size: 0.8rem;">
+                &copy; 2026 محجوب أونلاين - حوكمة رقمية رائدة
             </div>
         </div>
     </div>
