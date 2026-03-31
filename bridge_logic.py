@@ -26,3 +26,31 @@ def calculate_final_price(original_price, currency):
 # ثابت إعدادات الوصول لمتجر قمرة (سنستخدمها في الخطوة القادمة)
 GRAPHQL_URL = "https://mahjoub.online/admin/graphql"
 ACCESS_TOKEN = "qmr_6efc3577-9287-4588-8c87-667e449d5397"
+
+from PIL import Image
+import io
+
+def process_product_image(uploaded_file):
+    """
+    تستقبل هذه الدالة أي صورة مرفوعة، وتحولها إلى WebP 
+    لضمان خفة الوزن وسرعة المتجر.
+    """
+    try:
+        # فتح الصورة الأصلية
+        img = Image.open(uploaded_file)
+        
+        # تحويلها إلى صيغة RGB (للتأكد من توافق الألوان)
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+            
+        # حفظ الصورة في الذاكرة بصيغة WebP
+        buffer = io.BytesIO()
+        img.save(buffer, format="WebP", quality=80) # جودة 80% توازن بين الوضوح والحجم
+        buffer.seek(0)
+        
+        return buffer
+        
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        return None
+        
