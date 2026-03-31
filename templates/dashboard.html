@@ -1,19 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
-<div style="background: white; padding: 40px; border-radius: 15px; border-right: 6px solid #4b0082; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-    <h2 style="color: #4b0082;">أهلاً بك يا {{ vendor.owner_name or vendor.username }} 👋</h2>
-    <p style="color: #666;">إليك إحصائياتك ونظام الحوكمة الرقمية الخاص بك.</p>
+<div class="dashboard-card" style="background: white; padding: 30px; border-radius: 15px; border-right: 5px solid #4b0082;">
+    <h2>أهلاً بك يا {{ vendor.owner_name or vendor.username }} 👋</h2>
+    <p>لقد تم التحقق من هويتك في النظام اللامركزي بنجاح.</p>
     
-    <div style="display: flex; gap: 20px; margin-top: 30px;">
-        <div style="flex: 1; background: #f8f4ff; padding: 20px; border-radius: 10px;">
-            <small style="color: #888;">المحفظة المسجلة:</small>
-            <div style="font-weight: bold; color: #4b0082;">{{ vendor.wallet_address or 'لم تُربط محفظة' }}</div>
-        </div>
-    </div>
-
-    <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 30px;">
-        <h3>إضافة منتج جديد للمتجر</h3>
-        <p style="font-size: 0.9rem; color: #888;">تأكد من وضوح صور المنتج لرفع هرمونات الشراء لدى المستهلك.</p>
+    <div style="background: #f4f4f9; padding: 15px; border-radius: 10px; margin-top: 20px;">
+        <strong>رقم المحفظة:</strong> 
+        <span style="color: #4b0082;">{{ vendor.wallet_address or 'لم يتم الربط بعد' }}</span>
     </div>
 </div>
 {% endblock %}
