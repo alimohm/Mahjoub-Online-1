@@ -1,29 +1,33 @@
-# bridge_logic.py
-
 import requests
 import io
 import json
 from PIL import Image
 
-# الإعدادات الأساسية
-GRAPHQL_URL = "https://mahjoub.online/admin/graphql" # جرب هذا الرابط المباشر إذا فشل رابط الدومين
+# الإعدادات الأساسية - تم تحديث الرابط ليتجاوز بوابة الإدارة المتعثرة
+GRAPHQL_URL = "https://api.qumra.cloud/graphql" 
 ACCESS_TOKEN = "qmr_6efc3577-9287-4588-8c87-667e449d5397"
 
 def calculate_final_price(original_price, currency):
+    """تحويل العملة وإضافة نسبة الربح 30% (الحوكمة الرقمية)"""
     try:
         price = float(original_price)
+        # تحويل من دولار إلى ريال سعودي إذا لزم الأمر
         if currency.upper() == 'USD':
             price = price * 3.8
+        
+        # إضافة هامش الربح والتقريب
         final_price = price * 1.30
         return round(final_price, 2)
-    except ValueError:
+    except (ValueError, TypeError):
         return 0.0
 
 def process_product_image(uploaded_file):
+    """تحويل الصورة إلى WebP لرفع أداء المتجر و SEO"""
     try:
         img = Image.open(uploaded_file)
         if img.mode in ("RGBA", "P"):
             img = img.convert("RGB")
+        
         buffer = io.BytesIO()
         img.save(buffer, format="WebP", quality=80)
         buffer.seek(0)
@@ -33,21 +37,26 @@ def process_product_image(uploaded_file):
         return None
 
 def push_to_qmr_store(name, description, final_price, image_buffer):
+    """إرسال المنتج كمسودة إلى متجر محجوب أونلاين عبر GraphQL"""
+    
+    # الترويسات المطلوبة للاتصال بالسيرفر
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Accept": "application/json",
     }
 
-    # تعديل الاستعلام لدعم رفع الملفات بشكل صحيح
+    # استعلام متوافق مع نظام Apollo لرفع الملفات
     query = """
-    mutation CreateProduct($input: ProductInput!, $image: Upload!) {
+    mutation CreateProduct($input: ProductInput!, $image: Upload) {
       createProduct(input: $input, image: $image) {
         id
         name
+        status
       }
     }
     """
     
-    # خريطة الربط (Mapping) لإخبار السيرفر أين يضع ملف الصورة
+    # تجهيز العمليات (Operations)
     operations = {
         'query': query,
         'variables': {
@@ -58,13 +67,15 @@ def push_to_qmr_store(name, description, final_price, image_buffer):
                 'status': 'DRAFT',
                 'currency': 'SAR'
             },
-            'image': None
+            'image': None  # سيتم ربطه عبر خريطة الملفات أدناه
         }
     }
     
+    # خريطة الملفات (Map) لربط البافر بالمتغير variables.image
     map_data = {'0': ['variables.image']}
     
     try:
+        # بناء الطلب متعدد الأجزاء (Multipart Request)
         files = {
             'operations': (None, json.dumps(operations), 'application/json'),
             'map': (None, json.dumps(map_data), 'application/json'),
@@ -73,13 +84,15 @@ def push_to_qmr_store(name, description, final_price, image_buffer):
         
         response = requests.post(GRAPHQL_URL, headers=headers, files=files)
         
-        # لغرض التصحيح: اطبع النتيجة في سجلات Railway
-        print(f"Response: {response.status_code} - {response.text}")
+        # طباعة النتيجة في سجلات ريلوي للمتابعة التقنية
+        print(f"Qumra Status: {response.status_code}")
+        print(f"Qumra Body: {response.text}")
         
         if response.status_code == 200 and "errors" not in response.text:
             return True
-        return False
+        else:
+            return False
             
     except Exception as e:
-        print(f"Connection Error: {e}")
+        print(f"Connection Error to Qumra: {e}")
         return False
