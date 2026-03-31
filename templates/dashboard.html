@@ -1,14 +1,18 @@
 {% extends "layout.html" %}
-
 {% block content %}
-<div class="dashboard-container">
-    <div style="margin-bottom: 30px;">
-        <h2 style="color: #4b0082;">لوحة التحكم السيادية</h2>
-        <p style="color: #888;">أهلاً بك يا {{ vendor.owner_name or vendor.username }}، ابدأ بإدارة سلاسل إمدادك.</p>
-    </div>
+<div style="max-width: 900px; margin: 0 auto;">
+    {% include 'wallet_card.html' %}
 
-    <div style="max-width: 800px; margin: 0 auto;">
-        {% include 'product_upload.html' %}
-    </div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+            <i class="fas fa-check-circle"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% include 'product_upload.html' %}
 </div>
 {% endblock %}
