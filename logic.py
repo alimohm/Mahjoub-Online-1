@@ -10,7 +10,7 @@ def perform_login(username, password):
     # فحص سبب الفشل لإظهار الرسالة العربية المتناسقة
     existing_user = Vendor.query.filter_by(username=username).first()
     if not existing_user:
-        return None, "عذراً، هذا المستخدم غير مسجل في المنصة اللامركزية متطورة."
+        return None, "عذراً، هذا المستخدم غير مسجل في المنصة اللامركزية."
     else:
         return None, "كلمة المرور غير صحيحة، يرجى إعادة المحاولة."
 
