@@ -1,11 +1,12 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import db, init_db, Vendor
+import logic
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'mahjoub_king_2026')
+app.secret_key = os.environ.get('SECRET_KEY', 'mahjoub_king_2026_sovereign')
 
-# تهيئة قاعدة البيانات في ريلوي
+# ربط قاعدة بيانات Postgres في ريلوي
 init_db(app)
 
 @app.route('/')
@@ -19,12 +20,16 @@ def login():
     if request.method == 'POST':
         u = request.form.get('username')
         p = request.form.get('password')
-        # التحقق الحقيقي من قاعدة البيانات
-        vendor = Vendor.query.filter_by(username=u, password=p).first()
+        
+        # استدعاء المنطق البرمجي للتحقق
+        vendor, message = logic.perform_login(u, p)
+        
         if vendor:
             session['vendor_id'] = vendor.id
             return redirect(url_for('dashboard'))
-        flash("بيانات الدخول غير صحيحة")
+        else:
+            flash(message) # إظهار رسالة (غير مسجل أو كلمة مرور خطأ)
+            
     return render_template('login.html')
 
 @app.route('/dashboard')
@@ -33,7 +38,7 @@ def dashboard():
     if not vendor_id:
         return redirect(url_for('login'))
     
-    # جلب بيانات المورد لملء الهيكل
+    # جلب بيانات المورد الحقيقية لملء الهيكل
     vendor = Vendor.query.get(vendor_id)
     return render_template('dashboard.html', vendor=vendor)
 
