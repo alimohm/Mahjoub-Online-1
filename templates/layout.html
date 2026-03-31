@@ -3,159 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محجوب أونلاين | حوكمة الموردين</title>
+    <title>محجوب أونلاين | لوحة الموردين</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --royal-purple: #4b0082;
-            --deep-black: #0d001a;
-            --gold-accent: #ffd700;
-            --soft-bg: #f8f9fa;
-            --sidebar-width: 280px;
-            --sidebar-collapsed: 80px;
-        }
-
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--soft-bg); overflow-x: hidden; }
-
-        /* Sidebar - التصميم الذكي */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--royal-purple) 0%, var(--deep-black) 100%);
-            height: 100vh;
-            position: fixed;
-            right: 0;
-            top: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .brand-section {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* اللوجو الأبيض كما طلبت */
-        .brand-logo {
-            width: 70px;
-            filter: brightness(0) invert(1);
-            transition: 0.3s;
-        }
-
-        .brand-name {
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-top: 10px;
-            display: block;
-        }
-
-        /* القائمة المنسدلة */
-        .nav-links { flex: 1; padding: 20px 0; list-style: none; margin: 0; }
+        :root { --royal: #4b0082; --gold: #ffd700; --sidebar-w: 260px; }
+        body { margin: 0; display: flex; background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
         
-        .nav-item a {
-            display: flex;
-            align-items: center;
-            padding: 15px 25px;
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            transition: 0.3s;
-            border-right: 4px solid transparent;
+        .sidebar { 
+            width: var(--sidebar-w); background: linear-gradient(180deg, #2e004f, #0d001a); 
+            height: 100vh; position: fixed; right: 0; transition: 0.3s; z-index: 1000;
         }
+        
+        .brand { padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .brand img { width: 65px; filter: brightness(0) invert(1); } /* لوجو أبيض */
 
-        .nav-item a:hover, .nav-item.active a {
-            background: rgba(255,255,255,0.05);
-            color: white;
-            border-right-color: var(--gold-accent);
-        }
+        .nav-item { display: flex; align-items: center; padding: 15px 25px; color: rgba(255,255,255,0.7); text-decoration: none; }
+        .nav-item:hover, .active { background: rgba(255,255,255,0.05); color: white; border-right: 4px solid var(--gold); }
+        .nav-item i { margin-left: 15px; font-size: 1.2rem; }
 
-        .nav-item i { font-size: 1.3rem; min-width: 40px; }
+        .main { margin-right: var(--sidebar-w); width: 100%; transition: 0.3s; }
+        .header { background: white; height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
-        /* المحتوى الرئيسي */
-        .main-wrapper {
-            margin-right: var(--sidebar-width);
-            transition: 0.4s;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .top-header {
-            background: white;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-
-        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .user-info span { font-weight: 600; color: var(--deep-black); font-size: 0.9rem; }
-        .user-avatar { width: 40px; height: 40px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--royal-purple); border: 2px solid var(--soft-bg); }
-
-        .page-content { padding: 40px; flex: 1; }
-
-        /* تحسينات التجاوب (Mobile & Tablet) */
-        @media (max-width: 992px) {
-            .sidebar { width: var(--sidebar-collapsed); }
-            .brand-name, .link-text { display: none; }
-            .main-wrapper { margin-right: var(--sidebar-collapsed); }
-            .brand-section { padding: 20px 0; }
-            .brand-logo { width: 45px; }
-            .nav-item a { justify-content: center; padding: 20px 0; }
-            .nav-item i { margin: 0; }
-        }
-
-        @media (max-width: 576px) {
-            .top-header { padding: 0 15px; }
-            .page-content { padding: 20px; }
+        @media (max-width: 768px) {
+            .sidebar { width: 80px; }
+            .link-text, .brand span { display: none; }
+            .main { margin-right: 80px; }
+            .nav-item { justify-content: center; padding: 20px 0; }
         }
     </style>
 </head>
 <body>
-
     <aside class="sidebar">
-        <div class="brand-section">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="brand-logo" alt="Logo">
-            <span class="brand-name">محجوب أونلاين</span>
+        <div class="brand">
+            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp">
+            <div style="color:white; margin-top:10px;">محجوب أونلاين</div>
         </div>
-
-        <ul class="nav-links">
-            <li class="nav-item active"><a href="/dashboard"><i class="fas fa-chart-line"></i> <span class="link-text">الرئيسية</span></a></li>
-            <li class="nav-item"><a href="#"><i class="fas fa-box-open"></i> <span class="link-text">المنتجات</span></a></li>
-            <li class="nav-item"><a href="#"><i class="fas fa-users"></i> <span class="link-text">العملاء</span></a></li>
-            <li class="nav-item"><a href="#"><i class="fas fa-wallet"></i> <span class="link-text">المحفظة</span></a></li>
-            <li class="nav-item" style="margin-top: auto;"><a href="/logout" style="color: #ff7675;"><i class="fas fa-power-off"></i> <span class="link-text">خروج</span></a></li>
-        </ul>
+        <nav style="margin-top:20px;">
+            <a href="/dashboard" class="nav-item active"><i class="fas fa-th-large"></i> <span class="link-text">الرئيسية</span></a>
+            <a href="#" class="nav-item"><i class="fas fa-box"></i> <span class="link-text">المنتجات</span></a>
+            <a href="/logout" class="nav-item" style="margin-top:50px; color:#ff7675;"><i class="fas fa-power-off"></i> <span class="link-text">خروج</span></a>
+        </nav>
     </aside>
-
-    <div class="main-wrapper">
-        <header class="top-header">
-            <div style="font-size: 0.9rem; color: #888; font-weight: 500;">
-                <i class="fas fa-bars" style="margin-left: 10px; cursor: pointer;"></i> لوحة التحكم
-            </div>
-            
-            <div class="user-profile">
-                <div class="user-info">
-                    <span>{{ vendor.owner_name or vendor.username }}</span>
-                </div>
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
+    <div class="main">
+        <header class="header">
+            <div style="color:#888;">لوحة حوكمة الموردين</div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-weight:bold;">{{ vendor.owner_name or vendor.username }}</span>
+                <i class="fas fa-user-circle" style="font-size:2rem; color:var(--royal);"></i>
             </div>
         </header>
-
-        <main class="page-content">
-            {% block content %}{% endblock %}
-        </main>
+        <div style="padding:30px;">{% block content %}{% endblock %}</div>
     </div>
-
 </body>
 </html>
