@@ -2,38 +2,45 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
 
-# الاستدعاءات
-from database import db, init_db, Vendor, Product
-from config import Config
-import finance
-import bridge_logic
+# الاستدعاءات من الملفات المحلية
+# ملاحظة: تأكد أن هذه الملفات موجودة في نفس المجلد
+try:
+    from database import db, init_db, Vendor, Product
+    from config import Config
+    import finance
+    import bridge_logic
+except ImportError as e:
+    print(f"خطأ في استدعاء الملفات: {e}")
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# إنشاء مجلد الصور
-UPLOAD_FOLDER = 'static/uploads'
+# تأكد من تهيئة قاعدة البيانات فوراً
+init_db(app)
+
+# إنشاء مجلد الصور تلقائياً
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-init_db(app)
+# دالة لإنشاء مستخدم تجريبي للدخول
+def create_test_user():
+    with app.app_context():
+        db.create_all()
+        if not Vendor.query.filter_by(username="ali").first():
+            test_v = Vendor(username="ali", password="123", owner_name="Ali Mahjoub")
+            db.session.add(test_v)
+            db.session.commit()
+            print("تم إنشاء مستخدم الدخول: ali / 123")
 
-# دالة لإنشاء بيانات أولية (لتجنب خطأ 500 عند أول تشغيل)
-def create_initial_data():
-    if not Vendor.query.first():
-        test_vendor = Vendor(
-            username="ali", 
-            password="123", 
-            owner_name="Ali Mahjoub"
-        )
-        db.session.add(test_vendor)
-        db.session.commit()
+# --- المسارات (Routes) ---
 
 @app.route('/')
-def index():
-    if 'vendor_id' in session:
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+def home():
+    # إذا لم يكن مسجلاً، اذهب فوراً لصفحة الدخول
+    if 'vendor_id' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -42,19 +49,22 @@ def login():
         if user and user.password == request.form.get('password'):
             session['vendor_id'] = user.id
             return redirect(url_for('dashboard'))
-        flash("خطأ في البيانات")
+        flash("خطأ في بيانات الدخول")
     return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
     v_id = session.get('vendor_id')
-    if not v_id: return redirect(url_for('login'))
+    if not v_id:
+        return redirect(url_for('login'))
     vendor = Vendor.query.get(v_id)
     return render_template('dashboard.html', vendor=vendor)
 
 @app.route('/add_product', methods=['POST'])
 def add_product():
     v_id = session.get('vendor_id')
+    if not v_id: return redirect(url_for('login'))
+    
     vendor = Vendor.query.get(v_id)
     file = request.files.get('image')
     
@@ -77,7 +87,6 @@ def add_product():
     db.session.add(new_p)
     db.session.commit()
 
-    # إرسال للمتجر
     bridge_logic.push_to_store({
         "name": new_p.name, 
         "final_price": f_price, 
@@ -86,11 +95,14 @@ def add_product():
         "wallet": vendor.wallet_address
     })
     
-    flash("تم الرفع بنجاح")
+    flash("تم رفع المنتج بنجاح!")
     return redirect(url_for('dashboard'))
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        create_initial_data() # إنشاء المستخدم "ali" تلقائياً
+    create_test_user()
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
