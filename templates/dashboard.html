@@ -1,77 +1,31 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - محجوب أونلاين</title>
-    <style>
-        :root {
-            --royal-purple: #4b0082; /* اللون الأرجواني الملكي للماركة */
-            --gold: #ffd700; /* اللون الذهبي للماركة */
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1000px; margin: auto; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 25px; border-right: 5px solid var(--royal-purple); }
-        h2, h3 { color: var(--royal-purple); }
-        
-        /* تنسيق النموذج (Form) */
-        .form-group { margin-bottom: 15px; }
-        input, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { background-color: var(--royal-purple); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background-color: #310054; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        
-        /* شبكة المنتجات */
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .product-card { background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 10px; text-align: center; }
-        .product-card h4 { margin: 10px 0; color: var(--royal-purple); }
-        .price-tag { color: #28a745; font-weight: bold; font-size: 1.2em; }
-        
-        .btn-logout { color: #dc3545; text-decoration: none; font-weight: bold; float: left; }
-        .status-online { color: #28a745; font-size: 0.9em; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <a href="/logout" class="btn-logout">تسجيل الخروج</a>
-            <h2>مرحباً، {{ vendor.owner_name }} 👋</h2>
-            <p class="status-online">● المتجر متصل بنظام قمرة</p>
-            <p>عنوان المحفظة: <strong style="color: var(--royal-purple);">{{ vendor.wallet_address if vendor.wallet_address else 'غير مسجل' }}</strong></p>
-        </div>
+{% extends "layout.html" %}
 
-        <div class="card">
-            <h3>إضافة منتج جديد إلى "سوقك الذكي"</h3>
-            <form action="/upload_product" method="POST">
-                <div class="form-group">
-                    <label>اسم المنتج:</label>
-                    <input type="text" name="name" placeholder="مثال: سكريات ستيل فاخرة" required>
-                </div>
-                <div class="form-group">
-                    <label>السعر ($):</label>
-                    <input type="number" step="0.01" name="price" placeholder="0.00" required>
-                </div>
-                <div class="form-group">
-                    <label>وصف المنتج (اختياري):</label>
-                    <textarea name="description" rows="3" placeholder="اكتب وصفاً مختصراً للمنتج..."></textarea>
-                </div>
-                <button type="submit">تأكيد الرفع والمزامنة</button>
-            </form>
-        </div>
+{% block title %}لوحة التحكم - الرئيسية{% endblock %}
 
-        <h3>منتجاتك المعروضة حالياً:</h3>
-        <div class="product-grid">
-            {% for product in products %}
-                <div class="product-card">
-                    <h4>{{ product.name }}</h4>
-                    <p style="font-size: 0.9em; color: #666;">{{ product.description[:50] }}...</p>
-                    <p class="price-tag">{{ product.price }} $</p>
-                </div>
-            {% else %}
-                <div class="card" style="text-align: center; grid-column: 1 / -1;">
-                    <p>لا توجد منتجات مرفوعة حالياً. ابدأ بإضافة أول منتج لك!</p>
-                </div>
-            {% endfor %}
-        </div>
+{% block content %}
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h2>مرحباً، {{ vendor.owner_name }} 👋</h2>
+        <p>المحفظة: <strong>{{ vendor.wallet_address if vendor.wallet_address else 'غير مسجل' }}</strong></p>
     </div>
-</body>
-</html>
+
+    <div style="margin-top: 30px;">
+        <h3>إضافة منتج جديد</h3>
+        <form action="/upload_product" method="POST" style="background: white; padding: 20px; border-radius: 10px;">
+            <input type="text" name="name" placeholder="اسم المنتج" required style="width: 100%; padding: 10px; margin-bottom: 10px;">
+            <input type="number" step="0.01" name="price" placeholder="السعر" required style="width: 100%; padding: 10px; margin-bottom: 10px;">
+            <button type="submit" style="background: var(--royal-purple); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">تأكيد الرفع والمزامنة</button>
+        </form>
+    </div>
+
+    <h3 style="margin-top: 40px;">منتجاتك المرفوعة:</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+        {% for product in products %}
+            <div style="background: white; padding: 15px; border-radius: 10px; text-align: center; border-right: 4px solid var(--royal-purple);">
+                <h4>{{ product.name }}</h4>
+                <p style="color: green; font-weight: bold;">{{ product.price }} $</p>
+            </div>
+        {% else %}
+            <p>لا توجد منتجات حالياً.</p>
+        {% endfor %}
+    </div>
+{% endblock %}
