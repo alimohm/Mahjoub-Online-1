@@ -25,4 +25,4 @@ def calculate_final_price(original_price, currency):
 
 # ثابت إعدادات الوصول لمتجر قمرة (سنستخدمها في الخطوة القادمة)
 GRAPHQL_URL = "https://mahjoub.online/admin/graphql"
-ACCESS_TOKEN = "ضع_هنا_مفتاح_الوصول_الخاص_بك"
+ACCESS_TOKEN = "qmr_6efc3577-9287-4588-8c87-667e449d5397"
