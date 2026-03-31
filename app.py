@@ -1,25 +1,28 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from config import Config
 from database import db, init_db, Vendor, Product
+from config import Config
 import finance
 import bridge_logic
-import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
 init_db(app)
 
+@app.route('/')
+def home():
+    if 'vendor_id' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('dashboard'))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         user = Vendor.query.filter_by(username=request.form.get('username')).first()
-        if not user:
-            flash("المستخدم غير مسجل", "error")
-        elif user.password != request.form.get('password'):
-            flash("كلمة المرور خاطئة", "error")
-        else:
+        if user and user.password == request.form.get('password'):
             session['vendor_id'] = user.id
             return redirect(url_for('dashboard'))
+        flash("بيانات الدخول غير صحيحة", "error")
     return render_template('login.html')
 
 @app.route('/dashboard')
@@ -31,14 +34,14 @@ def dashboard():
 
 @app.route('/add_product', methods=['POST'])
 def add_product():
-    v_id = session.get('vendor_id')
+    # استخدام المنطق المنفصل لزيادة 30% والربط
     f_price = finance.calculate_final_price(request.form.get('price'))
     status = bridge_logic.push_to_store({"name": request.form.get('name'), "price": f_price})
     
     if status == "success":
-        flash("تم الرفع والربط بنجاح!", "success")
+        flash("تم النشر والتحقق من الربط بنجاح!", "success")
     else:
-        flash("فشل الاتصال بالمتجر الخارجي", "error")
+        flash("فشل الاتصال بالويب هوك الخارجي", "error")
     return redirect(url_for('dashboard'))
 
 if __name__ == "__main__":
