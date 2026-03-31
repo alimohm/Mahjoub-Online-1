@@ -1,18 +1,9 @@
-<div style="background: linear-gradient(135deg, #4b0082, #2e004f); color: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(75,0,130,0.2); margin-bottom: 30px; position: relative; overflow: hidden;">
-    <div style="position: absolute; left: -20px; top: -20px; opacity: 0.1; font-size: 8rem;">
-        <i class="fas fa-wallet"></i>
-    </div>
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
-            <small style="opacity: 0.8; font-size: 0.8rem;">رقم المحفظة المسجل</small>
-            <div style="font-family: monospace; font-size: 1.4rem; letter-spacing: 2px; margin-top: 5px;">
-                {{ vendor.wallet_address }}
-            </div>
-        </div>
-        <i class="fas fa-shield-alt" style="color: #ffd700; font-size: 1.5rem;"></i>
-    </div>
-    <div style="margin-top: 20px;">
-        <small style="opacity: 0.8;">حالة المحفظة</small>
-        <div style="color: #00ffcc; font-weight: bold;">نشط - مؤمنة برمجياً</div>
+<div class="card text-center p-4 border-0 mb-4" style="background: linear-gradient(135deg, #632C8F 0%, #000000 100%); border-radius: 20px;">
+    <div class="card-body">
+        <p class="text-light mb-1" style="font-size: 0.9rem; opacity: 0.8;">عنوان محفظة المورد السيادية</p>
+        <h2 class="text-white mb-3" style="letter-spacing: 2px; font-family: 'Courier New', Courier, monospace;">
+            {{ vendor.wallet_address }}
+        </h2>
+        <div class="badge bg-success p-2">نشط ومتصل بمتجر محجوب</div>
     </div>
 </div>
