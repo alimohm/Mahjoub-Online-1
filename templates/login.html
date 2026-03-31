@@ -2,52 +2,250 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول | محجوب أونلاين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { margin: 0; display: flex; height: 100vh; font-family: 'Cairo', sans-serif; overflow: hidden; }
+        :root {
+            --royal-purple: #4b0082; /* اللون البنفسجي الأساسي من الصورة */
+            --royal-hover: #3a0066;
+            --gold-accent: #FFD700; /* لون الأيقونات الذهبية */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            font-family: 'Cairo', sans-serif;
+            overflow: hidden;
+            background-color: #f4f7f6;
+        }
+
+        /* القسم الأيسر - نموذج الدخول */
+        .login-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 40px;
+        }
+
+        /* القسم الأيمن - الهوية البصرية */
+        .brand-section {
+            flex: 1.2;
+            background: linear-gradient(135deg, var(--royal-purple) 0%, #1a0033 100%);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .login-card h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .login-card p {
+            font-size: 16px;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        /* تنسيق حقول الإدخال مع الأيقونات (كما في الصورة) */
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 15px 15px 45px; /* مسافة للأيقونة على اليسار */
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background-color: #f8f9ff;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .input-group input:focus {
+            border-color: var(--royal-purple);
+            outline: none;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 18px;
+        }
+
+        /* زر الدخول البنفسجي */
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--royal-purple);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 10px;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 4px 15px rgba(75, 0, 130, 0.3);
+        }
+
+        .btn-login:hover {
+            background-color: var(--royal-hover);
+        }
+
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+
+        /* الهوية البصرية (اليمين) */
+        .logo {
+            width: 130px;
+            filter: brightness(0) invert(1); /* تحويل اللوجو للأبيض الناصع */
+            margin-bottom: 30px;
+        }
+
+        .brand-section h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .brand-section p {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-bottom: 50px;
+            max-width: 80%;
+        }
+
+        /* نقاط القوة الذهبية المتجاوبة */
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 18px;
+            margin: 10px;
+            border-radius: 15px;
+            width: 75%;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: background 0.3s;
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feature-item i {
+            color: var(--gold-accent);
+            font-size: 22px;
+            margin-left: 15px;
+        }
+
+        .feature-item span {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* تنبيهات الخطأ (الفلاش) */
+        .alert {
+            color: #d93025;
+            background-color: #fce8e6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
         
-        /* القسم الأيسر (نموذج الدخول) */
-        .login-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #ffffff; }
-        
-        /* القسم الأيمن (الهوية البصرية) */
-        .brand-section { flex: 1.2; background: #4b0082; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        
-        .login-card { width: 320px; text-align: center; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #e0e0e0; border-radius: 12px; background: #f8f9ff; font-size: 16px; }
-        button { width: 100%; padding: 15px; background: #632C8F; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(99, 44, 143, 0.3); }
-        
-        .logo { width: 110px; filter: brightness(0) invert(1); margin-bottom: 25px; } /* لوجو أبيض */
-        .feature-item { background: rgba(255, 255, 255, 0.1); padding: 15px; margin: 10px; border-radius: 12px; width: 70%; display: flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .alert { color: #d93025; background: #fce8e6; padding: 10px; border-radius: 8px; margin-bottom: 10px; width: 100%; }
+        .alert i { margin-left: 10px; font-size: 18px; }
+
+        /* التجاوب مع الجوال */
+        @media (max-width: 900px) {
+            body { flex-direction: column-reverse; overflow: auto; }
+            .login-section { flex: 1; width: 100%; padding: 40px 20px; }
+            .brand-section { flex: 0.5; width: 100%; padding: 40px 20px; }
+            .logo { width: 90px; margin-bottom: 20px; }
+            .brand-section h1 { font-size: 28px; }
+            .brand-section p { font-size: 16px; margin-bottom: 30px; }
+            .feature-item { width: 90%; padding: 15px; }
+            .login-card h2 { font-size: 24px; }
+        }
     </style>
 </head>
 <body>
     <div class="login-section">
         <div class="login-card">
-            <h2 style="color: #333; margin-bottom: 5px;">تسجيل الدخول</h2>
-            <p style="color: #777; margin-bottom: 30px;">مرحباً بك مجدداً في نظامك الإداري الملكي</p>
+            <h2>تسجيل الدخول</h2>
+            <p>مرحباً بك مجدداً في نظامك الإداري الملكي</p>
             
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}<div class="alert">{{ messages[0] }}</div>{% endif %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}{% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}{% endif %}
             {% endwith %}
 
             <form method="POST">
-                <input type="text" name="username" placeholder="اسم المستخدم" required>
-                <input type="password" name="password" placeholder="كلمة المرور" required>
-                <button type="submit">دخول للمنصة</button>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="اسم المستخدم" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="كلمة المرور" required>
+                </div>
+                <button type="submit" class="btn-login">دخول للمنصة</button>
             </form>
-            <p style="font-size: 12px; color: #aaa; margin-top: 40px;">© 2026 محجوب أونلاين - حوكمة رقمية رائدة</p>
+            <p style="font-size: 12px; color: #aaa; margin-top: 50px;">© 2026 محجوب أونلاين - حوكمة رقمية رائدة</p>
         </div>
     </div>
     
     <div class="brand-section">
-        <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo">
-        <h1 style="font-size: 32px; margin-bottom: 10px;">محجوب أونلاين</h1>
-        <p style="opacity: 0.8; margin-bottom: 40px;">المنصة الأولى لدعم الموردين والنمو الرقمي</p>
+        <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo" alt="Logo">
+        <h1>محجوب أونلاين</h1>
+        <p>المنصة الأولى لدعم الموردين والنمو الرقمي عبر قوة اللامركزية والذكاء الاصطناعي</p>
         
-        <div class="feature-item">🛡️ اللامركزية متطورة وحوكمة رقمية</div>
-        <div class="feature-item">📦 إدارة ذكية لسلاسل الإمداد</div>
-        <div class="feature-item">📈 سوقك الذكي للنمو المتسارع</div>
+        <div class="feature-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>اللامركزية متطورة وحوكمة رقمية بنظام سيادي</span>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-box-open"></i>
+            <span>إدارة ذكية وآمنة لسلاسل الإمداد والربط التلقائي</span>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-chart-line"></i>
+            <span>سوقك الذكي للنمو المتسارع وزيادة علامتك التجارية</span>
+        </div>
     </div>
 </body>
 </html>
