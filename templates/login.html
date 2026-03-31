@@ -2,35 +2,52 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دخول | محجوب أونلاين</title>
+    <title>تسجيل الدخول | محجوب أونلاين</title>
     <style>
-        body { margin: 0; display: flex; height: 100vh; font-family: 'Cairo', sans-serif; }
-        .left-side { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; }
-        .right-side { flex: 1; background: #4b0082; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; }
-        .login-input { width: 80%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; background: #f9f9fb; }
-        .btn-login { width: 80%; padding: 15px; background: #4b0082; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .feature-box { background: rgba(255,255,255,0.1); padding: 15px; margin: 5px; border-radius: 10px; width: 70%; display: flex; align-items: center; }
-        img.logo { width: 100px; filter: brightness(0) invert(1); } /* لوجو أبيض */
+        body { margin: 0; display: flex; height: 100vh; font-family: 'Cairo', sans-serif; overflow: hidden; }
+        
+        /* القسم الأيسر (نموذج الدخول) */
+        .login-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #ffffff; }
+        
+        /* القسم الأيمن (الهوية البصرية) */
+        .brand-section { flex: 1.2; background: #4b0082; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        
+        .login-card { width: 320px; text-align: center; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #e0e0e0; border-radius: 12px; background: #f8f9ff; font-size: 16px; }
+        button { width: 100%; padding: 15px; background: #632C8F; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(99, 44, 143, 0.3); }
+        
+        .logo { width: 110px; filter: brightness(0) invert(1); margin-bottom: 25px; } /* لوجو أبيض */
+        .feature-item { background: rgba(255, 255, 255, 0.1); padding: 15px; margin: 10px; border-radius: 12px; width: 70%; display: flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .alert { color: #d93025; background: #fce8e6; padding: 10px; border-radius: 8px; margin-bottom: 10px; width: 100%; }
     </style>
 </head>
 <body>
-    <div class="left-side">
-        <h2>تسجيل الدخول</h2>
-        <p>مرحباً بك مجدداً في نظامك الإداري الملكي</p>
-        <form method="POST" style="width: 100%; text-align: center;">
-            <input type="text" name="username" class="login-input" placeholder="اسم المستخدم" required>
-            <input type="password" name="password" class="login-input" placeholder="كلمة المرور" required>
-            <button type="submit" class="btn-login">دخول للمنصة</button>
-        </form>
+    <div class="login-section">
+        <div class="login-card">
+            <h2 style="color: #333; margin-bottom: 5px;">تسجيل الدخول</h2>
+            <p style="color: #777; margin-bottom: 30px;">مرحباً بك مجدداً في نظامك الإداري الملكي</p>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}<div class="alert">{{ messages[0] }}</div>{% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <input type="text" name="username" placeholder="اسم المستخدم" required>
+                <input type="password" name="password" placeholder="كلمة المرور" required>
+                <button type="submit">دخول للمنصة</button>
+            </form>
+            <p style="font-size: 12px; color: #aaa; margin-top: 40px;">© 2026 محجوب أونلاين - حوكمة رقمية رائدة</p>
+        </div>
     </div>
-    <div class="right-side">
+    
+    <div class="brand-section">
         <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo">
-        <h1>محجوب أونلاين</h1>
-        <p>المنصة الأولى لدعم الموردين والنمو الرقمي</p>
-        <div class="feature-box">🛡️ اللامركزية متطورة وحوكمة رقمية</div>
-        <div class="feature-box">📦 إدارة ذكية لسلاسل الإمداد</div>
-        <div class="feature-box">📈 سوقك الذكي للنمو المتسارع</div>
+        <h1 style="font-size: 32px; margin-bottom: 10px;">محجوب أونلاين</h1>
+        <p style="opacity: 0.8; margin-bottom: 40px;">المنصة الأولى لدعم الموردين والنمو الرقمي</p>
+        
+        <div class="feature-item">🛡️ اللامركزية متطورة وحوكمة رقمية</div>
+        <div class="feature-item">📦 إدارة ذكية لسلاسل الإمداد</div>
+        <div class="feature-item">📈 سوقك الذكي للنمو المتسارع</div>
     </div>
 </body>
 </html>
