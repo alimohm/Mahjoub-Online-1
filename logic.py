@@ -1,20 +1,16 @@
 from database import Vendor
 
 def perform_login(username, password):
-    """
-    التحقق الصارم من قاعدة البيانات لمنع الدخول العشوائي
-    """
-    # البحث عن المورد الذي يطابق كل من اسم المستخدم وكلمة المرور معاً
+    # البحث عن المورد الذي يطابق اسم المستخدم وكلمة المرور معاً
     vendor = Vendor.query.filter_by(username=username, password=password).first()
     
     if vendor:
-        # نجاح المطابقة مع قاعدة البيانات
         return vendor, "تم تسجيل الدخول بنجاح إلى النظام اللامركزي."
     
-    # في حال عدم التطابق، نتحقق من السبب لإظهار الرسالة الصحيحة
+    # فحص سبب الفشل لإظهار الرسالة العربية المتناسقة
     existing_user = Vendor.query.filter_by(username=username).first()
     if not existing_user:
-        return None, "هذا المستخدم غير مسجل في المنصة اللامركزية."
+        return None, "عذراً، هذا المستخدم غير مسجل في المنصة اللامركزية متطورة."
     else:
         return None, "كلمة المرور غير صحيحة، يرجى إعادة المحاولة."
 
