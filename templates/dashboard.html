@@ -4,14 +4,16 @@
 <div class="dashboard-wrapper" style="max-width: 900px; margin: 0 auto;">
 
     <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 30px; border-right: 5px solid #4b0082;">
-        <h1 style="color: #4b0082; margin-top: 0;">أهلاً بك، {{ vendor.owner_name }} 👋</h1>
+        <h1 style="color: #4b0082; margin-top: 0;">أهلاً بك، {{ vendor.owner_name or vendor.username }} 👋</h1>
         <p style="color: #666; font-size: 1.1rem;">سعيدون بتواجدك في محجوب أونلاين. إليك تفاصيل حسابك:</p>
         
         <div style="display: flex; align-items: center; gap: 15px; background: #f8f4ff; padding: 15px 25px; border-radius: 12px; margin-top: 20px;">
             <i class="fas fa-wallet" style="font-size: 1.5rem; color: #4b0082;"></i>
             <div>
                 <span style="display: block; color: #888; font-size: 0.85rem;">رقم المحفظة المسجل:</span>
-                <span style="font-weight: bold; color: #4b0082; font-family: monospace; font-size: 1.1rem;">{{ vendor.wallet_address }}</span>
+                <span style="font-weight: bold; color: #4b0082; font-family: monospace; font-size: 1.1rem;">
+                    {{ vendor.wallet_address or 'لم يتم ربط محفظة بعد' }}
+                </span>
             </div>
         </div>
     </div>
