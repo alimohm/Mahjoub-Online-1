@@ -1,47 +1,17 @@
-<div class="card p-4 border-0 shadow-sm" style="background: #1a1a1a; border-radius: 15px;">
-    <h3 class="text-white mb-4" style="color: #632C8F !important;">رفع منتج جديد إلى المتجر</h3>
-    
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-info bg-dark text-white border-0">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
+<div class="card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+    <h5 style="color: #632C8F;"><i class="fas fa-plus-circle"></i> إضافة منتج جديد للمتجر</h5>
     <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label class="text-secondary">اسم المنتج</label>
-            <input type="text" name="name" class="form-control bg-dark text-white border-secondary" required>
+        <div style="margin-bottom: 15px;">
+            <input type="text" name="name" placeholder="اسم المنتج" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
         </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="text-secondary">السعر الخام (Cost)</label>
-                <input type="number" step="0.01" name="price" class="form-control bg-dark text-white border-secondary" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="text-secondary">العملة</label>
-                <select name="currency" class="form-select bg-dark text-white border-secondary">
-                    <option value="SAR">ريال سعودي (SAR)</option>
-                    <option value="USD">دولار أمريكي (USD)</option>
-                </select>
-            </div>
+        <div style="margin-bottom: 15px;">
+            <input type="number" name="price" placeholder="السعر الأساسي ($)" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
         </div>
-
-        <div class="mb-3">
-            <label class="text-secondary">صورة المنتج</label>
-            <input type="file" name="image" class="form-control bg-dark text-white border-secondary" accept="image/*" required>
-            <small class="text-muted">سيتم رفع الصورة ومعالجتها عبر قمرة كلاود</small>
+        <div style="margin-bottom: 15px;">
+            <input type="file" name="image" required>
         </div>
-
-        <div class="mb-3">
-            <label class="text-secondary">وصف المنتج</label>
-            <textarea name="description" class="form-control bg-dark text-white border-secondary" rows="3"></textarea>
-        </div>
-
-        <button type="submit" class="btn w-100 shadow-sm" style="background: #632C8F; color: white; font-weight: bold;">
-            نشر المنتج كمسودة (زيادة 30% تلقائياً)
+        <button type="submit" style="width: 100%; padding: 15px; background: #632C8F; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            نشر وتفعيل الربط التلقائي
         </button>
     </form>
 </div>
