@@ -6,7 +6,7 @@ import json
 from PIL import Image
 
 # الإعدادات الأساسية
-GRAPHQL_URL = "https://api.qumra.cloud/graphql" # جرب هذا الرابط المباشر إذا فشل رابط الدومين
+GRAPHQL_URL = "https://mahjoub.online/admin/graphql" # جرب هذا الرابط المباشر إذا فشل رابط الدومين
 ACCESS_TOKEN = "qmr_6efc3577-9287-4588-8c87-667e449d5397"
 
 def calculate_final_price(original_price, currency):
