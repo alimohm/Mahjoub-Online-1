@@ -1,18 +1,8 @@
 {% extends "layout.html" %}
-
 {% block content %}
-<div class="dashboard-header" style="margin-bottom: 30px;">
-    <h1>لوحة التحكم الإدارية</h1>
-    <p>مرحباً علي محجوب، حالة النظام: <span style="color: green;">نشط</span></p>
-</div>
-
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <div class="section-card">
-        {% include 'wallet_card.html' %}
-    </div>
-
-    <div class="section-card">
-        {% include 'product_upload.html' %}
-    </div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+    {% include 'wallet_card.html' %}
+    
+    {% include 'product_upload.html' %}
 </div>
 {% endblock %}
