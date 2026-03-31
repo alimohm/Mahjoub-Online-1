@@ -1,10 +1,16 @@
 {% extends "layout.html" %}
+
 {% block content %}
-    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 30px;">
         <h1 style="color: #4b0082;">أهلاً بك، {{ vendor.owner_name }}</h1>
         <p style="color: #666;">رقم محفظتك المسجل لدينا هو:</p>
         <div style="background: #f0e6f7; padding: 20px; border-radius: 10px; display: inline-block; font-weight: bold; color: #4b0082;">
             {{ vendor.wallet_address }}
         </div>
     </div>
+
+    <div id="upload-section">
+        {% include 'product_upload.html' %}
+    </div>
+
 {% endblock %}
