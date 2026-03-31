@@ -3,77 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محجوب أونلاين | النظام الإداري</title>
+    <title>محجوب أونلاين | لوحة التحكم</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --main-purple: #4b0082; --deep-black: #0d001a; }
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f8f9fa; display: flex; }
+        :root {
+            /* البنفسجي الملكي المتدرج للسواد */
+            --royal-gradient: linear-gradient(145deg, #2e004f 0%, #4b0082 50%, #0d001a 100%);
+            --gold-accent: #ffd700;
+            --soft-white: #f8f9fa;
+        }
 
-        /* Sidebar الذكي: يتغير شكله بناءً على حجم الشاشة */
+        body { margin: 0; display: flex; font-family: 'Segoe UI', sans-serif; background: var(--soft-white); }
+
+        /* Sidebar البنفسجي الملكي */
         .sidebar {
-            width: 250px; height: 100vh; position: fixed; right: 0; top: 0;
-            background: var(--deep-black); color: white; transition: 0.3s;
-            display: flex; flex-direction: column; align-items: center; z-index: 1000;
+            width: 260px; height: 100vh; position: fixed; right: 0; top: 0;
+            background: var(--royal-gradient); color: white;
+            transition: 0.3s; display: flex; flex-direction: column; z-index: 1000;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
         }
 
-        .logo-section { padding: 30px 10px; text-align: center; width: 100%; }
-        .logo-section img { width: 60px; filter: brightness(0) invert(1); }
-        .brand-name { display: block; font-size: 1.1rem; margin-top: 10px; color: #ffd700; font-weight: bold; }
+        .brand-area { padding: 30px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .brand-area img { width: 70px; filter: brightness(0) invert(1); margin-bottom: 10px; }
+        .brand-title { display: block; font-size: 1.2rem; font-weight: bold; color: var(--gold-accent); }
 
-        .nav-menu { list-style: none; padding: 0; width: 100%; }
-        .nav-item { padding: 15px 20px; display: flex; align-items: center; color: rgba(255,255,255,0.7); text-decoration: none; transition: 0.3s; }
-        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
-        .nav-item i { font-size: 1.4rem; min-width: 40px; text-align: center; }
-        .item-text { transition: 0.3s; }
+        /* هوية المورد تحت اللوجو */
+        .vendor-badge {
+            padding: 15px; text-align: center; background: rgba(0,0,0,0.2); margin: 10px; border-radius: 10px;
+        }
+        .vendor-name { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+        .certified-tag { font-size: 0.75rem; color: #00ffcc; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* تعديلات الشاشات الصغيرة: تظهر الأيقونات فقط */
+        .nav-list { list-style: none; padding: 10px 0; width: 100%; flex-grow: 1; }
+        .nav-link {
+            padding: 15px 25px; display: flex; align-items: center; color: rgba(255,255,255,0.8);
+            text-decoration: none; transition: 0.3s; border-right: 4px solid transparent;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: white; border-right-color: var(--gold-accent); }
+        .nav-link i { font-size: 1.2rem; min-width: 35px; }
+
+        /* التجاوب مع الشاشات (أيقونات فقط) */
         @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .brand-name, .item-text, .user-name-sidebar { display: none; }
-            .main-content { margin-right: 70px !important; }
-            .logo-section img { width: 40px; }
+            .sidebar { width: 80px; }
+            .brand-title, .vendor-badge, .link-text { display: none; }
+            .main-content { margin-right: 80px !important; }
+            .brand-area { padding: 20px 5px; }
         }
 
-        .main-content { flex: 1; margin-right: 250px; transition: 0.3s; min-height: 100vh; }
+        .main-content { flex: 1; margin-right: 260px; transition: 0.3s; }
         
-        /* شريط علوي لعرض اسم المستخدم */
-        .top-nav {
-            background: white; height: 60px; display: flex; align-items: center;
-            justify-content: flex-end; padding: 0 30px; border-bottom: 1px solid #eee;
+        /* شريط علوي أنيق */
+        .top-header {
+            background: white; height: 70px; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .user-profile { display: flex; align-items: center; gap: 10px; color: var(--main-purple); font-weight: 500; }
+        .search-bar { background: #f1f3f4; padding: 8px 15px; border-radius: 8px; width: 300px; display: flex; align-items: center; color: #888; }
         
-        .content-body { padding: 30px; }
+        .content-area { padding: 30px; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="logo-section">
+        <div class="brand-area">
             <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp">
-            <span class="brand-name">محجوب أونلاين</span>
+            <span class="brand-title">محجوب أونلاين</span>
         </div>
 
-        <nav class="nav-menu">
-            <a href="/dashboard" class="nav-item"><i class="fas fa-home"></i> <span class="item-text">الرئيسية</span></a>
-            <a href="#" class="nav-item"><i class="fas fa-chart-pie"></i> <span class="item-text">إحصائيات</span></a>
-            <a href="#" class="nav-item"><i class="fas fa-box"></i> <span class="item-text">المنتجات</span></a>
-            <a href="#" class="nav-item"><i class="fas fa-file-alt"></i> <span class="item-text">المقالات</span></a>
-            <a href="/logout" class="nav-item" style="margin-top: auto; color: #ff5e5e;"><i class="fas fa-power-off"></i> <span class="item-text">خروج</span></a>
+        <div class="vendor-badge">
+            <span class="vendor-name">{{ vendor.username }}</span>
+            <span class="certified-tag">
+                <i class="fas fa-check-circle"></i> مورد معتمد
+            </span>
+        </div>
+
+        <nav class="nav-list">
+            <a href="/dashboard" class="nav-link"><i class="fas fa-th-large"></i> <span class="link-text">الرئيسية</span></a>
+            <a href="#" class="nav-link"><i class="fas fa-box-open"></i> <span class="link-text">المنتجات</span></a>
+            <a href="#" class="nav-link"><i class="fas fa-shopping-cart"></i> <span class="link-text">الطلبات</span></a>
+            <a href="#" class="nav-link"><i class="fas fa-wallet"></i> <span class="link-text">المحفظة</span></a>
+            <a href="/logout" class="nav-link" style="margin-top: auto; color: #ff7675;"><i class="fas fa-sign-out-alt"></i> <span class="link-text">تسجيل الخروج</span></a>
         </nav>
     </aside>
 
     <main class="main-content">
-        <header class="top-nav">
-            <div class="user-profile">
-                <span>{{ vendor.owner_name }}</span> <i class="fas fa-user-circle" style="font-size: 1.8rem;"></i>
+        <header class="top-header">
+            <div class="search-bar">
+                <i class="fas fa-search" style="margin-left: 10px;"></i>
+                <span>بحث في اللامركزية...</span>
             </div>
-        </header>
-
-        <div class="content-body">
-            {% block content %}{% endblock %}
-        </div>
-    </main>
-
-</body>
-</html>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="color: #555;">{{ vendor.owner_name }}</span>
+                <i class="fas fa-user-circle" style="font-size: 2rem; color: var(--main-purple);"></i>
