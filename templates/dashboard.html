@@ -1,38 +1,19 @@
 {% extends "layout.html" %}
-
 {% block content %}
-<div class="dashboard-wrapper" style="max-width: 900px; margin: 0 auto;">
-
-    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 30px; border-right: 5px solid #4b0082;">
-        <h1 style="color: #4b0082; margin-top: 0;">أهلاً بك، {{ vendor.owner_name or vendor.username }} 👋</h1>
-        <p style="color: #666; font-size: 1.1rem;">سعيدون بتواجدك في محجوب أونلاين. إليك تفاصيل حسابك:</p>
-        
-        <div style="display: flex; align-items: center; gap: 15px; background: #f8f4ff; padding: 15px 25px; border-radius: 12px; margin-top: 20px;">
-            <i class="fas fa-wallet" style="font-size: 1.5rem; color: #4b0082;"></i>
-            <div>
-                <span style="display: block; color: #888; font-size: 0.85rem;">رقم المحفظة المسجل:</span>
-                <span style="font-weight: bold; color: #4b0082; font-family: monospace; font-size: 1.1rem;">
-                    {{ vendor.wallet_address or 'لم يتم ربط محفظة بعد' }}
-                </span>
-            </div>
+<div style="background: white; padding: 40px; border-radius: 15px; border-right: 6px solid #4b0082; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <h2 style="color: #4b0082;">أهلاً بك يا {{ vendor.owner_name or vendor.username }} 👋</h2>
+    <p style="color: #666;">إليك إحصائياتك ونظام الحوكمة الرقمية الخاص بك.</p>
+    
+    <div style="display: flex; gap: 20px; margin-top: 30px;">
+        <div style="flex: 1; background: #f8f4ff; padding: 20px; border-radius: 10px;">
+            <small style="color: #888;">المحفظة المسجلة:</small>
+            <div style="font-weight: bold; color: #4b0082;">{{ vendor.wallet_address or 'لم تُربط محفظة' }}</div>
         </div>
     </div>
 
-    <div id="upload-section" style="animation: fadeIn 0.8s ease-in-out;">
-        <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-            <span style="width: 10px; height: 10px; background: #ffd700; border-radius: 50%;"></span>
-            <h2 style="color: #2e004f; margin: 0; font-size: 1.4rem;">إضافة منتج جديد للمتجر</h2>
-        </div>
-        
-        {% include 'product_upload.html' %}
+    <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 30px;">
+        <h3>إضافة منتج جديد للمتجر</h3>
+        <p style="font-size: 0.9rem; color: #888;">تأكد من وضوح صور المنتج لرفع هرمونات الشراء لدى المستهلك.</p>
     </div>
-
 </div>
-
-<style>
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
 {% endblock %}
