@@ -1,63 +1,48 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import db, init_db
+from database import db, init_db, Vendor
 import logic
-import bridge_logic
 
 app = Flask(__name__)
-# مفتاح تشفير الجلسات - استبدله بمتغير بيئة في Railway لاحقاً
-app.secret_key = os.environ.get('SECRET_KEY', 'mahjoub_online_sovereign_2026')
+app.secret_key = os.environ.get('SECRET_KEY', 'mahjoub_secret_2026')
 
-# تهيئة الاتصال بقاعدة البيانات
+# ربط قاعدة البيانات في ريلوي
 init_db(app)
 
 @app.route('/')
 def index():
-    if 'vendor_id' in session:
-        return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if 'vendor_id' in session:
-        return redirect(url_for('dashboard'))
-        
     if request.method == 'POST':
         u = request.form.get('username')
         p = request.form.get('password')
         
-        # منطق التحقق والمطابقة الحقيقي
-        vendor, message = logic.perform_login(u, p)
+        # الربط المنطقي: التحقق من وجود المورد في Postgres
+        vendor = Vendor.query.filter_by(username=u, password=p).first()
         
         if vendor:
+            # إنشاء تذكرة الدخول (الجلسة)
             session['vendor_id'] = vendor.id
             return redirect(url_for('dashboard'))
         else:
-            flash(message)
+            flash("خطأ في بيانات الدخول، يرجى التحقق من قاعدة البيانات")
             
     return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
-    # منع الدخول غير المصرح به للهيكل
-    v_id = session.get('vendor_id')
-    if not v_id:
+    # منع الدخول إذا لم تكن هناك جلسة نشطة
+    vendor_id = session.get('vendor_id')
+    if not vendor_id:
         return redirect(url_for('login'))
-        
-    # جلب بيانات المورد الحقيقية من القاعدة لعرضها في الهيكل
-    vendor = logic.get_current_vendor(v_id)
-    if not vendor:
-        session.clear()
-        return redirect(url_for('login'))
-        
+    
+    # سحب بيانات المورد الحقيقية لعرضها في الهيكل
+    vendor = Vendor.query.get(vendor_id)
     return render_template('dashboard.html', vendor=vendor)
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
-
-if __name__ == "__main__":
-    # التوافق مع منافذ Railway
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
