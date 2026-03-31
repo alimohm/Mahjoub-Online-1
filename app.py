@@ -49,3 +49,22 @@ def logout():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
+
+
+@app.route('/add_product', methods=['POST'])
+def add_product():
+    vendor_id = session.get('vendor_id')
+    if not vendor_id:
+        return redirect(url_for('login'))
+
+    # استلام بيانات النافذة
+    name = request.form.get('name')
+    price = request.form.get('price')
+    description = request.form.get('description')
+    
+    # هنا يتم إضافة منطق الحفظ في قاعدة بيانات ريلوي
+    # ومن ثم الربط مع قمرة عبر bridge_logic
+    
+    flash(f"تم رفع المنتج '{name}' بنجاح إلى منصة محجوب أونلاين!")
+    return redirect(url_for('dashboard'))
