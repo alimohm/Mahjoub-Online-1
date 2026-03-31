@@ -7,165 +7,78 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --royal-purple: #4b0082; /* البنفسجي الملكي */
+            --royal-purple: #4b0082;
             --pure-white: #ffffff;
             --text-dark: #2d0056;
             --gold-accent: #ffd700;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            height: 100vh;
+            margin: 0; padding: 0; display: flex; height: 100vh;
             font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: var(--pure-white); /* خلفية بيضاء للفورم */
-            overflow: hidden;
+            background-color: var(--pure-white); overflow: hidden;
         }
 
-        /* القسم البنفسجي الملكي العميق (التبادل اللوني) */
         .brand-section {
             flex: 1.2;
             background: linear-gradient(135deg, #3b0066 0%, var(--royal-purple) 50%, #0d001a 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            padding: 50px;
-            text-align: center;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; color: white; padding: 50px; text-align: center;
         }
 
-        /* التعديل الجوهري: تحويل اللوجو للأبيض الناصع */
         .logo-login {
-            width: 150px;
-            /* هذا الكود يحول أي لوجو ملون لأبيض نقي */
-            filter: brightness(0) invert(1) !important;
+            width: 150px; filter: brightness(0) invert(1) !important;
             margin-bottom: 30px;
         }
 
-        .brand-section h1 {
-            font-size: 2.8rem;
-            margin: 10px 0;
-            font-weight: 700;
-        }
-
-        .brand-section p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 450px;
-            line-height: 1.6;
-            margin-bottom: 40px;
-        }
-
-        /* بطاقات الميزات بنفسجي داكن */
-        .features-list {
-            text-align: right;
-            width: 100%;
-            max-width: 450px;
-        }
+        .brand-section h1 { font-size: 2.8rem; margin: 10px 0; font-weight: 700; }
+        .brand-section p { font-size: 1.2rem; opacity: 0.9; max-width: 450px; line-height: 1.6; margin-bottom: 40px; }
 
         .feature-item {
+            display: flex; align-items: center; margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.1); padding: 18px;
+            border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-item i { font-size: 1.6rem; margin-left: 18px; color: var(--gold-accent); }
+
+        .login-section { flex: 1; display: flex; justify-content: center; align-items: center; background-color: var(--pure-white); }
+        .login-card { width: 100%; max-width: 400px; padding: 40px; }
+        .login-card h2 { color: var(--text-dark); font-size: 2.2rem; margin-bottom: 12px; }
+
+        /* --- تنسيق رسائل الخطأ الجديدة --- */
+        .alert-error {
+            background-color: #fff5f5;
+            color: #e53e3e;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #fed7d7;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            margin-bottom: 25px;
-            background: rgba(0, 0, 0, 0.1); /* تباين خفيف على البنفسجي */
-            padding: 18px;
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
+            gap: 10px;
         }
 
-        .feature-item i {
-            font-size: 1.6rem;
-            margin-left: 18px;
-            color: var(--gold-accent); /* لمسة ذهبية للميزات */
-        }
-        .feature-item span { font-size: 1.1rem; }
-
-        /* القسم الأبيض للفورم: نظيف واحترافي */
-        .login-section {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--pure-white);
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 400px;
-            padding: 40px;
-        }
-
-        .login-card h2 {
-            color: var(--text-dark);
-            font-size: 2.2rem;
-            margin-bottom: 12px;
-        }
-
-        .login-card p {
-            color: #666;
-            margin-bottom: 35px;
-            font-size: 1rem;
-        }
-
-        /* تنسيق خانات الإدخال مع الأيقونات على اليمين */
-        .form-group {
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .form-group i {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--royal-purple);
-            font-size: 1.1rem;
-        }
+        .form-group { margin-bottom: 25px; position: relative; }
+        .form-group i { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--royal-purple); font-size: 1.1rem; }
 
         input {
-            width: 100%;
-            padding: 16px 50px 16px 16px; /* مسافة للأيقونة على اليمين */
-            border: 2px solid #eee;
-            border-radius: 12px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
-            background-color: #fcfcfc;
+            width: 100%; padding: 16px 50px 16px 16px; border: 2px solid #eee;
+            border-radius: 12px; font-size: 1rem; box-sizing: border-box; outline: none;
+            transition: 0.3s; background-color: #fcfcfc;
         }
 
-        input:focus {
-            border-color: var(--royal-purple);
-            background-color: #f0e6f7; /* خلفية بنفسجية فاتحة عند التركيز */
-        }
+        input:focus { border-color: var(--royal-purple); background-color: #f0e6f7; }
 
-        /* زر الدخول البنفسجي */
         button {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--royal-purple);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
+            width: 100%; padding: 16px; background-color: var(--royal-purple);
+            color: white; border: none; border-radius: 12px; font-size: 1.1rem;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
             box-shadow: 0 10px 20px rgba(75, 0, 130, 0.2);
         }
 
-        button:hover {
-            background-color: #3b0066;
-            transform: translateY(-2px);
-        }
-
-        /* التجاوب مع الجوال */
-        @media (max-width: 900px) {
-            .brand-section { display: none; }
-            .login-section { flex: 1; width: 100%; }
-        }
+        @media (max-width: 900px) { .brand-section { display: none; } .login-section { flex: 1; width: 100%; } }
     </style>
 </head>
 <body>
@@ -174,20 +87,10 @@
         <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-login">
         <h1>محجوب أونلاين</h1>
         <p>المنصة الأولى لدعم الموردين والنمو الرقمي</p>
-        
         <div class="features-list">
-            <div class="feature-item">
-                <i class="fas fa-network-wired"></i>
-                <span>اللامركزية متطورة وحوكمة رقمية</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-truck-loading"></i>
-                <span>إدارة ذكية لسلاسل الإمداد</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-chart-line"></i>
-                <span>سوقك الذكي للنمو المتسارع</span>
-            </div>
+            <div class="feature-item"><i class="fas fa-network-wired"></i><span>اللامركزية متطورة وحوكمة رقمية</span></div>
+            <div class="feature-item"><i class="fas fa-truck-loading"></i><span>إدارة ذكية لسلاسل الإمداد</span></div>
+            <div class="feature-item"><i class="fas fa-chart-line"></i><span>سوقك الذكي للنمو المتسارع</span></div>
         </div>
     </div>
 
@@ -195,7 +98,18 @@
         <div class="login-card">
             <h2>تسجيل الدخول</h2>
             <p>مرحباً بك مجدداً في نظامك الإداري الملكي</p>
-            
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
             <form method="POST">
                 <div class="form-group">
                     <i class="fas fa-user"></i>
