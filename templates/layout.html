@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}محجوب أونلاين{% endblock %}</title>
+    <style>
+        :root { --royal-purple: #4b0082; --gold: #ffd700; }
+        body { font-family: sans-serif; background-color: #f8f9fa; margin: 0; display: flex; }
+        .sidebar { width: 250px; background: #222; color: white; height: 100vh; padding: 20px; position: fixed; }
+        .main-content { margin-right: 250px; padding: 30px; width: 100%; }
+        .nav-item { display: block; color: white; text-decoration: none; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
+        .nav-item:hover { background: var(--royal-purple); }
+        .btn-logout { color: #ff4444; margin-top: 50px; display: block; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <h2>سوقك الذكي</h2>
+        <hr>
+        <a href="/dashboard" class="nav-item">الرئيسية</a>
+        <a href="#" class="nav-item">الطلبات</a>
+        <a href="#" class="nav-item">الإعدادات</a>
+        <a href="/logout" class="btn-logout">تسجيل الخروج</a>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
