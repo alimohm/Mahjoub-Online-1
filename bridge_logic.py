@@ -54,3 +54,63 @@ def process_product_image(uploaded_file):
         print(f"Error processing image: {e}")
         return None
         
+
+import requests
+
+def push_to_qmr_store(name, description, final_price, image_buffer):
+    """
+    تقوم هذه الدالة بإرسال البيانات النهائية لمتجر محجوب أونلاين عبر GraphQL
+    وتعيين حالة المنتج كـ 'مسودة' (DRAFT) للمراجعة.
+    """
+    
+    # 1. تجهيز الترويسات (Headers) المطلوبة من قمرة
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+    }
+
+    # 2. بناء استعلام GraphQL لإنشاء المنتج
+    # ملاحظة: نرسله كمسودة (DRAFT) لضبط الحوكمة الرقمية
+    query = """
+    mutation CreateProduct($input: ProductInput!) {
+      createProduct(input: $input) {
+        id
+        name
+        status
+      }
+    }
+    """
+    
+    variables = {
+        "input": {
+            "name": name,
+            "description": description,
+            "price": final_price,
+            "status": "DRAFT",  # سيظهر عندك للمراجعة أولاً
+            "currency": "SAR"   # المتجر بالريال السعودي
+        }
+    }
+
+    # 3. إرسال الطلب (هنا نرسل البيانات والصورة معاً)
+    try:
+        # تجهيز ملف الصورة المعالج بصيغة WebP
+        files = {
+            'image': ('product.webp', image_buffer, 'image/webp')
+        }
+        
+        response = requests.post(
+            GRAPHQL_URL,
+            json={'query': query, 'variables': variables},
+            headers=headers,
+            files=files
+        )
+        
+        if response.status_code == 200:
+            print("تم إرسال المنتج لمتجر محجوب أونلاين بنجاح (قيد المراجعة)")
+            return True
+        else:
+            print(f"خطأ في الإرسال: {response.text}")
+            return False
+            
+    except Exception as e:
+        print(f"حدث خطأ أثناء الاتصال بقمرة: {e}")
+        return False
