@@ -1,22 +1,58 @@
 {% extends "layout.html" %}
+
 {% block content %}
-   {% endblock %}
+<div class="container-fluid py-4" style="direction: rtl;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-dark text-white p-4" style="border-right: 5px solid #632C8F; border-radius: 15px;">
+                <h3><i class="fas fa- crown text-warning me-2"></i> أهلاً بك يا {{ vendor.owner_name }}</h3>
+                <p class="text-secondary">لوحة تحكم الموردين - محجوب أونلاين</p>
+            </div>
+        </div>
+    </div>
 
-{% extends "layout.html" %}
-{% block content %}
-<div style="max-width: 900px; margin: 0 auto;">
-    {% include 'wallet_card.html' %}
+    <div class="row g-4">
+        <div class="col-md-5">
+            <div class="card shadow-sm p-4" style="border-radius: 20px; border: 1px solid #eee;">
+                <h4 class="mb-4 text-dark"><i class="fas fa-plus-circle text-primary"></i> إضافة منتج جديد</h4>
+                <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">اسم المنتج</label>
+                        <input type="text" name="name" class="form-control" placeholder="مثلاً: راوتر جيل خامس" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">السعر (بالدولار)</label>
+                        <input type="number" name="price" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">صورة المنتج</label>
+                        <input type="file" name="image" class="form-control" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn w-100 py-3" style="background-color: #4b0082; color: white; font-weight: bold; border-radius: 12px;">
+                        نشر المنتج للمتجر <i class="fas fa-paper-plane ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-            <i class="fas fa-check-circle"></i> {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    {% include 'product_upload.html' %}
+        <div class="col-md-7">
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="p-4 text-center border rounded-4 bg-light">
+                        <i class="fas fa-box-open fa-2x mb-2" style="color: #632C8F;"></i>
+                        <h5 class="text-dark">المنتجات النشطة</h5>
+                        <h2 class="fw-bold" style="color: #632C8F;">{{ vendor.products|length }}</h2>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-4 text-center border rounded-4 bg-light">
+                        <i class="fas fa-wallet fa-2x mb-2 text-success"></i>
+                        <h5 class="text-dark">المحفظة الرقمية</h5>
+                        <h2 class="fw-bold text-success">نشطة</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
