@@ -2,22 +2,44 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل الدخول</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محجوب أونلاين</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #0d001a; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: sans-serif; }
-        .login-card { background: #1a0033; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 320px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { width: 100%; padding: 12px; background: #4b0082; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        :root { --purple: #4b0082; --black: #0d001a; --gold: #ffd700; }
+        body { margin: 0; display: flex; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+        
+        /* Sidebar بتدرج ملكي */
+        .sidebar {
+            width: 260px; height: 100vh; position: fixed; right: 0;
+            background: linear-gradient(180deg, var(--black) 0%, var(--purple) 50%, var(--black) 100%);
+            color: white; z-index: 1000; box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        }
+        .sidebar-header { padding: 40px 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-img { width: 100px; filter: brightness(0) invert(1); } /* اللوجو الأبيض */
+        
+        .nav-links { list-style: none; padding: 20px 0; margin: 0; }
+        .nav-links a { display: flex; align-items: center; padding: 15px 25px; color: rgba(255,255,255,0.7); text-decoration: none; transition: 0.3s; }
+        .nav-links a:hover { background: rgba(255,255,255,0.1); color: white; border-right: 4px solid var(--gold); }
+        
+        .main-content { margin-right: 260px; width: 100%; padding: 30px; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h2>تسجيل الدخول</h2>
-        <form method="POST">
-            <input type="text" name="username" placeholder="اسم المستخدم" required>
-            <input type="password" name="password" placeholder="كلمة المرور" required>
-            <button type="submit">دخول للمنصة</button>
-        </form>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-img">
+            <div style="margin-top:20px; font-weight:bold; font-size:1.2rem;">{{ vendor.owner_name }}</div>
+            <small style="color:var(--gold)"><i class="fas fa-check-circle"></i> مورد معتمد</small>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/dashboard"><i class="fas fa-th-large" style="margin-left:10px;"></i> الرئيسية</a></li>
+            <li><a href="/logout" style="color:#ff8080;"><i class="fas fa-power-off" style="margin-left:10px;"></i> خروج</a></li>
+        </ul>
+    </aside>
+
+    <div class="main-content">
+        {% block content %}{% endblock %}
     </div>
 </body>
 </html>
