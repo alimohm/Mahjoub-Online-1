@@ -2,57 +2,23 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محجوب أونلاين | لوحة الموردين</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>قمرة كلاود - محجوب أونلاين</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --royal: #4b0082; --gold: #ffd700; --sidebar-w: 260px; }
-        body { margin: 0; display: flex; background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-        
-        .sidebar { 
-            width: var(--sidebar-w); background: linear-gradient(180deg, #2e004f, #0d001a); 
-            height: 100vh; position: fixed; right: 0; transition: 0.3s; z-index: 1000;
-        }
-        
-        .brand { padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .brand img { width: 65px; filter: brightness(0) invert(1); } /* لوجو أبيض */
-
-        .nav-item { display: flex; align-items: center; padding: 15px 25px; color: rgba(255,255,255,0.7); text-decoration: none; }
-        .nav-item:hover, .active { background: rgba(255,255,255,0.05); color: white; border-right: 4px solid var(--gold); }
-        .nav-item i { margin-left: 15px; font-size: 1.2rem; }
-
-        .main { margin-right: var(--sidebar-w); width: 100%; transition: 0.3s; }
-        .header { background: white; height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 80px; }
-            .link-text, .brand span { display: none; }
-            .main { margin-right: 80px; }
-            .nav-item { justify-content: center; padding: 20px 0; }
-        }
+        body { background-color: #000; color: #fff; }
+        .purple-btn { background-color: #632C8F; color: white; border: none; }
     </style>
 </head>
 <body>
-    <aside class="sidebar">
-        <div class="brand">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp">
-            <div style="color:white; margin-top:10px;">محجوب أونلاين</div>
+    <nav class="navbar navbar-dark" style="background-color: #1a1a1a; border-bottom: 2px solid #632C8F;">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold" href="#">QAMRAH <span style="color: #632C8F;">CLOUD</span></a>
         </div>
-        <nav style="margin-top:20px;">
-            <a href="/dashboard" class="nav-item active"><i class="fas fa-th-large"></i> <span class="link-text">الرئيسية</span></a>
-            <a href="#" class="nav-item"><i class="fas fa-box"></i> <span class="link-text">المنتجات</span></a>
-            <a href="/logout" class="nav-item" style="margin-top:50px; color:#ff7675;"><i class="fas fa-power-off"></i> <span class="link-text">خروج</span></a>
-        </nav>
-    </aside>
-    <div class="main">
-        <header class="header">
-            <div style="color:#888;">لوحة حوكمة الموردين</div>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-weight:bold;">{{ vendor.owner_name or vendor.username }}</span>
-                <i class="fas fa-user-circle" style="font-size:2rem; color:var(--royal);"></i>
-            </div>
-        </header>
-        <div style="padding:30px;">{% block content %}{% endblock %}</div>
+    </nav>
+
+    <div class="container mt-5">
+        {% block content %}{% endblock %}
     </div>
 </body>
 </html>
