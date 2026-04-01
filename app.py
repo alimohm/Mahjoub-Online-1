@@ -18,3 +18,21 @@ def home():
 if __name__ == "__main__":
     # تشغيل السيرفر على المنفذ 8080
     app.run(host='0.0.0.0', port=8080, debug=True)
+
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+import logic # استدعاء العقل
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # إرسال البيانات للمنطق لمعالجتها
+        result = logic.verify_login(request.form.get('username'), request.form.get('password'))
+        
+        if result['status']:
+            session['vendor_id'] = result['user_id']
+            session['role'] = result['role']
+            return redirect(url_for('dashboard'))
+        
+        flash(result['message'], "error")
+        
+    return render_template('login.html')
