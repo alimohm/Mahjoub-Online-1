@@ -12,14 +12,17 @@ def login_page():
     if is_logged_in(): return redirect(url_for('dashboard'))
     return render_template('login.html')
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST']) # أضفنا GET هنا
 def do_login():
+    if request.method == 'GET':
+        return redirect(url_for('login_page')) # إذا دخلت بالرابط، يرجعك لصفحة الدخول
+    
+    # هذا الجزء يبقى كما هو لمعالجة البيانات
     user = request.form.get('username')
     pw = request.form.get('password')
     if login_vendor(user, pw):
         return redirect(url_for('dashboard'))
     return redirect(url_for('login_page'))
-
 @app.route('/dashboard')
 def dashboard():
     if not is_logged_in(): return redirect(url_for('login_page'))
