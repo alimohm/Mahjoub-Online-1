@@ -35,3 +35,30 @@ def logout():
 def is_logged_in():
     """فحص حالة الحوكمة للمستخدم الحالي"""
     return 'vendor_id' in session
+
+
+from database import db, Vendor
+from flask import session, flash
+
+def login_vendor(username, password):
+    """البحث الفعلي في قاعدة البيانات"""
+    try:
+        # 1. البحث عن المورد بالاسم
+        vendor = Vendor.query.filter_by(username=username).first()
+        
+        # 2. التحقق من الوجود وكلمة المرور
+        if vendor and vendor.password == password:
+            # تخزين البيانات في الجلسة للوصول إليها في Dashboard
+            session['vendor_id'] = vendor.id
+            session['brand_name'] = vendor.brand_name
+            session['wallet'] = vendor.wallet_address
+            return True
+            
+        # 3. إرسال تنبيه في حال الفشل
+        flash("تنبيه: الهوية الرقمية أو المفتاح الخاص غير صحيح.", "danger")
+        return False
+        
+    except Exception as e:
+        print(f"Database Query Error: {e}")
+        flash("عذراً، النظام يواجه صعوبة في الاتصال بالقاعدة الآن.", "warning")
+        return False
