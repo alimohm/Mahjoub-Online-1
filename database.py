@@ -1,23 +1,15 @@
-import os
-from flask_sqlalchemy import SQLAlchemy
+from database import Vendor
 
-db = SQLAlchemy()
-
-def init_db(app):
-    # تحويل الرابط ليتوافق مع مكتبة SQLAlchemy الحديثة
-    uri = os.environ.get('DATABASE_URL', 'sqlite:///local.db')
-    if uri.startswith("postgres://"): uri = uri.replace("postgres://", "postgresql://", 1)
+def do_auth(u, p):
+    """التحقق المباشر من قاعدة البيانات"""
+    # البحث عن اسم المستخدم في جدول vendor
+    user = Vendor.query.filter_by(username=u).first()
     
-    app.config.update(
-        SQLALCHEMY_DATABASE_URI=uri,
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        SECRET_KEY=os.environ.get('SK', 'M_26_R')
-    )
-    db.init_app(app)
-    with app.app_context(): db.create_all()
-
-class Vendor(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-    owner_name = db.Column(db.String(120))
+    if not user:
+        return {"status": False, "msg": "اسم المستخدم غير مسجل في المنصة اللامركزية"}
+    
+    # التحقق من كلمة المرور
+    if user.password != p:
+        return {"status": False, "msg": "كلمة المرور غير صحيحة"}
+    
+    return {"status": True, "user": user}
