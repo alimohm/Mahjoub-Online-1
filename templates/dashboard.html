@@ -3,59 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم | محجوب أونلاين</title>
+    <title>لوحة التحكم السيادية | محجوب أونلاين</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --p-color: #4b0082; --gold: #FFD700; --dark: #1a1a1a; }
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: #f4f7f6; color: var(--dark); }
-        
-        /* الهيدر الملكي */
-        .navbar { background: var(--p-color); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .navbar .brand { font-weight: 700; font-size: 20px; display: flex; align-items: center; }
-        .navbar .brand i { color: var(--gold); margin-left: 10px; }
-        
-        .container { padding: 30px; max-width: 1200px; margin: 0 auto; }
-        
-        /* بطاقة المحفظة MQ */
-        .wallet-card { 
-            background: linear-gradient(135deg, var(--p-color), #6a0dad); 
-            color: white; padding: 30px; border-radius: 20px; position: relative;
-            overflow: hidden; box-shadow: 0 10px 20px rgba(75,0,130,0.3); margin-bottom: 30px;
+        :root {
+            --p-color: #4b0082; /* أرجواني ملكي */
+            --gold: #FFD700;
+            --bg-light: #f8f9fa;
+            --white: #ffffff;
         }
-        .wallet-card::after { content: '\f51e'; font-family: 'Font Awesome 5 Free'; position: absolute; left: -20px; bottom: -20px; font-size: 150px; opacity: 0.1; }
-        .wallet-card h3 { margin: 0; font-size: 18px; opacity: 0.8; }
-        .wallet-card .balance { font-size: 36px; font-weight: 700; margin: 15px 0; color: var(--gold); }
-        .wallet-card .address { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; font-family: monospace; font-size: 14px; display: inline-block; }
 
-        /* الأزرار والإجراءات */
-        .actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .btn-action { background: white; padding: 20px; border-radius: 15px; text-align: center; text-decoration: none; color: var(--p-color); font-weight: 700; transition: 0.3s; border: 1px solid #eee; }
-        .btn-action:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: var(--gold); }
-        .btn-action i { display: block; font-size: 30px; margin-bottom: 10px; color: var(--gold); }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg-light); color: #333; }
 
-        .logout-btn { color: #ff4d4d; text-decoration: none; font-weight: 600; border: 1px solid #ff4d4d; padding: 8px 20px; border-radius: 8px; transition: 0.3s; }
-        .logout-btn:hover { background: #ff4d4d; color: white; }
+        /* الهيدر العلوي */
+        header {
+            background: var(--p-color);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .brand-name { font-size: 22px; font-weight: 700; display: flex; align-items: center; }
+        .brand-name i { color: var(--gold); margin-left: 10px; }
+
+        .user-meta { display: flex; align-items: center; gap: 20px; }
+        .logout-link { 
+            color: #ff4d4d; text-decoration: none; font-weight: 600; 
+            border: 1px solid #ff4d4d; padding: 5px 15px; border-radius: 8px; transition: 0.3s;
+        }
+        .logout-link:hover { background: #ff4d4d; color: white; }
+
+        /* محتوى الصفحة */
+        .main-content { padding: 40px 5%; max-width: 1300px; margin: 0 auto; }
+
+        /* بطاقة المحفظة MQ */
+        .wallet-section {
+            background: linear-gradient(135deg, var(--p-color), #2e004f);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            position: relative;
+            box-shadow: 0 15px 30px rgba(75,0,130,0.2);
+            overflow: hidden;
+        }
+
+        .wallet-section::before {
+            content: '\f51e'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; left: -30px; bottom: -30px; font-size: 180px; opacity: 0.05;
+        }
+
+        .wallet-label { font-size: 16px; opacity: 0.8; margin-bottom: 10px; }
+        .wallet-balance { font-size: 42px; font-weight: 700; color: var(--gold); margin-bottom: 20px; }
+        .wallet-address { 
+            background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 10px;
+            font-family: monospace; border: 1px border: rgba(255,255,255,0.2); display: inline-block;
+        }
+
+        /* شبكة الإحصائيات/الأدوات */
+        .grid-tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .tool-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #eee;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .tool-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-color: var(--gold); }
+        .tool-card i { font-size: 40px; color: var(--p-color); margin-bottom: 15px; }
+        .tool-card h3 { margin: 0 0 10px 0; font-size: 20px; }
+        .tool-card p { font-size: 14px; color: #777; margin: 0; }
+
+        @media (max-width: 768px) {
+            .wallet-section { padding: 25px; }
+            .wallet-balance { font-size: 30px; }
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="brand"><i class="fas fa-crown"></i> محجوب أونلاين - سوقك الذكي</div>
-        <a href="/logout" class="logout-btn">خروج سيادي</a>
-    </nav>
+    <header>
+        <div class="brand-name">
+            <i class="fas fa-microchip"></i> محجوب أونلاين
+        </div>
+        <div class="user-meta">
+            <span>مرحباً، <strong>{{ session['brand_name'] }}</strong></span>
+            <a href="/logout" class="logout-link">خروج آمن</a>
+        </div>
+    </header>
 
-    <div class="container">
-        <div class="wallet-card">
-            <h3>أهلاً بك يا {{ session['brand_name'] }}</h3>
-            <div class="balance">رصيد المحفظة: 0.00 MAH</div>
-            <div class="address">عنوان محفظة MQ: {{ session['wallet'] }}</div>
+    <div class="main-content">
+        <div class="wallet-section">
+            <div class="wallet-label">إجمالي رصيد القيمة الرقمية (MAH)</div>
+            <div class="wallet-balance">0.00 <small style="font-size: 18px;">MAH</small></div>
+            <div class="wallet-label">عنوان محفظة MQ اللامركزية:</div>
+            <div class="wallet-address">{{ session['wallet'] }}</div>
         </div>
 
-        <div class="actions">
-            <a href="#" class="btn-action"><i class="fas fa-plus-circle"></i> إضافة منتج جديد</a>
-            <a href="#" class="btn-action"><i class="fas fa-history"></i> سجل العمليات</a>
-            <a href="#" class="btn-action"><i class="fas fa-cog"></i> إعدادات المتجر</a>
+        <div class="grid-tools">
+            <div class="tool-card">
+                <i class="fas fa-boxes-packing"></i>
+                <h3>إدارة المخزون</h3>
+                <p>تتبع سلاسل الإمداد والمنتجات الرقمية</p>
+            </div>
+            <div class="tool-card">
+                <i class="fas fa-receipt"></i>
+                <h3>الطلبات الواردة</h3>
+                <p>مراقبة المبيعات والتحصيل السيادي</p>
+            </div>
+            <div class="tool-card">
+                <i class="fas fa-user-gear"></i>
+                <h3>إعدادات العلامة</h3>
+                <p>تخصيص الهوية البصرية لمتجرك</p>
+            </div>
         </div>
     </div>
 
