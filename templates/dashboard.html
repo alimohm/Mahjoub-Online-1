@@ -1,8 +1,27 @@
 {% extends "layout.html" %}
+{% block title %}الرئيسة السيادية{% endblock %}
+{% block header_title %}لوحة التحكم الإحصائية{% endblock %}
+
 {% block content %}
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-    {% include 'wallet_card.html' %}
-    
-    {% include 'product_upload.html' %}
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-right: 5px solid var(--p-color);">
+        <h4 style="color: #888;">رصيد محفظة MQ</h4>
+        <h2 style="color: var(--p-color); margin: 15px 0;">0.00 <small style="font-size: 14px;">MQ</small></h2>
+        <p style="font-size: 12px; color: #aaa;">آخر تحديث: الآن</p>
+    </div>
+
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-right: 5px solid var(--gold);">
+        <h4 style="color: #888;">إجمالي المبيعات</h4>
+        <h2 style="color: #333; margin: 15px 0;">0.00 <small style="font-size: 14px;">YER</small></h2>
+        <p style="font-size: 12px; color: #2ecc71;">+0% منذ الشهر الماضي</p>
+    </div>
+</div>
+
+<div style="margin-top: 30px; background: #fffbe6; border: 1px solid #ffe58f; padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px;">
+    <i class="fas fa-rocket" style="color: #faad14; font-size: 24px;"></i>
+    <div>
+        <strong style="display: block;">ابدأ رحلتك في البيع!</strong>
+        <span style="font-size: 13px; color: #856404;">أكمل إعداد معلومات متجرك لتبدأ في استقبال الطلبات عبر محجوب أونلاين.</span>
+    </div>
 </div>
 {% endblock %}
