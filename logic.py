@@ -2,20 +2,22 @@ from flask import session, flash, redirect, url_for
 from database import db, Vendor
 
 def login_vendor(username, password):
-    """منطق التحقق وحوكمة الدخول"""
+    """منطق التحقق وحوكمة الدخول للمنصة اللامركزية"""
     try:
-        # البحث عن المورد في قاعدة البيانات السيادية
+        # 1. البحث عن المورد في قاعدة البيانات السيادية (Railway Postgres)
         vendor = Vendor.query.filter_by(username=username).first()
         
+        # 2. التحقق من وجود الهوية الرقمية
         if not vendor:
-            flash("تنبيه: هذه الهوية الرقمية غير مسجلة في نظام MQ.", "warning")
+            flash("تنبيه: هذه الهوية الرقمية غير مسجلة في المنصة اللامركزية.", "warning")
             return False
             
+        # 3. التحقق من مطابقة المفتاح الخاص (كلمة المرور)
         if vendor.password != password:
-            flash("خطأ: المفتاح الخاص (كلمة المرور) غير مطابق.", "danger")
+            flash("خطأ: المفتاح الخاص (كلمة المرور) غير مطابق لسجلاتنا.", "danger")
             return False
             
-        # إنشاء جلسة عمل آمنة للمورد
+        # 4. في حال النجاح: إنشاء جلسة عمل آمنة للمورد وتخزين بياناته
         session['vendor_id'] = vendor.id
         session['brand_name'] = vendor.brand_name or "محجوب أونلاين"
         session['wallet'] = vendor.wallet_address
@@ -23,42 +25,15 @@ def login_vendor(username, password):
         
     except Exception as e:
         print(f"Logic Execution Error: {e}")
-        flash("عذراً، حدث خطأ في مزامنة البيانات مع السيرفر.", "danger")
+        flash("عذراً، النظام يواجه صعوبة في مزامنة البيانات مع السيرفر السيادي الآن.", "danger")
         return False
 
 def logout():
-    """تطهير الجلسة وإغلاق البوابة"""
+    """تطهير الجلسة وإغلاق بوابة الحوكمة"""
     session.clear()
-    flash("تم تسجيل الخروج بنجاح. نراك قريباً.", "info")
+    flash("تم تسجيل الخروج بنجاح من نظامك الإداري.", "info")
     return redirect(url_for('login_page'))
 
 def is_logged_in():
-    """فحص حالة الحوكمة للمستخدم الحالي"""
+    """فحص حالة الحوكمة للمستخدم الحالي (هل الجلسة نشطة؟)"""
     return 'vendor_id' in session
-
-
-from database import db, Vendor
-from flask import session, flash
-
-def login_vendor(username, password):
-    """البحث الفعلي في قاعدة البيانات"""
-    try:
-        # 1. البحث عن المورد بالاسم
-        vendor = Vendor.query.filter_by(username=username).first()
-        
-        # 2. التحقق من الوجود وكلمة المرور
-        if vendor and vendor.password == password:
-            # تخزين البيانات في الجلسة للوصول إليها في Dashboard
-            session['vendor_id'] = vendor.id
-            session['brand_name'] = vendor.brand_name
-            session['wallet'] = vendor.wallet_address
-            return True
-            
-        # 3. إرسال تنبيه في حال الفشل
-        flash("تنبيه: الهوية الرقمية أو المفتاح الخاص غير صحيح.", "danger")
-        return False
-        
-    except Exception as e:
-        print(f"Database Query Error: {e}")
-        flash("عذراً، النظام يواجه صعوبة في الاتصال بالقاعدة الآن.", "warning")
-        return False
