@@ -1,55 +1,37 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import db, init_db, Vendor
-import logic  # استدعاء ملف المنطق المنفصل
+from database import db, init_db
+import logic # استيراد العقل المنفصل
 
 app = Flask(__name__)
-# ضبط المسارات لضمان رؤية المجلدات الصحيحة
-app.template_folder = os.path.abspath('templates')
-app.secret_key = 'mahjoub_online_2026_key' # مفتاح الأمان للتشفير
-
-# 1. تهيئة قاعدة البيانات عند التشغيل
+app.secret_key = os.environ.get("SECRET_KEY", "mahjoub_2026_secret")
 init_db(app)
 
-# 2. بوابة الدخول (المسار الوحيد للدالة login)
+@app.route('/')
+def index():
+    return redirect(url_for('login_view')) # توجيه للفيو الجديد
+
+# تغيير اسم الدالة البرمجية إلى login_view مع بقاء الرابط /login
 @app.route('/login', methods=['GET', 'POST'])
-def login():
-    # منع الدخول المتكرر إذا كانت الجلسة نشطة
+def login_view(): 
     if 'vendor_id' in session:
-        return redirect(url_for('dashboard'))
+        return "تم تسجيل الدخول بنجاح" # أو وجهه للـ Dashboard
 
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         
-        # استدعاء منطق التحقق من ملف logic.py
-        # تأكد أن الدالة في logic.py اسمها do_login_check
-        result = logic.do_login_check(username, password)
+        # نطلب من المنطق تنفيذ التحقق
+        result = logic.execute_authentication(username, password)
         
         if result['status']:
-            session.permanent = True
             session['vendor_id'] = result['user'].id
-            return redirect(url_for('dashboard'))
-        else:
-            # إظهار رسالة الخطأ باللون الأحمر في القسم البنفسجي
-            flash(result['message'], "error")
-            
-    # عرض الواجهة المعكوسة (أبيض يمين، بنفسجي يسار)
+            return redirect(url_for('login_view'))
+        
+        flash(result['message'], "error")
+        
     return render_template('login.html')
 
-# 3. توجيه الرابط الرئيسي
-@app.route('/')
-def index():
-    return redirect(url_for('login'))
-
-# 4. لوحة التحكم (مؤقتة لاختبار النجاح)
-@app.route('/dashboard')
-def dashboard():
-    if 'vendor_id' not in session:
-        return redirect(url_for('login'))
-    return "تم تسجيل الدخول بنجاح إلى لوحة محجوب أونلاين"
-
 if __name__ == "__main__":
-    # التشغيل على منفذ 8080 المتوافق
     port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port)
