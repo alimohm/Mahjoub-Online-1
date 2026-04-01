@@ -1,3 +1,7 @@
+from database import init_db
+
+# ... داخل الكود بعد تعريف app ...
+init_db(app) # هذا السطر هو الذي "يفتح البوابة" بين الكود والقاعدة
 import os
 from flask import Flask, render_template, request, redirect, url_for
 from config import Config
