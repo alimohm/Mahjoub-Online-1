@@ -1,38 +1,144 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}اللوحة السيادية{% endblock %} | محجوب أونلاين</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        :root { --main-bg: #0a001a; --p-purple: #632C8F; }
-        body { margin: 0; display: flex; background: #f4f7f6; font-family: sans-serif; }
-        .sidebar { width: 250px; background: var(--main-bg); height: 100vh; position: fixed; color: white; transition: 0.3s; z-index: 1000; }
-        .sidebar img { width: 80px; filter: brightness(0) invert(1); padding: 25px; display: block; margin: 0 auto; }
-        .main { margin-right: 250px; width: 100%; transition: 0.3s; }
-        @media (max-width: 768px) {
-            .sidebar { width: 70px; } .sidebar span { display: none; }
-            .main { margin-right: 70px; }
+        :root {
+            --p-color: #4b0082; /* الأرجواني الملكي */
+            --gold: #FFD700;    /* الذهب للتمييز الملكي */
+            --bg-body: #f4f6f9;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg-body); display: flex; direction: rtl; }
+
+        /* --- القائمة الجانبية (Sidebar) في اليمين - باللون البنفسجي --- */
+        .sidebar { 
+            width: 260px; height: 100vh; background: var(--p-color); 
+            display: flex; flex-direction: column; position: fixed; right: 0; 
+            padding-top: 20px; color: var(--text-light); border-left: 1px solid rgba(255,255,255,0.1); 
+            transition: 0.3s;
+        }
+
+        /* استبدال قمرة بـ محجوب أونلاين في الأعلى */
+        .brand-logo { 
+            display: flex; align-items: center; justify-content: center; 
+            padding: 10px 20px 30px 20px; gap: 10px;
+        }
+        .brand-logo img { width: 35px; filter: brightness(0) invert(1); } /* اللوجو أبيض على البنفسجي */
+        .brand-name { font-size: 18px; font-weight: 700; color: var(--gold); }
+
+        /* روابط التنقل */
+        .nav-links { flex: 1; padding: 0 15px; }
+        .nav-link { 
+            display: flex; align-items: center; padding: 12px 15px; 
+            color: rgba(255,255,255,0.8); text-decoration: none; border-radius: 8px; 
+            margin-bottom: 5px; font-size: 15px; transition: 0.2s;
+        }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .nav-link i { margin-left: 12px; font-size: 16px; color: var(--gold); } /* الأيقونات ذهبية */
+
+        /* --- المحتوى الرئيسي (Main Content) في اليسار --- */
+        .main-wrapper { 
+            margin-right: 260px; width: 100%; display: flex; flex-direction: column; 
+            transition: 0.3s;
+        }
+
+        /* شريط العنوان العلوي (Top Navbar) */
+        .top-navbar { 
+            height: 70px; background: white; border-bottom: 1px solid #eee; 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 30px; position: sticky; top: 0; z-content: 1000;
+        }
+        
+        /* استدعاء الهوية الملكية للمورد */
+        .vendor-profile { display: flex; align-items: center; gap: 12px; }
+        .vendor-avatar { 
+            width: 45px; height: 45px; border-radius: 50%; 
+            background: var(--p-color); color: white; font-weight: 700; font-size: 18px;
+            display: flex; align-items: center; justify-content: center; 
+            border: 2px solid #eee; overflow: hidden; /* تمييز حواف اللوجو */
+        }
+        /* في حال استخدام الصورة الحقيقية للوجو المورد */
+        .vendor-avatar img { width: 100%; height: 100%; object-fit: cover; } 
+
+        .vendor-info { text-align: right; }
+        .vendor-name { font-weight: 700; color: var(--text-dark); font-size: 15px; }
+        .vendor-brand { color: var(--p-color); font-size: 13px; font-weight: 600; } /* اسم العلامة التجارية */
+
+        /* منطقة المحتوى */
+        .content-area { padding: 30px; }
+
+        /* --- التجاوب الذكي مع الشاشات --- */
+        @media (max-width: 991px) {
+            .sidebar { width: 80px; }
+            .brand-name { display: none; }
+            .nav-link span { display: none; }
+            .nav-link { justify-content: center; padding: 15px; }
+            .nav-link i { margin-left: 0; font-size: 20px; }
+            .main-wrapper { margin-right: 80px; }
+        }
+
+        @media (max-width: 767px) {
+            .top-navbar { padding: 0 15px; }
+            .vendor-avatar { width: 40px; height: 40px; font-size: 16px; }
+            .vendor-info { display: none; } /* إخفاء النص لتقليل الزحام على الجوال */
+            .content-area { padding: 15px; }
         }
     </style>
 </head>
 <body>
+
     <div class="sidebar">
-        <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp">
-        <nav style="padding: 15px;">
-            <p><i class="fas fa-home"></i> <span>الرئيسية</span></p>
-            <p><i class="fas fa-wallet"></i> <span>المحفظة</span></p>
-            <p><i class="fas fa-box"></i> <span>المنتجات</span></p>
-        </nav>
+        <div class="brand-logo">
+            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" alt="محجوب أونلاين">
+            <span class="brand-name">محجوب أونلاين</span>
+        </div>
+        
+        <div class="nav-links">
+            <a href="{{ url_for('db_v') }}" class="nav-link active"><i class="fas fa-chart-line"></i> <span>الرئيسة السيادية</span></a>
+            <a href="#" class="nav-link"><i class="fas fa-wallet"></i> <span>المحفظة الرقمية MQ</span></a>
+            <a href="#" class="nav-link"><i class="fas fa-tags"></i> <span>المنتجات المسودة</span></a>
+            <a href="#" class="nav-link"><i class="fas fa-user-tie"></i> <span>إعدادات العلامة التجارية</span></a>
+            <a href="{{ url_for('logout') }}" class="nav-link" style="margin-top: auto; color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> <span>تسجيل الخروج</span></a>
+        </div>
     </div>
-    <div class="main">
-        <header style="background:white; padding:15px 30px; display:flex; justify-content:space-between; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-            <b>{{ vendor.brand_name }}</b>
-            <span>مرحباً، {{ vendor.owner_name }}</span>
-        </header>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}{% for cat, msg in messages %}<div style="padding:15px; margin:10px; border-radius:8px; background:{% if cat=='success' %}#d4edda{% else %}#f8d7da{% endif %};">{{ msg }}</div>{% endfor %}{% endif %}
-        {% endwith %}
-        <div style="padding: 20px;">{% block content %}{% endblock %}</div>
+
+    <div class="main-wrapper">
+        <div class="top-navbar">
+            <div class="top-nav-right">
+                <h3>{% block header_title %}{% endblock %}</h3>
+            </div>
+            
+            <div class="vendor-profile">
+                <div class="vendor-info">
+                    <span class="vendor-name">{{ session.get('owner_name', 'مورد سيادي') }}</span>
+                    <br>
+                    <span class="vendor-brand">{{ session.get('brand_name', 'علامتك التجارية') }}</span>
+                </div>
+                <div class="vendor-avatar">
+                    {% if session.get('brand_logo_url') %}
+                        <img src="{{ session.get('brand_logo_url') }}" alt="لوجو">
+                    {% else %}
+                        {{ session.get('owner_name', 'م')[0] }}
+                    {% endif %}
+                </div>
+                <button style="background: none; border: none; font-size: 20px; color: #aaa; cursor: pointer;"><i class="fas fa-angle-down"></i></button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            {% block content %}{% endblock %}
+        </div>
     </div>
+
 </body>
 </html>
