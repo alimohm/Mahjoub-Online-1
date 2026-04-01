@@ -37,13 +37,14 @@ def init_db(app):
     
     db.init_app(app)
     
-    with app.app_context():
+with app.app_context():
         try:
-            # مسح وإعادة إنشاء الجدول لضمان تطابق الهيكل
+            # هذا السطر سيمسح الجداول القديمة (التي تفتقد لعمود phone)
             db.drop_all() 
+            # هذا السطر سينشئ الجداول الجديدة بكل الأعمدة (phone, brand_name, wallet_address)
             db.create_all()
             
-            # إنشاء حسابك الأساسي 'ali' ببياناته التلقائية
+            # إعادة إنشاء حسابك 'ali' ليكون جاهزاً للدخول فوراً
             if not Vendor.query.filter_by(username='ali').first():
                 new_v = Vendor(
                     username='ali',
@@ -51,10 +52,10 @@ def init_db(app):
                     phone='77xxxxxxx',
                     owner_name='علي محجوب',
                     brand_name='محجوب أونلاين',
-                    wallet_address=generate_mah_wallet()
+                    wallet_address=generate_mah_wallet() # المحفظة الملكية MAH
                 )
                 db.session.add(new_v)
                 db.session.commit()
-                print("✅ تم بناء النظام بنجاح وواجهة تسجيل الدخول جاهزة!")
+            print("✅ تم تحديث قاعدة البيانات وإضافة عمود الهاتف بنجاح!")
         except Exception as e:
-            print(f"⚠️ خطأ أثناء التهيئة: {e}")
+            print(f"⚠️ تنبيه: {e}")
