@@ -74,38 +74,3 @@ def add_product():
         return redirect(url_for('dashboard'))
 
     return render_template('add_product.html')
-
-@app.route('/add_product')
-def add_product_page():
-    if 'username' not in session:
-        return redirect(url_for('login_page'))
-    return render_template('add_product.html')
-
-@app.route('/add_product', methods=['POST'])
-def handle_product_upload():
-    if 'username' not in session:
-        return redirect(url_for('login_page'))
-    
-    # 1. استلام البيانات من الملف المستقل
-    name = request.form.get('name')
-    price = request.form.get('price')
-    description = request.form.get('description')
-    
-    # 2. تجهيز البيانات للمزامنة (Webhook Payload)
-    product_payload = {
-        "name": name,
-        "price": float(price),
-        "description": description,
-        "vendor_wallet": session.get('wallet'), # محفظة MAH
-        "origin": "Mahjoub-Online"
-    }
-    
-    # 3. إطلاق الـ Webhook
-    is_synced = sync_product_to_qumra(product_payload)
-    
-    if is_synced:
-        flash(f"تم رفع {name} ومزامنته مع متجر قمرة بنجاح!", "success")
-    else:
-        flash(f"تم الرفع محلياً، لكن فشلت المزامنة مع متجر قمرة.", "warning")
-        
-    return redirect(url_for('dashboard'))
