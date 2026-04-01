@@ -1,38 +1,39 @@
-# ملف المنطق: logic.py
-# انتبه: لا تقم باستيراد db هنا لمنع التعليق
-from database import Vendor
+from flask import session, flash, redirect, url_for
+from database import db, Vendor
 
-def do_auth(u, p):
-    """
-    وظيفة التحقق من الهوية من قاعدة البيانات مباشرة
-    """
+def login_vendor(username, password):
+    """التحقق من بيانات المورد وتخزين هويته في الجلسة"""
     try:
-        # البحث عن المستخدم في جدول الموردين
-        user = Vendor.query.filter_by(username=u).first()
+        # البحث عن المورد في قاعدة البيانات
+        vendor = Vendor.query.filter_by(username=username).first()
         
-        # 1. التحقق من وجود المستخدم
-        if not user:
-            return {
-                "status": False, 
-                "msg": "اسم المستخدم غير مسجل في المنصة اللامركزية"
-            }
-        
-        # 2. التحقق من تطابق كلمة المرور
-        if user.password != p:
-            return {
-                "status": False, 
-                "msg": "كلمة المرور غير صحيحة، يرجى المحاولة مرة أخرى"
-            }
-        
-        # 3. نجاح التحقق وإعادة بيانات الهوية كاملة
-        return {
-            "status": True, 
-            "user": user
-        }
-        
+        if vendor and vendor.password == password:
+            # تخزين البيانات الأساسية في الـ Session
+            session['vendor_id'] = vendor.id
+            session['username'] = vendor.username
+            session['brand_name'] = vendor.brand_name or f"متجر {vendor.username}"
+            session['wallet'] = vendor.wallet_address # محفظة MAH
+            
+            flash(f"أهلاً بك في منصتك السيادية، {vendor.owner_name or vendor.username}", "success")
+            return True
+        else:
+            flash("خطأ في اسم المستخدم أو كلمة المرور. يرجى التحقق.", "danger")
+            return False
+            
     except Exception as e:
-        # معالجة أي خطأ مفاجئ في الاتصال بالقاعدة
-        return {
-            "status": False, 
-            "msg": f"خطأ في الاتصال بقاعدة البيانات: {str(e)}"
-        }
+        # التعامل مع أخطاء قاعدة البيانات (مثل العمود المفقود)
+        print(f"Logic Error: {e}")
+        flash("عذراً، حدث خطأ فني في النظام. جاري الإصلاح تلقائياً.", "warning")
+        return False
+
+def get_current_vendor():
+    """جلب بيانات المورد الحالي المسجل دخوله"""
+    if 'vendor_id' in session:
+        return Vendor.query.get(session['vendor_id'])
+    return None
+
+def logout_vendor():
+    """إنهاء الجلسة والخروج"""
+    session.clear()
+    flash("تم تسجيل الخروج من سوقك الذكي بنجاح.", "info")
+    return redirect(url_for('login_page'))
