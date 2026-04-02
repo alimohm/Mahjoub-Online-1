@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from werkzeug.utils import secure_filename # أداة أمان لرفع الملفات
+from werkzeug.utils import secure_filename
 from config import Config
 from database import db, init_db, Product, Vendor 
 from logic import login_vendor, logout, is_logged_in
@@ -9,11 +9,12 @@ from sync_service import send_to_qumra_webhook
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# إعدادات مجلد الرفع الذي أنشأته توكاً
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # حد أقصى 16 ميجا للصورة
+# ضمان وجود مسار الرفع من الإعدادات
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True) # إنشاء المجلد تلقائياً إذا لم يوجد
 
-# تهيئة قاعدة البيانات
+# تهيئة قاعدة البيانات (تفعيل الترقيع الذكي للأعمدة)
 init_db(app)
 
 @app.route('/')
@@ -31,6 +32,7 @@ def login_page():
         pw = request.form.get('password')
         if login_vendor(user, pw):
             return redirect(url_for('dashboard'))
+        flash("❌ خطأ في اسم المستخدم أو كلمة المرور", "danger")
     return render_template('login.html')
 
 @app.route('/dashboard')
@@ -41,12 +43,15 @@ def dashboard():
     vendor = Vendor.query.filter_by(username=session['username']).first()
     
     try:
-        products_count = Product.query.filter_by(vendor_username=session['username']).count()
+        # عرض منتجات المورد الحالي فقط
+        products = Product.query.filter_by(vendor_username=session['username']).all()
+        products_count = len(products)
     except Exception as e:
         print(f"⚠️ تنبيه أثناء جلب الإحصائيات: {e}")
         products_count = 0
+        products = []
     
-    return render_template('dashboard.html', vendor=vendor, products_count=products_count)
+    return render_template('dashboard.html', vendor=vendor, products_count=products_count, products=products)
 
 @app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
@@ -57,7 +62,7 @@ def add_product():
         p_name = request.form.get('name')
         p_price = request.form.get('price')
         p_desc = request.form.get('description', '') 
-        p_image = request.files.get('image') # استقبال ملف الصورة من النموذج
+        p_image = request.files.get('image')
 
         if not p_name or not p_price:
             flash("❌ يرجى إدخال اسم المنتج وسعره.", "danger")
@@ -67,36 +72,36 @@ def add_product():
             final_price = float(p_price)
             image_filename = None
 
-            # معالجة رفع الصورة وحفظها في المجلد الجديد
+            # معالجة الصورة بأمان
             if p_image and p_image.filename != '':
+                # نستخدم secure_filename لحماية السيرفر
                 image_filename = secure_filename(p_image.filename)
-                # التأكد من وجود المجلد (احتياطاً)
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                # حفظ الصورة في المسار المحدد
                 p_image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
 
-            # الحفظ المحلي في قاعدة بيانات محجوب أونلاين
+            # الحفظ المحلي: لاحظ استخدام image_file ليتوافق مع database.py المحدث
             new_item = Product(
                 name=p_name,
                 price=final_price,
                 description=p_desc,
-                image_file=image_filename, # حفظ اسم الملف في القاعدة
+                image_file=image_filename, 
                 vendor_username=session['username']
             )
             
             db.session.add(new_item)
             db.session.commit()
             
-            # إطلاق المزامنة مع قمرة مع تمرير اسم ملف الصورة
+            # إطلاق المزامنة السيادية عبر GraphQL
             try:
-                # نمرر اسم ملف الصورة لـ sync_service لكي تصنع الرابط لقمرة
+                # نرسل السعر كنص واسم الصورة للربط الخارجي
                 status = send_to_qumra_webhook(p_name, str(final_price), p_desc, image_filename)
                 if status:
                     flash(f"🚀 تم رفع {p_name} ومزامنته مع المتجر بنجاح!", "success")
                 else:
-                    flash(f"✅ تم الحفظ في لوحة محجوب، وجاري المزامنة التقنية.", "info")
+                    flash(f"✅ تم الحفظ في لوحتك، جاري تحديث بيانات المتجر الخارجي.", "info")
             except Exception as sync_err:
-                print(f"📡 خطأ مزامنة: {sync_err}")
-                flash(f"⚠️ المنتج متاح في لوحتك، سيتم تحديث المتجر الخارجي آلياً.", "warning")
+                print(f"📡 خطأ مزامنة خارجية: {sync_err}")
+                flash(f"⚠️ المنتج متاح في لوحتك، سيتم مزامنته لاحقاً.", "warning")
 
             return redirect(url_for('dashboard'))
 
@@ -112,11 +117,13 @@ def add_product():
 
 @app.route('/webhook/qumra', methods=['POST'])
 def qumra_receiver():
+    """استقبال تحديثات الطلبات من قمرة"""
     try:
         data = request.json
         print(f"📡 إشارة قادمة من قمرة: {data}")
-        return {"status": "received"}, 200
-    except:
+        return {"status": "success", "message": "Mahjoub Received"}, 200
+    except Exception as e:
+        print(f"❌ خطأ ويب هوك: {e}")
         return {"status": "error"}, 400
 
 @app.route('/logout')
@@ -124,5 +131,6 @@ def logout_route():
     return logout()
 
 if __name__ == '__main__':
+    # دعم بورت Railway التلقائي
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
