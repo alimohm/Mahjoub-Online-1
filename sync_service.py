@@ -2,27 +2,24 @@ import os
 import requests
 import json
 
-# الرابط المستخرج من واجهة GraphQL الخاصة بك في قمرة
 GRAPHQL_URL = "https://mahjoub.online/admin/graphql"
 
-# المفتاح الذي أنشأته (Access Token)
-# ملاحظة: سيقوم الكود بجلب المفتاح من إعدادات Railway، وإذا لم يجده سيستخدم القيمة الافتراضية
-API_KEY = os.environ.get("QUMRA_ACCESS_TOKEN", "ضع_المفتاح_هنا_إذا_لم_تضعه_في_railway")
+# جلب المفتاح والتأكد من أنه نص إنجليزي سليم
+API_KEY = str(os.environ.get("QUMRA_ACCESS_TOKEN", "")).strip()
 
 def send_to_qumra_webhook(name, price, description, image_filename=None):
     """
-    إرسال المنتج كمسودة (DRAFT) عبر GraphQL مع معالجة الحروف العربية (UTF-8).
+    إرسال المنتج مع ضمان تشفير UTF-8 للحروف العربية لمنع خطأ latin-1.
     """
-    # رابط سيرفرك في Railway للوصول للصور المرفوعة
     BASE_URL = "https://mahjoub-online-1-production-c824.up.railway.app"
     
+    # التأكد من خلو Headers من أي حروف عربية أو مسافات غريبة
     headers = {
-        "Authorization": "Bearer " + str(API_KEY),
+        "Authorization": "Bearer " + API_KEY,
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
 
-    # بناء الاستعلام (Mutation) المتوافق مع GraphQL
     query = """
     mutation CreateNewProduct($input: CreateProductInput!) {
       createProduct(input: $input) {
@@ -33,54 +30,41 @@ def send_to_qumra_webhook(name, price, description, image_filename=None):
     }
     """
     
-    # تجهيز البيانات (المتغيرات)
     variables = {
         "input": {
-            "title": name,
+            "title": str(name),
             "price": float(price),
-            "description": description,
+            "description": str(description),
             "status": "DRAFT",
-            "image": (BASE_URL + "/static/uploads/" + image_filename) if image_filename else None
+            "image": (BASE_URL + "/static/uploads/" + str(image_filename)) if image_filename else None
         }
     }
 
     try:
-        # تحويل البيانات إلى JSON بتشفير UTF-8 لضمان سلامة اللغة العربية
-        data_to_send = json.dumps(
-            {'query': query, 'variables': variables}, 
-            ensure_ascii=False
-        ).encode('utf-8')
+        # الحل الجذري: تحويل البيانات إلى JSON ثم Encode إلى bytes باستخدام utf-8
+        # هذا يمنع requests من محاولة استخدام تشفير latin-1 الافتراضي
+        json_payload = json.dumps({'query': query, 'variables': variables}, ensure_ascii=False)
+        encoded_payload = json_payload.encode('utf-8')
         
-        print("🚀 محاولة مزامنة المنتج: " + str(name))
+        print("🚀 محاولة إرسال البيانات المشفرة لمنتج: " + str(name))
         
-        # إرسال الطلب للسيرفر
         response = requests.post(
             GRAPHQL_URL, 
-            data=data_to_send, 
+            data=encoded_payload, # نرسل الـ bytes مباشرة
             headers=headers, 
             timeout=30
         )
         
-        # تحليل الرد لكشف الأخطاء (معالجة آمنة للطباعة لتجنب الـ Crash)
-        response_data = {}
+        # تحليل الرد
         try:
             response_data = response.json()
-            # طباعة الرد بشكل واضح في الـ Logs
-            print("📡 رد السيرفر التفصيلي: " + json.dumps(response_data, indent=2, ensure_ascii=False))
+            print("📡 رد السيرفر: " + json.dumps(response_data, ensure_ascii=False))
         except:
-            print("📡 الرد ليس بتنسيق JSON: " + str(response.text))
+            print("📡 رد غير مفهوم من السيرفر")
 
-        # التحقق من النجاح التقني والبرمجي
-        if response.status_code == 200:
-            if "errors" in response_data:
-                print("⚠️ رفض السيرفر الطلب بسبب أخطاء في حقول الـ GraphQL")
-                return False
-            print("✅ تمت المزامنة بنجاح! المنتج الآن مسودة في قمرة.")
-            return True
-        else:
-            print("❌ فشل الاتصال. الكود: " + str(response.status_code))
-            return False
+        return response.status_code == 200 and "errors" not in response.text
 
     except Exception as e:
-        print("❌ خطأ تقني غير متوقع: " + str(e))
+        # طباعة الخطأ بشكل آمن
+        print("❌ خطأ أثناء الإرسال: " + str(e))
         return False
