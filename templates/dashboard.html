@@ -1,176 +1,34 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محجوب أونلاين | لوحة التحكم</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --bg-body: #f8fafb;
-            --white: #ffffff;
-            --main-p-color: #4b0082;
-            --gold: #FFD700;
-            --sidebar-width: 280px;
-            --sidebar-collapsed-width: 80px;
-            --header-height: 80px;
-        }
+{% extends "layout.html" %}
 
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg-body); display: flex; height: 100vh; overflow: hidden; }
+{% block title %}الرئيسية - محجوب أونلاين{% endblock %}
 
-        /* --- السايدبار (جهة اليمين) --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--white);
-            height: 100%;
-            border-left: 1px solid #eef2f3;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
+{% block content %}
+<header class="top-header">
+    <div class="header-welcome">
+        نظامك الإداري <span>| المنصة اللامركزية الأولى في اليمن</span>
+    </div>
+    </header>
 
-        .brand-section { padding: 25px; text-align: center; border-bottom: 1px solid #eef2f3; }
-        .logo-img { height: 45px; }
-
-        .menu-list { flex: 1; padding: 20px 0; overflow-y: auto; }
-        .menu-item {
-            display: flex; align-items: center; padding: 14px 20px;
-            text-decoration: none; color: #7f8c8d; font-weight: 600;
-            margin: 4px 15px; border-radius: 12px; transition: 0.3s;
-        }
-        .menu-item i { margin-left: 15px; font-size: 18px; width: 25px; text-align: center; }
-        .menu-item.active { background: rgba(75,0,130,0.08); color: var(--main-p-color); }
-
-        /* --- الهيكل الرئيسي --- */
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-
-        /* الهيدر (أيقونة المستخدم في أقصى اليسار) */
-        .top-header {
-            height: var(--header-height);
-            background: var(--white);
-            border-bottom: 1px solid #eef2f3;
-            display: flex;
-            align-items: center;
-            justify-content: space-between; /* توزيع المحتوى بين الطرفين */
-            padding: 0 30px;
-        }
-
-        .header-welcome { font-size: 14px; font-weight: 700; color: #2c3e50; }
-        .header-welcome span { color: var(--main-p-color); }
-
-        /* حاوية المستخدم - الآن في جهة اليسار دائماً */
-        .user-profile-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-right: auto; /* دفع العنصر لأقصى اليسار في RTL */
-        }
-
-        .user-badge {
-            display: flex; align-items: center; gap: 10px;
-            background: #f8fafc; padding: 6px 15px; border-radius: 12px;
-            border: 1px solid #eef2f3;
-        }
-        .user-name { font-size: 13px; font-weight: 800; color: var(--main-p-color); }
-
-        .page-content { flex: 1; padding: 30px; overflow-y: auto; }
-
-        /* كرت المحفظة والأصبع */
-        .wallet-card {
-            background: linear-gradient(135deg, var(--main-p-color), #2d004d);
-            padding: 25px 35px; border-radius: 20px; color: white;
-            display: flex; justify-content: space-between; align-items: center;
-            max-width: 550px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(75, 0, 130, 0.15);
-        }
-
-        .finger-box { text-align: center; cursor: pointer; }
-        .finger-btn {
-            position: relative; width: 55px; height: 55px; background: var(--gold);
-            border: none; border-radius: 50%; color: var(--main-p-color); font-size: 22px;
-            animation: bounce 2s infinite ease-in-out; display: flex; align-items: center; justify-content: center;
-        }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-        /* التجاوب مع الشاشات */
-        @media (max-width: 1024px) {
-            .sidebar { width: var(--sidebar-collapsed-width); }
-            .menu-item span, .header-welcome { display: none; }
-            .menu-item i { margin-left: 0; }
-        }
-
-        @media (max-width: 768px) {
-            .top-header { padding: 0 15px; }
-            .user-name { display: none; } /* إخفاء النص في الموبايل لترك مساحة للأيقونة */
-            .wallet-card { flex-direction: column; text-align: center; gap: 20px; }
-        }
-
-        /* النافذة المنبثقة */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(5px); }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; }
-    </style>
-</head>
-<body>
-
-    <nav class="sidebar">
-        <div class="brand-section">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-img">
+<div class="page-content">
+    <div class="wallet-card">
+        <div class="wallet-info">
+            <p style="margin:0; opacity: 0.8; font-size: 13px;">رصيد محفظة MAH</p>
+            <h2 style="margin:5px 0;">0.00 <span style="font-size: 18px; color: var(--gold);">MAH</span></h2>
+            <small style="opacity: 0.5;">ID: {{ session.get('wallet', 'PENDING') }}</small>
         </div>
-        <div class="menu-list">
-            <a href="#" class="menu-item active"><i class="fas fa-th-large"></i><span>الرئيسية</span></a>
-            <a href="#" class="menu-item"><i class="fas fa-wallet"></i><span>محفظة MAH</span></a>
-            <a href="#" class="menu-item"><i class="fas fa-plus-circle"></i><span>رفع منتج</span></a>
-            <a href="#" class="menu-item"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
-        </div>
-    </nav>
-
-    <main class="main-wrapper">
-        <header class="top-header">
-            <div class="header-welcome">
-                نظامك الإداري <span>| المنصة اللامركزية الأولى في اليمن</span>
-            </div>
-
-            <div class="user-profile-left">
-                <div class="user-badge">
-                    <span class="user-name">@ali</span>
-                    <div style="color: var(--main-p-color);"><i class="fas fa-user-circle fa-lg"></i></div>
-                </div>
-                <a href="#" style="color:#e74c3c; font-size: 18px;"><i class="fas fa-power-off"></i></a>
-            </div>
-        </header>
-
-        <div class="page-content">
-            <div class="wallet-card">
-                <div class="wallet-info">
-                    <p style="margin:0; opacity: 0.8; font-size: 13px;">رصيد محفظة MAH</p>
-                    <h2 style="margin:5px 0;">0.00 <span style="font-size: 18px; color: var(--gold);">MAH</span></h2>
-                    <small style="opacity: 0.5;">ID: MAJ-A37G0HQNX26</small>
-                </div>
-                <div class="finger-box" onclick="openWithdrawModal()">
-                    <button class="finger-btn">
-                        <i class="fas fa-hand-pointer"></i>
-                    </button>
-                    <span style="display:block; margin-top:8px; font-size:10px; color:var(--gold); font-weight:800;">سحب الرصيد</span>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <div class="modal-overlay" id="wModal">
-        <div class="modal-content">
-            <h3 style="color: var(--main-p-color);">سحب الرصيد</h3>
-            <p style="font-size: 13px; color: #7f8c8d;">سيتم معالجة طلبك فوراً</p>
-            <button onclick="closeWithdrawModal()" style="width:100%; padding:10px; background:var(--main-p-color); color:white; border:none; border-radius:10px; cursor:pointer;">إغلاق</button>
+        <div class="finger-box" onclick="openWithdrawModal()">
+            <button class="finger-btn"><i class="fas fa-hand-pointer"></i></button>
+            <span style="display:block; margin-top:8px; font-size:10px; color:var(--gold); font-weight:800;">سحب الرصيد</span>
         </div>
     </div>
+</div>
 
-    <script>
-        function openWithdrawModal() { document.getElementById('wModal').style.display = 'flex'; }
-        function closeWithdrawModal() { document.getElementById('wModal').style.display = 'none'; }
-    </script>
-</body>
-</html>
+{% include 'add_product.html' %}
+
+<script>
+    // تفعيل فتح نافذة الرفع من القائمة الجانبية أو أي زر
+    function openUploadModal() {
+        document.getElementById('uploadProductModal').style.display = 'flex';
+    }
+</script>
+{% endblock %}
