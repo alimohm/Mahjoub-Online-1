@@ -37,12 +37,12 @@
                 <div class="upload-side">
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; font-weight: 700; margin-bottom: 10px; color: #2c3e50;">صورة المنتج</label>
-                        <div id="dropZone" style="border: 2px dashed #cbd5e0; padding: 25px; border-radius: 18px; text-align: center; background: #f8fafc; position: relative; height: 165px; display: flex; align-items: center; justify-content: center;">
-                            <img id="imgPreview" src="#" alt="Preview" style="display: none; max-width: 100%; max-height: 140px; border-radius: 10px; object-fit: contain; z-index: 5;">
+                        <div id="dropZone" style="border: 2px dashed #cbd5e0; padding: 25px; border-radius: 18px; text-align: center; background: #f8fafc; position: relative; height: 180px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <img id="imgPreview" src="#" alt="Preview" style="display: none; max-width: 100%; max-height: 100%; border-radius: 10px; object-fit: contain; position: relative; z-index: 5;">
                             
                             <div id="uploadContent">
                                 <i class="fas fa-cloud-upload-alt" style="font-size: 35px; color: var(--main-p-color); margin-bottom: 10px;"></i>
-                                <p style="font-size: 13px; color: #64748b;">اضغط أو اسحب الصور هنا</p>
+                                <p style="font-size: 13px; color: #64748b;">اضغط لاختيار الصورة</p>
                             </div>
                             <input type="file" name="image" id="imageInput" accept="image/*" required 
                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
@@ -54,14 +54,14 @@
 
             <div style="margin-top: 10px;">
                 <label style="display: block; font-weight: 700; margin-bottom: 10px; color: #2c3e50;">وصف المنتج</label>
-                <textarea name="description" rows="4" placeholder="اكتب تفاصيل المنتج الفنية هنا..." 
+                <textarea name="description" rows="4" placeholder="اكتب تفاصيل المنتج هنا..." 
                           style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #e0e0e0; font-family: 'Cairo'; resize: none;"></textarea>
             </div>
 
             <hr style="margin: 30px 0; border: 0; border-top: 1px solid #f1f5f9;">
 
             <div style="display: flex; justify-content: flex-end;">
-                <button type="submit" id="submitBtn" style="background: var(--main-p-color); color: white; border: none; padding: 15px 45px; border-radius: 14px; font-weight: 700; cursor: pointer; font-family: 'Cairo';">
+                <button type="submit" id="submitBtn" style="background: var(--main-p-color); color: white; border: none; padding: 15px 45px; border-radius: 14px; font-weight: 700; cursor: pointer; font-family: 'Cairo'; transition: 0.3s;">
                     تأكيد الرفع والمزامنة
                 </button>
             </div>
@@ -77,13 +77,6 @@
     imageInput.onchange = function(event) {
         const file = event.target.files[0];
         if (file) {
-            // التحقق من الحجم (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert("❌ حجم الصورة كبير جداً");
-                this.value = "";
-                return;
-            }
-            
             const reader = new FileReader();
             reader.onload = function(e) {
                 imgPreview.src = e.target.result;
