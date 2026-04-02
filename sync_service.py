@@ -1,38 +1,29 @@
 import os
 import requests
+import json # أضفنا هذه المكتبة للتأكد من التشفير
 
-# الرابط المستخرج من واجهة GraphQL في صورتك
 GRAPHQL_URL = "https://mahjoub.online/admin/graphql"
-
-# المفتاح الذي أنشأته توكاً (Access Token)
-# يفضل وضعه في Railway Environment باسم QUMRA_ACCESS_TOKEN
-API_KEY = os.environ.get("QUMRA_ACCESS_TOKEN", "ضع_المفتاح_الجديد_هنا")
+API_KEY = os.environ.get("QUMRA_ACCESS_TOKEN", "YOUR_TOKEN")
 
 def send_to_qumra_webhook(name, price, description, image_filename=None):
-    """
-    إرسال المنتج عبر GraphQL Mutation (التنسيق المعتمد في قمرة كلاود)
-    """
-    # رابط سيرفرك في Railway للوصول للصور
     BASE_URL = "https://mahjoub-online-1-production-c824.up.railway.app"
     
+    # التأكد من أن الترويسات تحتوي فقط على حروف إنجليزية (ASCII)
     headers = {
         "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Accept": "application/json"
     }
 
-    # صياغة الاستعلام (Mutation) لإضافة منتج جديد
-    # ملاحظة: قد تختلف مسميات الحقول (Fields) قليلاً حسب توثيق قمرة
     query = """
     mutation CreateNewProduct($input: CreateProductInput!) {
       createProduct(input: $input) {
         id
         title
-        price
       }
     }
     """
     
-    # تجهيز المتغيرات (Variables)
     variables = {
         "input": {
             "title": name,
@@ -43,28 +34,23 @@ def send_to_qumra_webhook(name, price, description, image_filename=None):
     }
 
     try:
-        print(f"🚀 جاري إرسال المنتج عبر GraphQL: {name}")
+        # التعديل الهام: نستخدم json.dumps لضمان تشفير الحروف العربية بشكل صحيح (UTF-8)
+        data_to_send = json.dumps({'query': query, 'variables': variables}, ensure_ascii=False).encode('utf-8')
+        
+        print(f"🚀 جاري المزامنة السيادية لمنتج: {name}")
+        
         response = requests.post(
             GRAPHQL_URL, 
-            json={'query': query, 'variables': variables}, 
+            data=data_to_send, # نرسل البيانات المشفرة يدوياً
             headers=headers, 
-            timeout=30 # مهلة أطول لمعالجة طلبات GraphQL
+            timeout=30
         )
         
-        result = response.json()
+        # لعرض الرد الفعلي من قمرة في سجلات Railway
+        print(f"📡 رد السيرفر: {response.status_code} - {response.text}")
         
-        # التحقق من وجود أخطاء في رد GraphQL
-        if "errors" in result:
-            print(f"⚠️ خطأ في منطق GraphQL: {result['errors']}")
-            return False
-            
-        if response.status_code == 200:
-            print(f"✅ تمت المزامنة السيادية عبر GraphQL بنجاح!")
-            return True
-        else:
-            print(f"❌ فشل الاتصال: {response.status_code}")
-            return False
+        return response.status_code == 200
 
     except Exception as e:
-        print(f"❌ خطأ تقني غير متوقع: {e}")
+        print(f"❌ فشل الإرسال بسبب تشفير النصوص: {e}")
         return False
