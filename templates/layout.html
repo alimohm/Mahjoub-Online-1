@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}محجوب أونلاين | لوحة التحكم{% endblock %}</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -12,24 +11,15 @@
         :root {
             --bg-body: #f8fafb;
             --white: #ffffff;
-            --main-p-color: #4b0082; /* الأرجواني الملكي */
+            --main-p-color: #4b0082;
             --gold: #FFD700;
-            --sidebar-width: 280px;
+            --sidebar-width: 80px; /* عرض ضيق للأيقونات فقط */
             --header-height: 80px;
-            --transition: all 0.3s ease;
         }
 
-        * { box-sizing: border-box; }
-        body { 
-            margin: 0; 
-            font-family: 'Cairo', sans-serif; 
-            background: var(--bg-body); 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg-body); display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- السايدبار (جهة اليمين) --- */
+        /* السايدبار - أيقونات فقط */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--white);
@@ -37,54 +27,28 @@
             border-left: 1px solid #eef2f3;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
             z-index: 1000;
-            transition: var(--transition);
         }
 
-        .brand-section { 
-            padding: 25px; 
-            text-align: center; 
-            border-bottom: 1px solid #eef2f3; 
-        }
-        .logo-img { height: 45px; object-fit: contain; }
+        .brand-section { margin-bottom: 30px; }
+        .logo-img { height: 40px; }
 
-        .menu-list { flex: 1; padding: 20px 0; overflow-y: auto; }
-        
+        .menu-list { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .menu-item {
-            display: flex; 
-            align-items: center; 
-            padding: 14px 20px;
-            text-decoration: none; 
-            color: #7f8c8d; 
-            font-weight: 600;
-            margin: 4px 15px; 
-            border-radius: 12px; 
-            transition: var(--transition);
+            width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #7f8c8d;
+            border-radius: 12px; transition: 0.3s;
         }
+        .menu-item i { font-size: 20px; }
+        .menu-item.active { background: #f2eefa; color: var(--main-p-color); }
+        .menu-item:hover { background: #f8f9fa; color: var(--main-p-color); }
 
-        .menu-item i { margin-left: 15px; font-size: 18px; width: 25px; text-align: center; }
+        /* المحتوى الرئيسي */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* حالة الزر النشط بناءً على الصفحة الحالية */
-        .menu-item.active { 
-            background: rgba(75, 0, 130, 0.08); 
-            color: var(--main-p-color); 
-        }
-        
-        .menu-item:hover:not(.active) {
-            background: #f8f9fa;
-            color: var(--main-p-color);
-        }
-
-        /* --- المحتوى الرئيسي (جهة اليسار) --- */
-        .main-wrapper { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%; 
-            overflow: hidden; 
-        }
-
-        /* الهيدر العلوي */
         .top-header {
             height: var(--header-height);
             background: var(--white);
@@ -95,86 +59,54 @@
             padding: 0 30px;
         }
 
-        .header-welcome { font-size: 14px; font-weight: 700; color: #2c3e50; }
-        .header-welcome span { color: var(--main-p-color); }
-
-        .user-profile-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-right: auto;
-        }
+        .brand-text { display: flex; align-items: center; gap: 10px; }
+        .brand-name { font-weight: 800; color: var(--main-p-color); font-size: 18px; }
+        .brand-tagline { font-size: 13px; color: #7f8c8d; font-weight: 600; }
 
         .user-badge {
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-            background: #f8fafc; 
-            padding: 6px 15px; 
-            border-radius: 12px;
+            display: flex; align-items: center; gap: 10px;
+            background: #f8fafc; padding: 6px 15px; border-radius: 12px;
             border: 1px solid #eef2f3;
         }
-        .user-name { font-size: 13px; font-weight: 800; color: var(--main-p-color); }
 
-        /* منطقة حقن الصفحات المتغيرة */
-        .page-content { 
-            flex: 1; 
-            padding: 30px; 
-            overflow-y: auto; 
-            background: var(--bg-body);
-        }
-
-        /* التجاوب مع الجوال */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                right: -100%;
-                height: 100%;
-            }
-            .sidebar.active { right: 0; }
-        }
+        .page-content { flex: 1; padding: 30px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
         <div class="brand-section">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-img" alt="Logo">
+            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-img">
         </div>
-        
         <div class="menu-list">
-            <a href="{{ url_for('dashboard') }}" class="menu-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
-                <i class="fas fa-th-large"></i><span>الرئيسية</span>
+            <a href="{{ url_for('dashboard') }}" class="menu-item {% if request.endpoint == 'dashboard' %}active{% endif %}" title="الرئيسية">
+                <i class="fas fa-th-large"></i>
             </a>
-            
-            <a href="#" class="menu-item">
-                <i class="fas fa-wallet"></i><span>محفظة MAH</span>
+            <a href="#" class="menu-item" title="المحفظة">
+                <i class="fas fa-wallet"></i>
             </a>
-            
-            <a href="{{ url_for('add_product') }}" class="menu-item {% if request.endpoint == 'add_product' %}active{% endif %}">
-                <i class="fas fa-plus-circle"></i><span>رفع منتج</span>
+            <a href="{{ url_for('add_product') }}" class="menu-item {% if request.endpoint == 'add_product' %}active{% endif %}" title="رفع منتج">
+                <i class="fas fa-plus-circle"></i>
             </a>
-            
-            <a href="#" class="menu-item">
-                <i class="fas fa-cog"></i><span>الإعدادات</span>
+            <a href="#" class="menu-item" title="الإعدادات">
+                <i class="fas fa-cog"></i>
             </a>
         </div>
     </nav>
 
     <main class="main-wrapper">
         <header class="top-header">
-            <div class="header-welcome">
-                نظامك الإداري <span>| المنصة اللامركزية الأولى في اليمن</span>
+            <div class="brand-text">
+                <span class="brand-name">محجوب أونلاين | سوقك الذكي</span>
+                <span class="brand-tagline">لوحتك الإدارية</span>
             </div>
 
-            <div class="user-profile-area">
+            <div style="display: flex; align-items: center; gap: 15px;">
                 <div class="user-badge">
-                    <span class="user-name">@{{ session.get('username', 'ali') }}</span>
-                    <div style="color: var(--main-p-color);"><i class="fas fa-user-circle fa-lg"></i></div>
+                    <span style="font-size: 13px; font-weight: 800; color: var(--main-p-color);">@{{ session.get('username', 'ali') }}</span>
+                    <i class="fas fa-user-circle fa-lg" style="color: var(--main-p-color);"></i>
                 </div>
-                <a href="{{ url_for('logout_route') }}" style="color:#e74c3c; font-size: 18px; margin-right: 10px;">
-                    <i class="fas fa-power-off"></i>
-                </a>
+                <a href="{{ url_for('logout_route') }}" style="color:#e74c3c;"><i class="fas fa-power-off"></i></a>
             </div>
         </header>
 
@@ -182,9 +114,5 @@
             {% block content %}{% endblock %}
         </div>
     </main>
-
-    <script>
-        console.log("نظام محجوب أونلاين: الهيكل الموحد جاهز ✅");
-    </script>
 </body>
 </html>
