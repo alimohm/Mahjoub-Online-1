@@ -17,13 +17,15 @@
             --text-dark: #2c3e50;
             --border-color: #eef2f3;
             --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
             --header-height: 80px;
         }
 
+        * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Cairo', sans-serif; background-color: var(--bg-body); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
 
         /* =========================================
-           الشريط الجانبي (Sidebar)
+           1. الشريط الجانبي (Sidebar)
            ========================================= */
         .sidebar {
             width: var(--sidebar-width);
@@ -32,22 +34,52 @@
             border-left: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            transition: all 0.3s ease;
             z-index: 1000;
         }
 
         .brand-container {
-            padding: 25px 20px;
+            padding: 30px 20px;
             border-bottom: 1px solid var(--border-color);
-            text-align: center;
+            text-align: center; /* لضمان توسط العناصر تحت اللوجو */
         }
 
-        .logo-img { height: 50px; margin-bottom: 10px; }
-        
-        .brand-name { font-size: 18px; font-weight: 800; color: var(--main-p-color); display: block; }
-        .brand-tagline { font-size: 13px; color: #7f8c8d; font-weight: 600; margin-bottom: 8px; display: block; }
-        
-        /* اسم المستخدم تحت العلامة التجارية */
-        .brand-user { font-size: 12px; color: #95a5a6; display: block; background: #f8fafc; padding: 4px 10px; border-radius: 20px; width: fit-content; margin: 0 auto; }
+        .logo-img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .brand-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--main-p-color);
+            line-height: 1.2;
+        }
+
+        .brand-tagline {
+            font-size: 13px;
+            font-weight: 600;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        /* اسم المستخدم تحت العلامة التجارية مباشرة */
+        .brand-user-id {
+            font-size: 11px;
+            color: #95a5a6;
+            background: #f8fafc;
+            padding: 2px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
 
         .menu-list { flex: 1; padding: 20px 0; overflow-y: auto; }
         .menu-item {
@@ -58,17 +90,17 @@
             color: #7f8c8d;
             font-size: 15px;
             font-weight: 600;
+            transition: 0.3s;
             margin: 4px 15px;
             border-radius: 12px;
-            transition: 0.3s;
         }
-        .menu-item i { margin-left: 15px; font-size: 18px; }
+        .menu-item i { margin-left: 15px; font-size: 18px; width: 25px; text-align: center; }
         .menu-item:hover, .menu-item.active { background-color: rgba(75,0,130,0.08); color: var(--main-p-color); }
 
         /* =========================================
-           المحتوى العلوي (Header)
+           2. المحتوى الرئيسي (Header + Content)
            ========================================= */
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100%; }
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; }
 
         .top-header {
             height: var(--header-height);
@@ -80,29 +112,51 @@
             padding: 0 30px;
         }
 
-        .platform-status { font-size: 15px; font-weight: 700; color: #2c3e50; }
-        .platform-status span { color: var(--main-p-color); margin-right: 5px; font-weight: 400; }
-
-        /* زر سحب الرصيد */
-        .withdraw-btn {
-            background: linear-gradient(135deg, #4b0082, #6a0dad);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-family: 'Cairo';
+        .platform-status {
+            font-size: 15px;
             font-weight: 700;
-            font-size: 13px;
+            color: #2c3e50;
+        }
+        .platform-status span {
+            color: var(--main-p-color);
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .header-profile { display: flex; align-items: center; gap: 20px; }
+        
+        /* أيقونة الخروج */
+        .logout-link {
+            color: #e74c3c;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+        .logout-link:hover { transform: scale(1.1); }
+
+        .page-content { flex: 1; padding: 30px; overflow-y: auto; }
+
+        /* تنسيق زر السحب داخل المحفظة (يستخدم في dashboard.html) */
+        .pull-btn {
+            background: var(--gold);
+            border: none;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(75, 0, 130, 0.2);
+            justify-content: center;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
-        .withdraw-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(75, 0, 130, 0.3); }
+        .pull-btn:hover { transform: scale(1.15) rotate(-10deg); background: #fff; }
 
-        .page-content { flex: 1; padding: 30px; overflow-y: auto; }
+        @media (max-width: 991px) {
+            .sidebar { width: var(--sidebar-collapsed-width); }
+            .brand-info, .menu-item span, .platform-status { display: none; }
+            .menu-item { justify-content: center; margin: 5px; padding: 15px 0; }
+            .menu-item i { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
@@ -110,9 +164,11 @@
     <nav class="sidebar">
         <div class="brand-container">
             <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" alt="محجوب أونلاين" class="logo-img">
-            <span class="brand-name">محجوب أونلاين</span>
-            <span class="brand-tagline">سوقك الذكي</span>
-            <span class="brand-user">@{{ session.get('username', 'ali') }}</span>
+            <div class="brand-info">
+                <span class="brand-name">محجوب أونلاين</span>
+                <span class="brand-tagline">سوقك الذكي</span>
+                <span class="brand-user-id">@{{ session.get('username', 'ali') }}</span>
+            </div>
         </div>
 
         <div class="menu-list">
@@ -147,12 +203,10 @@
                 </div>
             </div>
 
-            <div class="header-left" style="display: flex; align-items: center; gap: 20px;">
-                <button class="withdraw-btn">
-                    <i class="fas fa-arrow-down"></i> سحب الرصيد
-                </button>
-                
-                <a href="/logout" style="color:#e74c3c; font-size: 18px;"><i class="fas fa-power-off"></i></a>
+            <div class="header-profile">
+                <a href="/logout" class="logout-link" title="تسجيل الخروج">
+                    <i class="fas fa-power-off"></i>
+                </a>
             </div>
         </header>
 
