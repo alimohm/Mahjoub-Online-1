@@ -6,31 +6,11 @@ from sqlalchemy import text
 
 db = SQLAlchemy()
 
-# نموذج الموردين (Vendors)
-class Vendor(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-    wallet_address = db.Column(db.String(255), unique=True)
-    brand_name = db.Column(db.String(120))
-
-# نموذج المنتجات (Products) - تم تحديثه ليدعم الصور المحلية
-class Product(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    image_url = db.Column(db.String(500)) # الرابط الخارجي (اختياري)
-    image_file = db.Column(db.String(200)) # اسم ملف الصورة المرفوعة محلياً (ضروري للرفع الجديد)
-    description = db.Column(db.Text)
-    vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'))
-    vendor_username = db.Column(db.String(80)) 
-
-def generate_mah_wallet():
-    """توليد محفظة تبدأ بـ MAH متبوعة بـ 10 رموز عشوائية"""
-    suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-    return f"MAH-{suffix}"
-
+# استيراد النماذج من ملف models (سيتم إنشاؤه في الخطوة التالية)
+# ملاحظة: نضعه داخل الدالة لتجنب التعارض
 def init_db(app):
+    from models import Vendor, Product
+    
     uri = os.environ.get('DATABASE_URL')
     if uri and uri.startswith("postgres://"):
         uri = uri.replace("postgres://", "postgresql://", 1)
@@ -45,10 +25,12 @@ def init_db(app):
             # 1. إنشاء الجداول الأساسية
             db.create_all()
             
-            # 2. نظام "الترقيع الذكي" المطور لإضافة الأعمدة المفقودة تلقائياً
+            # 2. نظام الترقيع الذكي لإضافة الأعمدة المطلوبة للمزامنة والاختفاء
             columns_to_check = [
                 ("vendor_username", "VARCHAR(80)"),
-                ("image_file", "VARCHAR(200)") # العمود الجديد للصور المرفوعة
+                ("image_file", "VARCHAR(200)"),
+                ("is_published", "BOOLEAN DEFAULT FALSE"), # لضمان اختفاء المنتج بعد نشره
+                ("qomra_id", "VARCHAR(100)")                # لربطه بقمرة
             ]
             
             for col_name, col_type in columns_to_check:
@@ -56,11 +38,12 @@ def init_db(app):
                     db.session.execute(text(f"SELECT {col_name} FROM product LIMIT 1"))
                 except Exception:
                     db.session.rollback()
-                    print(f"🚀 تحديث سيادي: جاري إضافة عمود {col_name} لجدول المنتجات...")
+                    print(f"🚀 تحديث سيادي: جاري إضافة عمود {col_name}...")
                     db.session.execute(text(f"ALTER TABLE product ADD COLUMN {col_name} {col_type}"))
                     db.session.commit()
 
-            # 3. التأكد من وجود حسابك الإداري (علي)
+            # 3. التأكد من وجود حسابك (علي) بمحفظة MAH
+            from models import generate_mah_wallet
             admin = Vendor.query.filter_by(username='ali').first()
             if not admin:
                 admin_user = Vendor(
