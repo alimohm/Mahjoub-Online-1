@@ -2,7 +2,7 @@
 
 {% block content %}
 <style>
-    /* تصميم المحفظة البنفسجية المنسق */
+    /* تصميم المحفظة البنفسجية المنسق - لم يتم تغيير أي شيء في التصميم */
     .wallet-container {
         background: linear-gradient(135deg, #30005a 0%, #4b0082 100%);
         padding: 40px;
@@ -58,11 +58,14 @@
 
 <div class="wallet-container">
     <div class="balance-label">رصيد محفظة MAH الحالي</div>
-    <div class="balance-value"><span>MAH</span>0.00</div>
-    <div class="wallet-id-code">ID: MAJ-A37G0HQNX26</div>
+    <div class="balance-value">
+        <span>MAH</span>{{ "%.2f"|format(vendor.balance if vendor.balance else 0.00) }}
+    </div>
+
+    <div class="wallet-id-code">ID: {{ vendor.wallet_address }}</div>
 
     <div class="action-box">
-        <button class="finger-trigger" onclick="alert('طلب السحب قيد المعالجة...')">
+        <button class="finger-trigger" onclick="alert('عزيزي {{ vendor.username }}، طلب السحب قيد المعالجة...')">
             <i class="fas fa-hand-pointer"></i>
         </button>
         <span class="withdraw-btn-label">سحب الرصيد الآن</span>
