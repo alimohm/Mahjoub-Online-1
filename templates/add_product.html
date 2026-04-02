@@ -56,6 +56,7 @@
         box-shadow: 0 5px 15px rgba(75, 0, 130, 0.05);
     }
 
+    /* زر الذكاء الاصطناعي المحدث */
     .ai-gen-btn {
         background: linear-gradient(45deg, #4b0082, #6a11cb);
         color: white;
@@ -68,7 +69,15 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        transition: 0.3s;
     }
+    .ai-gen-btn:hover { transform: scale(1.05); opacity: 0.9; }
+
+    /* تنسيق النافذة المنبثقة للذكاء الاصطناعي */
+    .modal-content { border-radius: 25px; border: none; padding: 10px; }
+    .modal-header { border: none; }
+    .modal-footer { border: none; }
+    .ai-style-select { cursor: pointer; font-weight: 700; }
 
     #successToast {
         position: fixed;
@@ -156,7 +165,7 @@
         <div style="margin-bottom: 30px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <label style="font-weight: 800;">وصف المنتج</label>
-                <button type="button" class="ai-gen-btn" onclick="generateAIDescription()">
+                <button type="button" class="ai-gen-btn" data-bs-toggle="modal" data-bs-target="#aiModal">
                     <i class="fas fa-robot"></i> توليد وصف تلقائي
                 </button>
             </div>
@@ -169,19 +178,69 @@
     </form>
 </div>
 
+<div class="modal fade" id="aiModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold">توليد محتوى ذكي ✨</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="text-muted mb-4">اختر أسلوب الكتابة المناسب لمنتجك ليقوم النظام بصياغة وصف احترافي لك.</p>
+                <div class="mb-3 text-start">
+                    <label class="form-label font-weight-bold">أسلوب الكتابة:</label>
+                    <select id="aiStyle" class="form-control ai-style-select">
+                        <option value="خبير">👨‍🏫 خبير (تركيز على المواصفات)</option>
+                        <option value="احترافي">💼 احترافي (رسمي وتسويقي)</option>
+                        <option value="ودي">😊 ودي (جذاب للشباب)</option>
+                        <option value="بسيط">📝 بسيط (واضح ومباشر)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submit-btn" style="margin:0" onclick="applyAIDescription()">
+                    <i class="fas fa-magic"></i> توليد الآن
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="successToast">
     <i class="fas fa-check-circle"></i> تم تحديث المخزون ورفع المنتج بنجاح!
 </div>
 
 <script>
-    function generateAIDescription() {
+    function applyAIDescription() {
         const name = document.getElementById('prodName').value;
+        const style = document.getElementById('aiStyle').value;
         const descBox = document.getElementById('prodDesc');
-        if(!name) return alert("اكتب الاسم أولاً");
-        descBox.value = "جاري التوليد...";
+        
+        if(!name) {
+            alert("يرجى كتابة اسم المنتج أولاً ليتمكن النظام من وصفه.");
+            return;
+        }
+
+        // إغلاق النافذة
+        const modal = bootstrap.Modal.getInstance(document.getElementById('aiModal'));
+        modal.hide();
+
+        descBox.value = "جاري صياغة المحتوى بأسلوب " + style + "...";
+
+        // محاكاة التوليد بناءً على الأسلوب
         setTimeout(() => {
-            descBox.value = `نقدم لكم ${name}، منتج عالي الجودة متوفر الآن ضمن مجموعتنا المختارة في "سوقك الذكي". يتميز بمواصفات احترافية تضمن لك أفضل تجربة استخدام.`;
-        }, 800);
+            let baseText = "";
+            if(style === "خبير") {
+                baseText = `نقدم لكم مراجعة تقنية لمنتج ${name}. يتميز هذا الإصدار بمعايير جودة عالية وهندسة دقيقة توفر كفاءة استثنائية في الأداء، مما يجعله الخيار الأول للمهتمين بالتفاصيل التقنية المتطورة.`;
+            } else if(style === "ودي") {
+                baseText = `يا هلا! جبنا لكم ${name} الرهيب. إذا كنت تبحث عن التميز والراحة، هذا المنتج صُمم خصيصاً عشانك. لا يفوتك العرض في سوقك الذكي!`;
+            } else if(style === "بسيط") {
+                baseText = `${name} متوفر الآن. منتج سهل الاستخدام، جودته ممتازة وسعره مناسب جداً. اطلبه الآن من محجوب أونلاين.`;
+            } else {
+                baseText = `نفخر بتقديم ${name} ضمن مجموعتنا المختارة. يجمع هذا المنتج بين الأناقة والوظيفة العملية، مما يضمن لكم تجربة مستخدم احترافية تليق بتطلعاتكم في "سوقك الذكي".`;
+            }
+            descBox.value = baseText;
+        }, 1200);
     }
 
     document.getElementById('productForm').onsubmit = function(e) {
