@@ -7,7 +7,6 @@
     :root {
         --royal-purple: #4b0082;
         --soft-bg: #f8f9ff;
-        --gold-accent: #d4af37;
     }
 
     body { background-color: var(--soft-bg); font-family: 'Cairo', sans-serif; }
@@ -49,6 +48,26 @@
         position: relative;
     }
 
+    .style-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+        margin: 15px 0;
+    }
+
+    .style-card {
+        background: white;
+        border: 1.5px solid #eee;
+        padding: 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        text-align: center;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+
+    .style-card.active { background: var(--royal-purple); color: white; border-color: var(--royal-purple); }
+
     .btn-ai-generate {
         background: var(--royal-purple);
         color: white;
@@ -60,8 +79,6 @@
         cursor: pointer;
         transition: 0.3s;
     }
-
-    .btn-ai-generate:hover { transform: scale(1.01); box-shadow: 0 10px 20px rgba(75, 0, 130, 0.2); }
 
     .publish-btn {
         background: linear-gradient(135deg, var(--royal-purple), #2d004d);
@@ -76,12 +93,10 @@
         margin-top: 20px;
     }
 
-    /* ميزة الربط التلقائي للهوية */
     .locked-identity {
-        background: #f8f9fa;
-        color: var(--royal-purple);
+        background: #f0f0f0;
+        color: #555;
         font-weight: 700;
-        border: 1.5px solid #ddd;
         cursor: not-allowed;
     }
 </style>
@@ -89,7 +104,7 @@
 <div class="master-card" dir="rtl">
     <div class="text-center mb-5">
         <h3 class="fw-bold" style="color: var(--royal-purple);">✨ إدارة منتجات محجوب أونلاين</h3>
-        <p class="text-muted">المنصة الأولى اللامركزية في اليمن | سوقك الذكي</p>
+        <p class="text-muted">سوقك الذكي | المنصة اللامركزية الأولى في اليمن</p>
     </div>
 
     <form id="productForm" method="POST" enctype="multipart/form-data">
@@ -99,11 +114,10 @@
                 <input type="text" id="pName" name="name" class="premium-input" placeholder="مثلاً: هاتف ذكي سامسونج..." required>
             </div>
             <div class="col-md-6">
-                <label class="form-label">اسم المستخدم مربوط بـ (العلامة التجارية أو المورد)</label>
+                <label class="form-label">اسم المستخدم مربوط بالعلامة التجارية أو المورد</label>
                 <input type="text" id="pBrandDisplay" class="premium-input locked-identity" 
                        value="{{ vendor.username }} | {{ vendor.brand_name }}" readonly>
                 <input type="hidden" name="brand" value="{{ vendor.brand_name }}">
-                <small class="text-muted">يتم تسجيل المنتج آلياً تحت هوية المؤسسة الموثقة.</small>
             </div>
         </div>
 
@@ -121,16 +135,25 @@
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label">الكمية بالمخزن</label>
+                <label class="form-label">الكمية</label>
                 <input type="number" name="stock" class="premium-input" value="1" required>
             </div>
         </div>
 
         <div class="ai-engine-container">
-            <h6 class="fw-bold mb-3"><i class="fas fa-magic"></i> مساعد سوقك الذكي (الذكاء الاصطناعي)</h6>
-            <label class="form-label small">المواصفات الأساسية (افصل بينها بفاصلة):</label>
-            <textarea id="pSpecs" class="premium-input mb-3" rows="2" placeholder="مثلاً: شاشة OLED، معالج سريع، كاميرا 108MP..."></textarea>
+            <h6 class="fw-bold mb-3"><i class="fas fa-magic"></i> مساعد صياغة الوصف الذكي</h6>
             
+            <label class="form-label small">المواصفات الأساسية:</label>
+            <textarea id="pSpecs" class="premium-input mb-3" rows="3" placeholder="اكتب المواصفات هنا مفصولة بفاصلة..."></textarea>
+            
+            <label class="form-label small">اختر أسلوب العرض:</label>
+            <div class="style-grid">
+                <div class="style-card active" onclick="setStyle(this, 'خبير تقني')">👨‍🏫 خبير تقني</div>
+                <div class="style-card" onclick="setStyle(this, 'احترافي')">💼 احترافي</div>
+                <div class="style-card" onclick="setStyle(this, 'ودي')">😊 ودي</div>
+                <div class="style-card" onclick="setStyle(this, 'بسيط')">📝 بسيط</div>
+            </div>
+
             <button type="button" class="btn-ai-generate" onclick="generatePremiumDesc()">
                 توليد الوصف الاحترافي ✨
             </button>
@@ -138,7 +161,7 @@
 
         <div class="mb-4">
             <label class="form-label">الوصف النهائي للمنتج</label>
-            <textarea id="pDesc" name="description" class="premium-input" rows="8" placeholder="سيظهر الوصف المولد هنا..."></textarea>
+            <textarea id="pDesc" name="description" class="premium-input" rows="8" placeholder="سيتم تعبئة الوصف هنا..."></textarea>
         </div>
 
         <div class="mb-4">
@@ -153,30 +176,38 @@
 </div>
 
 <script>
+    let currentStyle = 'خبير تقني';
+
+    function setStyle(el, style) {
+        document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        currentStyle = style;
+    }
+
     function generatePremiumDesc() {
         const name = document.getElementById('pName').value;
-        // استخراج اسم العلامة التجارية من الحقل المدمج
-        const combinedIdentity = document.getElementById('pBrandDisplay').value;
-        const brandName = combinedIdentity.split('|')[1]?.trim() || "مورد موثوق";
+        const identity = document.getElementById('pBrandDisplay').value;
+        const brandName = identity.split('|')[1]?.trim() || "موردنا الموثوق";
         const specs = document.getElementById('pSpecs').value;
         const target = document.getElementById('pDesc');
 
         if(!name || !specs) {
-            alert("يرجى إدخال اسم المنتج والمواصفات أولاً."); return;
+            alert("يرجى ملء الاسم والمواصفات أولاً."); return;
         }
 
-        let result = `🌟 المنتج المميز: ${name}\n`;
+        let result = `🌟 المنتج: ${name}\n`;
         result += `🏢 العلامة التجارية: ${brandName}\n`;
-        result += `🔗 متوفر الآن عبر "محجوب أونلاين" - سوقك الذكي 🇾🇪\n\n`;
-        result += `🚀 المزايا والخصائص:\n`;
+        result += `🔗 متوفر حصرياً عبر "محجوب أونلاين" - سوقك الذكي 🇾🇪\n`;
+        result += `🎭 الأسلوب المختارة: ${currentStyle}\n\n`;
+        result += `🚀 المزايا الرئيسية:\n`;
         
         specs.split('،').forEach(s => {
             if(s.trim()) result += `✅ ${s.trim()}\n`;
         });
 
-        result += `\n🛡️ لماذا تطلب منا؟\n`;
-        result += `نحن نضمن لك أصالة المنتج من خلال ${brandName} وشحن آمن عبر منصتنا اللامركزية.\n\n`;
-        result += `📥 اطلب الآن واستمتع بمستقبل التسوق!`;
+        result += `\n🛡️ لماذا تختار محجوب أونلاين؟\n`;
+        result += `نحن نضمن لك الشفافية والأمان في كل عملية شراء عبر تقنياتنا اللامركزية.\n\n`;
+        result += `📥 اطلب الآن وانضم لمستقبل التسوق!`;
 
         target.value = result;
     }
