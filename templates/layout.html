@@ -5,21 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}محجوب أونلاين{% endblock %} | 2026</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-body: #f4f7f6; /* خلفية ناعمة مثل Qumra */
+            --bg-body: #f4f7f6;
             --white: #ffffff;
             --main-p-color: #4b0082; /* الأرجواني السيادي */
             --gold: #FFD700;
             --text-dark: #2c3e50;
             --border-color: #eef2f3;
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
             --sidebar-collapsed-width: 80px;
-            --header-height: 70px;
+            --header-height: 80px;
         }
 
         * { box-sizing: border-box; }
@@ -40,27 +39,43 @@
         }
 
         .brand-container {
-            height: var(--header-height);
+            height: 100px; /* زيادة الطول لاستيعاب الهوية الجديدة */
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 15px;
+            padding: 20px;
             border-bottom: 1px solid var(--border-color);
+            gap: 12px;
         }
 
-        /* لوجو محجوب أونلاين مكان قمرة كلاود */
         .logo-img {
-            max-width: 150px;
-            height: auto;
-            max-height: 45px;
+            height: 45px;
+            width: auto;
             object-fit: contain;
         }
 
-        .menu-list { flex: 1; padding: 25px 0; overflow-y: auto; }
+        .brand-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--main-p-color);
+            line-height: 1.2;
+        }
+
+        .brand-tagline {
+            font-size: 13px;
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+
+        .menu-list { flex: 1; padding: 20px 0; overflow-y: auto; }
         .menu-item {
             display: flex;
             align-items: center;
-            padding: 14px 25px;
+            padding: 14px 20px;
             text-decoration: none;
             color: #7f8c8d;
             font-size: 15px;
@@ -73,7 +88,7 @@
         .menu-item:hover, .menu-item.active { background-color: rgba(75,0,130,0.08); color: var(--main-p-color); }
 
         /* =========================================
-           2. المحتوى الرئيسي (Header + Content)
+           2. المحتوى الرئيسي
            ========================================= */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; }
 
@@ -85,10 +100,20 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        /* معلومات المورد في الهيدر */
+        /* نص المنصة اللامركزية في الهيدر */
+        .platform-status {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .platform-status span {
+            color: var(--main-p-color);
+            font-weight: 400;
+            margin-right: 5px;
+        }
+
         .header-profile { display: flex; align-items: center; gap: 15px; }
         .vendor-details { text-align: left; line-height: 1.2; }
         .vendor-brand { display: block; font-weight: 700; color: var(--main-p-color); font-size: 14px; }
@@ -102,15 +127,11 @@
 
         .page-content { flex: 1; padding: 30px; overflow-y: auto; }
 
-        /* =========================================
-           3. التجاوب (Mobile Responsive)
-           ========================================= */
         @media (max-width: 991px) {
             .sidebar { width: var(--sidebar-collapsed-width); }
-            .menu-item span, .vendor-details { display: none; } /* إخفاء النص مثل Qumra Mobile */
+            .brand-info, .menu-item span, .vendor-details, .platform-status { display: none; }
             .menu-item { justify-content: center; margin: 5px; padding: 15px 0; }
-            .menu-item i { margin-left: 0; font-size: 22px; }
-            .logo-img { max-width: 40px; }
+            .menu-item i { margin-left: 0; }
         }
     </style>
 </head>
@@ -118,11 +139,15 @@
 
     <nav class="sidebar">
         <div class="brand-container">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" alt="Logo" class="logo-img">
+            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" alt="محجوب أونلاين" class="logo-img">
+            <div class="brand-info">
+                <span class="brand-name">محجوب أونلاين</span>
+                <span class="brand-tagline">سوقك الذكي</span>
+            </div>
         </div>
 
         <div class="menu-list">
-            <a href="/dashboard" class="menu-item active">
+            <a href="/dashboard" class="menu-item {{ 'active' if request.path == '/dashboard' }}">
                 <i class="fas fa-th-large"></i>
                 <span>الرئيسية</span>
             </a>
@@ -130,10 +155,10 @@
                 <i class="fas fa-wallet"></i>
                 <span>محفظة MAH</span>
             </a>
-          <a href="/add_product" class="menu-item {{ 'active' if request.path == '/add_product' }}">
-    <i class="fas fa-cloud-upload-alt"></i>
-    <span>رفع منتج جديد</span>
-</a>
+            <a href="/add_product" class="menu-item {{ 'active' if request.path == '/add_product' }}">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>رفع منتج جديد</span>
+            </a>
             <a href="#" class="menu-item">
                 <i class="fas fa-chart-line"></i>
                 <span>الإحصائيات</span>
@@ -148,13 +173,15 @@
     <main class="main-wrapper">
         <header class="top-header">
             <div class="header-right">
-                <i class="fas fa-outdent" style="color:#95a5a6; cursor:pointer; font-size:18px;"></i>
+                <div class="platform-status">
+                    أهلاً بك في نظامك الإداري الملكي <span>| المنصة اللامركزية في اليمن اليوم</span>
+                </div>
             </div>
 
             <div class="header-profile">
                 <div class="vendor-details">
-                    <span class="vendor-brand">{{ session['brand_name'] }}</span>
-                    <span class="vendor-user">@{{ session['username'] }}</span>
+                    <span class="vendor-brand">{{ session.get('brand_name', 'محجوب أونلاين') }}</span>
+                    <span class="vendor-user">@{{ session.get('username', 'ali') }}</span>
                 </div>
                 <div class="avatar">
                     <i class="fas fa-user-tie" style="color:var(--main-p-color);"></i>
