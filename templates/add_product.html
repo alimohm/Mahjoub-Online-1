@@ -1,67 +1,48 @@
 {% extends "layout.html" %}
 
-{% block title %}إضافة منتج ذكي | سوقك الذكي{% endblock %}
+{% block title %}إضافة منتج | سوقك الذكي{% endblock %}
 
 {% block content %}
 <style>
+    /* التنسيقات الأساسية المتوافقة مع الهوية */
     .upload-card {
         background: #ffffff;
-        padding: 40px;
-        border-radius: 25px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        max-width: 800px;
-        margin: 30px auto;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        max-width: 850px;
+        margin: 20px auto;
         border: 1px solid #f0f0f0;
     }
 
-    .form-header {
-        text-align: center;
-        color: #4b0082;
-        font-weight: 800;
-        font-size: 20px;
-        margin-bottom: 30px;
-        border-bottom: 2px solid #f8f5ff;
-        padding-bottom: 15px;
-    }
-
-    .form-label {
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 8px;
-        display: block;
-    }
-
-    .form-control {
-        border-radius: 12px;
-        border: 1px solid #e0e0e0;
-        padding: 12px 15px;
-        font-family: 'Cairo', sans-serif;
-        background: #fafafa;
-        transition: 0.3s;
-    }
-
-    /* مساعد الكتابة الذكي - الأداة الوحيدة الاحترافية */
-    .smart-ai-section {
+    /* صندوق مساعد الكتابة الذكي - الأداة الوحيدة الآن */
+    .ai-dashed-box {
+        border: 2px dashed #6a11cb;
         background: #fdfbff;
-        border: 2px dashed #d1b3ff;
-        border-radius: 20px;
-        padding: 25px;
-        margin: 25px 0;
+        border-radius: 15px;
+        padding: 20px;
         text-align: center;
+        margin: 25px 0;
     }
 
-    .ai-btn-trigger {
-        background: linear-gradient(45deg, #4b0082, #6a11cb);
+    .ai-trigger-btn {
+        background: #4b0082;
         color: white;
         border: none;
-        padding: 12px 35px;
-        border-radius: 50px;
+        padding: 10px 25px;
+        border-radius: 10px;
         font-weight: 700;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        box-shadow: 0 4px 15px rgba(106, 17, 203, 0.2);
+        gap: 8px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        padding: 12px;
+        font-family: 'Cairo', sans-serif;
     }
 
     .main-submit-btn {
@@ -69,75 +50,57 @@
         background: #4b0082;
         color: white;
         border: none;
-        padding: 16px;
-        border-radius: 15px;
+        padding: 15px;
+        border-radius: 12px;
         font-weight: 800;
-        font-size: 18px;
         cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
     }
-
-    /* تنسيق المودال والخيارات */
-    .modal-content { border-radius: 25px; border: none; }
-    .modal-header { background: #f8f5ff; border-radius: 25px 25px 0 0; }
-    .style-option { padding: 10px; font-weight: 600; }
 </style>
 
-<div class="upload-card">
-    <div class="form-header">
-        <i class="fas fa-magic"></i> إضافة منتج جديد للمنصة
-    </div>
+<div class="upload-card" dir="rtl">
+    <h5 class="text-center mb-4" style="color: #4b0082; font-weight: 800;">إضافة منتج جديد للمنصة</h5>
 
     <form id="productForm">
-        <div class="row g-3">
+        <div class="row g-3 mb-3">
             <div class="col-md-8">
-                <label class="form-label">اسم المنتج</label>
-                <input type="text" id="prodName" class="form-control" placeholder="أدخل اسم المنتج..." required>
+                <label class="fw-bold">اسم المنتج</label>
+                <input type="text" id="prodName" class="form-control" placeholder="أدخل اسم المنتج...">
             </div>
             <div class="col-md-4">
-                <label class="form-label">الفئة</label>
-                <select class="form-control">
-                    <option>إلكترونيات</option>
-                    <option>أزياء</option>
-                </select>
+                <label class="fw-bold">الفئة</label>
+                <select class="form-control"><option>إلكترونيات</option></select>
             </div>
+        </div>
 
+        <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <label class="form-label">السعر</label>
+                <label class="fw-bold">السعر</label>
                 <input type="number" class="form-control" placeholder="0.00">
             </div>
             <div class="col-md-4">
-                <label class="form-label">العملة</label>
-                <select class="form-control">
-                    <option>ريال سعودي</option>
-                    <option>ريال يمني</option>
-                </select>
+                <label class="fw-bold">العملة</label>
+                <select class="form-control"><option>ريال سعودي</option></select>
             </div>
             <div class="col-md-4">
-                <label class="form-label">الكمية</label>
+                <label class="fw-bold">الكمية</label>
                 <input type="number" class="form-control" placeholder="100">
             </div>
         </div>
 
-        <div class="smart-ai-section">
-            <div style="margin-bottom: 12px;">
-                <span style="color: #6a11cb; font-weight: 800;">✨ مساعد الكتابة الذكي</span>
-            </div>
-            <button type="button" class="ai-btn-trigger" data-bs-toggle="modal" data-bs-target="#aiModal">
-                <i class="fas fa-robot"></i> توليد الوصف بالمواصفات
+        <div class="ai-dashed-box">
+            <p style="color: #6a11cb; font-weight: 800; margin-bottom: 12px;">✨ مساعد الكتابة الذكي</p>
+            <button type="button" class="ai-trigger-btn" data-bs-toggle="modal" data-bs-target="#aiModal">
+                توليد الوصف بالمواصفات <i class="fas fa-magic"></i>
             </button>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">وصف المنتج (النتيجة النهائية)</label>
-            <textarea id="prodDesc" class="form-control" rows="5" placeholder="سيظهر الوصف المولد هنا..."></textarea>
+            <label class="fw-bold">وصف المنتج (النتيجة)</label>
+            <textarea id="prodDesc" class="form-control" rows="5" placeholder="سيتم تعبئة الوصف هنا تلقائياً..."></textarea>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">صور المنتج</label>
+            <label class="fw-bold">صورة المنتج</label>
             <input type="file" class="form-control">
         </div>
 
@@ -148,58 +111,51 @@
 </div>
 
 <div class="modal fade" id="aiModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h6 class="modal-title font-weight-bold">توليد محتوى ذكي ✨</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
+    <div class="modal-dialog modal-dialog-centered text-end" dir="rtl">
+        <div class="modal-content" style="border-radius: 20px;">
+            <div class="modal-body p-4">
                 <div class="mb-3">
-                    <label class="form-label small font-weight-bold">المواصفات الأساسية:</label>
-                    <textarea id="aiSpecs" class="form-control" rows="3" placeholder="مثلاً: تبريد سريع، موفر للطاقة، ضمان سنتين..."></textarea>
+                    <label class="form-label fw-bold">المواصفات (اكتب نقاط سريعة):</label>
+                    <textarea id="aiSpecs" class="form-control" rows="3" placeholder="مثلاً: دقة 4K، معالج قوي، بطارية تدوم 24 ساعة..."></textarea>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small font-weight-bold">اختر أسلوب الكتابة:</label>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">أسلوب الكتابة:</label>
                     <select id="aiStyle" class="form-control">
-                        <option value="خبير">👨‍🏫 خبير (التركيز على التفاصيل التقنية)</option>
+                        <option value="خبير">👨‍🏫 خبير (تركيز على التفاصيل التقنية)</option>
                         <option value="احترافي">💼 احترافي (رسمي وتسويقي)</option>
                         <option value="ودي">😊 ودي (جذاب وقريب للمستهلك)</option>
                         <option value="بسيط">📝 بسيط (واضح ومباشر)</option>
                     </select>
                 </div>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="main-submit-btn" onclick="generateSmartText()">
-                    توليد الآن ✨
-                </button>
+                <button type="button" class="main-submit-btn" onclick="executeGeneration()">توليد الوصف الآن ✨</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    function generateSmartText() {
+    function executeGeneration() {
         const name = document.getElementById('prodName').value;
         const specs = document.getElementById('aiSpecs').value;
         const style = document.getElementById('aiStyle').value;
         const output = document.getElementById('prodDesc');
 
-        if (!name) { alert("لطفاً أدخل اسم المنتج أولاً."); return; }
+        if(!name) { alert("يرجى إدخال اسم المنتج أولاً."); return; }
 
+        // إغلاق المودال وبدء التوليد
         bootstrap.Modal.getInstance(document.getElementById('aiModal')).hide();
-        output.value = "جاري التوليد بذكاء لـ " + name + "...";
+        output.value = "جاري التوليد بذكاء لأسلوبك الـ " + style + "...";
 
         setTimeout(() => {
-            let result = "";
-            if (style === "خبير") {
-                result = `إليك المواصفات الفنية لـ ${name}: يتميز هذا المنتج بـ (${specs})، مما يجعله الخيار الأول للباحثين عن الكفاءة العالية والدقة في الأداء.`;
-            } else if (style === "ودي") {
-                result = `تبحث عن التميز؟ ${name} صار بين يديك! مع ميزات رهيبة مثل (${specs})، بيخلي حياتك أسهل وأجمل بكثير. اطلبه الحين!`;
+            let text = "";
+            if(style === "خبير") {
+                text = `تقرير تقني لمنتج ${name}: يتميز بمواصفات عالية تشمل (${specs}) لضمان أداء احترافي فائق الدقة.`;
+            } else if(style === "ودي") {
+                text = `يا هلا! جبنا لك ${name} الرهيب. بميزات مثل (${specs})، بيسهل عليك حياتك اليومية بشكل ما تتخيله!`;
             } else {
-                result = `نقدم لكم ${name} المتميز بمواصفاته الشاملة ومنها (${specs}). جودة مضمونة وسعر منافس تجدونه فقط في سوقك الذكي.`;
+                text = `نقدم لكم ${name} المتوفر الآن بمواصفات (${specs}). جودة مضمونة تجدونها فقط في سوقك الذكي.`;
             }
-            output.value = result;
+            output.value = text;
         }, 1200);
     }
 </script>
