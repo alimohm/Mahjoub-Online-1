@@ -38,7 +38,6 @@
         outline: none;
     }
 
-    /* أداة الذكاء الاصطناعي - سوقك الذكي */
     .ai-engine-container {
         background: linear-gradient(145deg, #f9f7ff, #ffffff);
         border: 2px dashed var(--royal-purple);
@@ -80,8 +79,6 @@
         transition: 0.3s;
     }
 
-    .btn-ai-generate:hover { transform: scale(1.01); box-shadow: 0 10px 20px rgba(75, 0, 130, 0.2); }
-
     .publish-btn {
         background: linear-gradient(135deg, var(--royal-purple), #2d004d);
         color: white;
@@ -94,12 +91,19 @@
         cursor: pointer;
         margin-top: 20px;
     }
+
+    /* ميزة الربط التلقائي */
+    .locked-badge {
+        background: #f0f0f0;
+        color: #666;
+        cursor: not-allowed;
+    }
 </style>
 
 <div class="master-card" dir="rtl">
     <div class="text-center mb-5">
-        <h3 class="fw-bold" style="color: var(--royal-purple);">✨ إدارة منتجات محجوب أونلاين</h3>
-        <p class="text-muted">المنصة الأولى اللامركزية في اليمن | سوقك الذكي</p>
+        <h3 class="fw-bold" style="color: var(--royal-purple);">✨ إضافة منتج جديد</h3>
+        <p class="text-muted">الموظف المسؤول: <b>{{ vendor.employee_name }}</b> | المؤسسة: <b>{{ vendor.brand_name }}</b></p>
     </div>
 
     <form id="productForm" method="POST" enctype="multipart/form-data">
@@ -109,21 +113,17 @@
                 <input type="text" id="pName" name="name" class="premium-input" placeholder="مثلاً: هاتف ذكي سامسونج..." required>
             </div>
             <div class="col-md-6">
-                <label class="form-label">العلامة التجارية (مربوطة بحسابك)</label>
-                <select name="brand" id="pBrand" class="premium-input" required>
-                    {% for brand in user_brands %}
-                        <option value="{{ brand.id }}">{{ brand.name }}</option>
-                    {% else %}
-                        <option value="">لا يوجد علامات تجارية مسجلة</option>
-                    {% endfor %}
-                </select>
+                <label class="form-label">العلامة التجارية (مربوطة آلياً بقاعدة البيانات)</label>
+                <input type="text" id="pBrandDisplay" class="premium-input locked-badge" value="{{ vendor.brand_name }}" readonly>
+                <input type="hidden" name="brand" value="{{ vendor.brand_name }}">
+                <small class="text-muted">يتم تسجيل المنتج تحت هوية: {{ vendor.brand_name }}</small>
             </div>
         </div>
 
         <div class="row g-3 mb-4">
             <div class="col-md-4">
                 <label class="form-label">السعر</label>
-                <input type="number" name="price" class="premium-input" placeholder="0.00" required>
+                <input type="number" name="price" class="premium-input" placeholder="0.00" step="0.01" required>
             </div>
             <div class="col-md-4">
                 <label class="form-label">العملة</label>
@@ -134,90 +134,63 @@
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label">الكمية</label>
-                <input type="number" name="stock" class="premium-input" placeholder="المخزون">
+                <label class="form-label">الكمية بالمخزن</label>
+                <input type="number" name="stock" class="premium-input" value="1" required>
             </div>
         </div>
 
         <div class="ai-engine-container">
-            <h6 class="fw-bold mb-3"><i class="fas fa-magic"></i> مساعد صياغة الوصف الذكي</h6>
+            <h6 class="fw-bold mb-3"><i class="fas fa-magic"></i> مساعد سوقك الذكي (الذكاء الاصطناعي)</h6>
+            <label class="form-label small">المواصفات الأساسية (افصل بينها بفاصلة):</label>
+            <textarea id="pSpecs" class="premium-input mb-3" rows="2" placeholder="مثلاً: شاشة 6.5 بوصة، بطارية 5000mAh..."></textarea>
             
-            <label class="form-label small">المواصفات الأساسية:</label>
-            <textarea id="pSpecs" class="premium-input mb-3" rows="3" placeholder="اكتب المواصفات هنا مفصولة بفاصلة..."></textarea>
-            
-            <label class="form-label small">اختر أسلوب العرض:</label>
-            <div class="style-grid">
-                <div class="style-card active" onclick="setStyle(this, 'خبير تقني')">👨‍🏫 خبير تقني</div>
-                <div class="style-card" onclick="setStyle(this, 'احترافي')">💼 احترافي</div>
-                <div class="style-card" onclick="setStyle(this, 'ودي')">😊 ودي</div>
-                <div class="style-card" onclick="setStyle(this, 'بسيط')">📝 بسيط</div>
-            </div>
-
             <button type="button" class="btn-ai-generate" onclick="generatePremiumDesc()">
-                توليد الوصف الاحترافي ✨
+                توليد الوصف للمؤسسة والمنتج ✨
             </button>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">الوصف النهائي للمنتج</label>
-            <textarea id="pDesc" name="description" class="premium-input" rows="8" placeholder="سيتم تعبئة الوصف هنا..."></textarea>
+            <label class="form-label">الوصف النهائي</label>
+            <textarea id="pDesc" name="description" class="premium-input" rows="8"></textarea>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">المرفقات (صور وفيديو)</label>
-            <input type="file" id="mediaUpload" name="files" class="premium-input" multiple onchange="autoRename(this)">
-            <p id="renameMsg" class="text-success small mt-2 d-none fw-bold">✓ تم ربط الملفات بهوية المنتج بنجاح.</p>
+            <label class="form-label">صورة المنتج</label>
+            <input type="file" name="image" class="premium-input" accept="image/*" required>
         </div>
 
         <button type="submit" class="publish-btn">
-             حفظ ونشر المنتج الآن 🚀
+             نشر المنتج في سوقك الذكي 🚀
         </button>
     </form>
 </div>
 
 <script>
-    let currentStyle = 'خبير تقني';
-
-    function setStyle(el, style) {
-        document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        currentStyle = style;
-    }
-
     function generatePremiumDesc() {
         const name = document.getElementById('pName').value;
-        const brandSelect = document.getElementById('pBrand');
-        const brandName = brandSelect.options[brandSelect.selectedIndex].text;
+        // قراءة اسم المؤسسة المربوطة آلياً
+        const brandName = document.getElementById('pBrandDisplay').value;
         const specs = document.getElementById('pSpecs').value;
         const target = document.getElementById('pDesc');
 
         if(!name || !specs) {
-            alert("يرجى ملء الاسم والمواصفات أولاً."); return;
+            alert("يرجى إدخال اسم المنتج والمواصفات."); return;
         }
 
-        // صياغة النص بذكاء مع دمج البراند والمنصة
-        let result = `🌟 المنتج: ${name}\n`;
-        result += `🏢 العلامة التجارية: ${brandName}\n`;
-        result += `🔗 متوفر حصرياً عبر "محجوب أونلاين" - سوقك الذكي 🇾🇪\n\n`;
-        result += `🚀 المزايا والخصائص الرئيسية:\n`;
+        let result = `🌟 المنتج المميز: ${name}\n`;
+        result += `🏢 برعاية: ${brandName}\n`;
+        result += `🔗 متوفر الآن عبر منصة "محجوب أونلاين" اللامركزية 🇾🇪\n\n`;
+        result += `🚀 المواصفات الفنية:\n`;
         
-        const specArray = specs.split('،');
-        specArray.forEach(s => {
+        specs.split('،').forEach(s => {
             if(s.trim()) result += `✅ ${s.trim()}\n`;
         });
 
-        result += `\n🛡️ لماذا تختار محجوب أونلاين؟\n`;
-        result += `نحن المنصة الأولى اللامركزية في اليمن التي تضمن لك تجربة تسوق آمنة وموثوقة بنسبة 100%.\n\n`;
-        result += `📥 اطلب الآن وانضم لمستقبل التسوق الذكي!`;
+        result += `\n🛡️ الضمان والخدمة:\n`;
+        result += `نحن في ${brandName} نضمن لك جودة المنتج وخدمة ما بعد البيع عبر سوقك الذكي.\n\n`;
+        result += `📥 اطلب الآن عبر الرابط!`;
 
         target.value = result;
-    }
-
-    function autoRename(input) {
-        const name = document.getElementById('pName').value;
-        if(input.files.length > 0 && name) {
-            document.getElementById('renameMsg').classList.remove('d-none');
-        }
     }
 </script>
 {% endblock %}
