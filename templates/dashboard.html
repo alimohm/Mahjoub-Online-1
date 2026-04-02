@@ -6,7 +6,7 @@
 <div class="dashboard-container">
     
     <div class="welcome-section" style="margin-bottom: 30px;">
-        <h2 style="margin: 0; font-size: 24px; color: var(--main-p-color);">أهلاً بك في نظامك الإداري الملكي</h2>
+        <h2 style="margin: 0; font-size: 24px; color: var(--main-p-color);">أهلاً بك في نظامك الإداري</h2>
         <p style="color: #7f8c8d; margin: 5px 0 0 0;">إليك نظرة سريعة على حالة متجرك في المنصة اللامركزية اليوم.</p>
     </div>
 
@@ -73,5 +73,33 @@
 </style>
 
 {% include 'add_product.html' %}
+
+<script>
+    function openUploadModal() {
+        const modal = document.getElementById('uploadProductModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // منع التمرير في الخلفية
+        } else {
+            console.error("خطأ: لم يتم العثور على عنصر 'uploadProductModal'. تأكد من وجود الـ ID في ملف add_product.html");
+        }
+    }
+
+    function closeUploadModal() {
+        const modal = document.getElementById('uploadProductModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // إعادة التمرير
+        }
+    }
+
+    // إغلاق النافذة عند الضغط في أي مكان خارج محتواها الأبيض
+    window.onclick = function(event) {
+        const modal = document.getElementById('uploadProductModal');
+        if (event.target == modal) {
+            closeUploadModal();
+        }
+    }
+</script>
 
 {% endblock %}
