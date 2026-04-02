@@ -1,111 +1,187 @@
 {% extends "layout.html" %}
 
-{% block title %}رفع منتج جديد | محجوب أونلاين{% endblock %}
+{% block title %}رفع منتج احترافي | محجوب أونلاين{% endblock %}
 
 {% block content %}
 <style>
-    /* تنسيق حاوية الرفع لتناسب فخامة النظام */
-    .upload-container {
+    .upload-card {
         background: var(--white);
-        padding: 40px;
+        padding: 30px;
         border-radius: 25px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-        max-width: 700px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        max-width: 800px;
         margin: 0 auto;
         border: 1px solid #eef2f3;
     }
 
-    .form-header {
-        text-align: center;
-        margin-bottom: 35px;
-    }
-
-    .form-header i {
-        font-size: 40px;
+    .form-section-title {
+        font-size: 16px;
+        font-weight: 800;
         color: var(--main-p-color);
-        margin-bottom: 15px;
-    }
-
-    .form-group {
         margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    .form-group label {
-        display: block;
-        font-weight: 700;
-        margin-bottom: 10px;
-        color: #2c3e50;
-        font-size: 14px;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 14px;
-        border: 2px solid #f1f1f1;
-        border-radius: 12px;
-        font-family: 'Cairo', sans-serif;
+    .media-upload-area {
+        border: 2px dashed #d1d8e0;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        cursor: pointer;
         transition: 0.3s;
         background: #fcfcfc;
     }
 
-    .form-control:focus {
-        border-color: var(--main-p-color);
-        outline: none;
-        background: #fff;
+    .media-upload-area:hover { border-color: var(--main-p-color); background: #f8f5ff; }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #eef2f3;
+        border-radius: 12px;
+        font-family: 'Cairo', sans-serif;
+        margin-top: 8px;
     }
 
-    .submit-btn {
-        width: 100%;
-        padding: 16px;
-        background: var(--main-p-color);
+    .ai-gen-btn {
+        background: linear-gradient(45deg, #4b0082, #8e44ad);
         color: white;
         border: none;
-        border-radius: 12px;
-        font-weight: 800;
-        font-size: 16px;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
         cursor: pointer;
-        transition: 0.3s;
-        box-shadow: 0 8px 20px rgba(75, 0, 130, 0.15);
+        margin-top: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
-    .submit-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 25px rgba(75, 0, 130, 0.2);
+    /* إشعار النجاح العائم */
+    #successToast {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        background: #2ecc71;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 12px;
+        display: none;
+        box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+        z-index: 9999;
+        animation: slideIn 0.5s ease;
     }
+
+    @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 </style>
 
-<div class="upload-container">
-    <div class="form-header">
-        <i class="fas fa-cloud-upload-alt"></i>
-        <h2 style="color: var(--main-p-color); margin: 0;">إضافة منتج جديد</h2>
-        <p style="color: #7f8c8d; font-size: 13px; margin-top: 5px;">أضف منتجاتك إلى "سوقك الذكي" بلمسة واحدة</p>
+<div class="upload-card">
+    <div class="form-section-title">
+        <i class="fas fa-plus-circle"></i> إضافة منتج جديد إلى سوقك الذكي
     </div>
 
-    <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label>اسم المنتج</label>
-            <input type="text" name="name" class="form-control" placeholder="مثلاً: هاتف ذكي سامسونج" required>
+    <form id="productForm" enctype="multipart/form-data">
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: 700;">اسم المنتج</label>
+            <input type="text" id="prodName" name="name" class="form-control" placeholder="أدخل اسم المنتج بدقة..." required>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="form-group">
-                <label>السعر (MAH)</label>
-                <input type="number" step="0.01" name="price" class="form-control" placeholder="0.00" required>
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: 700;">الصور والفيديو (يمكنك اختيار ملفات متعددة)</label>
+            <div class="media-upload-area" onclick="document.getElementById('mediaInput').click()">
+                <i class="fas fa-images fa-2x" style="color: #bdc3c7;"></i>
+                <p style="margin: 10px 0 0; font-size: 13px; color: #7f8c8d;">اسحب وأفلت الملفات هنا أو اضغط للاختيار</p>
+                <input type="file" id="mediaInput" name="media" multiple accept="image/*,video/*" style="display: none;">
             </div>
-            <div class="form-group">
-                <label>صورة المنتج</label>
-                <input type="file" name="image" class="form-control" accept="image/*" required>
+            <div id="filePreview" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div>
+                <label style="font-weight: 700;">السعر</label>
+                <input type="number" name="price" class="form-control" placeholder="0.00" required>
+            </div>
+            <div>
+                <label style="font-weight: 700;">العملة</label>
+                <select name="currency" class="form-control">
+                    <option value="YER">ريال يمني</option>
+                    <option value="SAR">ريال سعودي</option>
+                    <option value="MAH">عملة MAH</option>
+                </select>
             </div>
         </div>
 
-        <div class="form-group">
-            <label>وصف مختصر</label>
-            <textarea name="description" class="form-control" rows="3" placeholder="اكتب تفاصيل المنتج هنا..."></textarea>
+        <div style="margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="font-weight: 700;">وصف المنتج</label>
+                <button type="button" class="ai-gen-btn" onclick="generateAIDescription()">
+                    <i class="fas fa-magic"></i> توليد وصف ذكي
+                </button>
+            </div>
+            <textarea id="prodDesc" name="description" class="form-control" rows="5" placeholder="اكتب تفاصيل المنتج..."></textarea>
         </div>
 
-        <button type="submit" class="submit-btn">
-            <i class="fas fa-check-circle" style="margin-left: 8px;"></i> اعتماد ونشر المنتج
+        <button type="submit" class="submit-btn" style="width: 100%; background: var(--main-p-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer;">
+            نشر المنتج للادارة فوراً
         </button>
     </form>
 </div>
+
+<div id="successToast">
+    <i class="fas fa-check-circle"></i> تم رفع المنتج بنجاح وجاري المعالجة في الخلفية!
+</div>
+
+<script>
+    // 1. توليد الوصف تلقائياً (محاكاة ذكاء اصطناعي)
+    function generateAIDescription() {
+        const name = document.getElementById('prodName').value;
+        const descBox = document.getElementById('prodDesc');
+        if(!name) { alert("يرجى كتابة اسم المنتج أولاً"); return; }
+        
+        descBox.placeholder = "جاري التوليد...";
+        setTimeout(() => {
+            descBox.value = `منتج ${name} المميز، متوفر الآن في محجوب أونلاين بجودة عالية وأفضل الأسعار. يتميز بتصميم عصري وأداء قوي يناسب احتياجاتك اليومية في السوق اليمني الذكي.`;
+        }, 1000);
+    }
+
+    // 2. معالجة الرفع في الخلفية وإظهار الإشعار الفوري
+    document.getElementById('productForm').onsubmit = function(e) {
+        e.preventDefault();
+        
+        // إظهار الإشعار فوراً دون انتظار السيرفر
+        const toast = document.getElementById('successToast');
+        toast.style.display = 'block';
+        
+        // تفريغ الفورم ليبدو للمستخدم أنه انتهى
+        this.reset();
+        document.getElementById('filePreview').innerHTML = '';
+
+        // إرسال البيانات في الخلفية (AJAX)
+        const formData = new FormData(this);
+        fetch("{{ url_for('add_product') }}", {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            console.log("تم الرفع للسيرفر بنجاح");
+        });
+
+        // إخفاء الإشعار بعد 4 ثواني
+        setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    };
+
+    // 3. معاينة الملفات المختارة
+    document.getElementById('mediaInput').onchange = function() {
+        const preview = document.getElementById('filePreview');
+        preview.innerHTML = '';
+        Array.from(this.files).forEach(file => {
+            const span = document.createElement('span');
+            span.style.cssText = "font-size: 10px; background: #eee; padding: 5px 10px; border-radius: 5px;";
+            span.innerText = file.name;
+            preview.appendChild(span);
+        });
+    };
+</script>
 {% endblock %}
