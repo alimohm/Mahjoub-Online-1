@@ -1,247 +1,219 @@
 {% extends "layout.html" %}
 
-{% block title %}إضافة منتج عالمي | سوقك الذكي{% endblock %}
+{% block title %}إضافة منتج | محجوب أونلاين{% endblock %}
 
 {% block content %}
 <style>
     :root {
         --royal-purple: #4b0082;
-        --deep-gold: #c5a059;
-        --ui-bg: #f4f7fa;
-        --card-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        --soft-bg: #f8f9ff;
     }
 
-    body { background-color: var(--ui-bg); font-family: 'Cairo', sans-serif; }
+    body { background-color: var(--soft-bg); font-family: 'Cairo', sans-serif; }
 
     .master-card {
         background: #ffffff;
         border-radius: 30px;
-        padding: 45px;
-        box-shadow: var(--card-shadow);
-        max-width: 1100px;
-        margin: 3rem auto;
-        border: 1px solid rgba(0,0,0,0.02);
+        padding: 40px;
+        box-shadow: 0 15px 45px rgba(0,0,0,0.06);
+        max-width: 1000px;
+        margin: 2rem auto;
+        border: 1px solid #edf2f7;
     }
 
-    /* أداة التوليد الذكية - تصميم انسيابي */
-    .ai-smart-engine {
-        background: linear-gradient(135deg, #fdfbff 0%, #f4f0ff 100%);
-        border: 2px dashed var(--royal-purple);
-        border-radius: 20px;
-        padding: 25px;
-        margin-bottom: 25px;
-        position: relative;
-        transition: 0.3s;
-    }
+    .form-label { font-weight: 800; color: #333; margin-bottom: 10px; display: block; font-size: 0.95rem; }
 
-    .ai-engine-header {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-        color: var(--royal-purple);
-        font-weight: 800;
-    }
-
-    .style-selector-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 10px;
-        margin-top: 15px;
-    }
-
-    .style-chip {
-        background: white;
-        border: 1.5px solid #eee;
-        padding: 10px;
-        border-radius: 12px;
-        cursor: pointer;
-        text-align: center;
-        font-size: 0.85rem;
-        transition: 0.2s;
-    }
-
-    .style-chip:hover, .style-chip.active {
-        border-color: var(--royal-purple);
-        background: var(--royal-purple);
-        color: white;
-    }
-
-    .form-label { font-weight: 700; color: #2d3748; margin-bottom: 10px; display: block; }
-
-    .form-control-premium {
+    .premium-input {
         width: 100%;
-        padding: 15px;
+        padding: 14px 18px;
         border: 1.5px solid #e2e8f0;
         border-radius: 15px;
-        background: #fff;
-        transition: 0.3s;
+        transition: 0.3s ease;
+        background: #fdfdfd;
     }
 
-    .form-control-premium:focus {
+    .premium-input:focus {
         border-color: var(--royal-purple);
-        box-shadow: 0 0 0 4px rgba(75, 0, 130, 0.05);
+        box-shadow: 0 0 0 4px rgba(75, 0, 130, 0.08);
         outline: none;
     }
 
-    .btn-generate {
+    /* أداة الذكاء الاصطناعي - سوقك الذكي */
+    .ai-engine-container {
+        background: linear-gradient(145deg, #f9f7ff, #ffffff);
+        border: 2px dashed var(--royal-purple);
+        border-radius: 20px;
+        padding: 25px;
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .style-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+        margin: 15px 0;
+    }
+
+    .style-card {
+        background: white;
+        border: 1.5px solid #eee;
+        padding: 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        text-align: center;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+
+    .style-card.active { background: var(--royal-purple); color: white; border-color: var(--royal-purple); }
+
+    .btn-ai-generate {
         background: var(--royal-purple);
         color: white;
         border: none;
-        padding: 12px 30px;
+        padding: 16px;
         border-radius: 12px;
-        font-weight: 700;
-        margin-top: 20px;
         width: 100%;
+        font-weight: 800;
         cursor: pointer;
+        transition: 0.3s;
     }
 
-    .btn-publish {
-        background: linear-gradient(45deg, var(--royal-purple), #6a11cb);
+    .btn-ai-generate:hover { transform: scale(1.01); box-shadow: 0 10px 20px rgba(75, 0, 130, 0.2); }
+
+    .publish-btn {
+        background: linear-gradient(135deg, var(--royal-purple), #2d004d);
         color: white;
         border: none;
         padding: 20px;
         border-radius: 18px;
-        font-weight: 800;
         width: 100%;
-        font-size: 1.1rem;
+        font-weight: 900;
+        font-size: 1.2rem;
         cursor: pointer;
-        box-shadow: 0 10px 20px rgba(75, 0, 130, 0.2);
-    }
-
-    /* حالة التوليد (Loading) */
-    .generating-overlay {
-        display: none;
-        color: var(--royal-purple);
-        font-weight: 700;
-        margin-top: 10px;
+        margin-top: 20px;
     }
 </style>
 
 <div class="master-card" dir="rtl">
     <div class="text-center mb-5">
-        <h3 style="color: var(--royal-purple); font-weight: 900;">إضافة منتج عالمي جديد</h3>
-        <p class="text-muted">نظام "سوقك الذكي" مدعوم بالذكاء الاصطناعي لإدارة المحتوى</p>
+        <h3 class="fw-bold" style="color: var(--royal-purple);">✨ إدارة منتجات محجوب أونلاين</h3>
+        <p class="text-muted">المنصة الأولى اللامركزية في اليمن | سوقك الذكي</p>
     </div>
 
-    <form id="productForm">
+    <form id="productForm" method="POST" enctype="multipart/form-data">
         <div class="row g-4 mb-4">
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <label class="form-label">اسم المنتج</label>
-                <input type="text" id="pName" class="form-control-premium" placeholder="مثال: لاب توب ديل XPS 15 المطور" required>
+                <input type="text" id="pName" name="name" class="premium-input" placeholder="مثلاً: هاتف ذكي سامسونج..." required>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">الفئة</label>
-                <select class="form-control-premium">
-                    <option>إلكترونيات</option>
-                    <option>أدوات منزلية</option>
+            <div class="col-md-6">
+                <label class="form-label">العلامة التجارية (مربوطة بحسابك)</label>
+                <select name="brand" id="pBrand" class="premium-input" required>
+                    {% for brand in user_brands %}
+                        <option value="{{ brand.id }}">{{ brand.name }}</option>
+                    {% else %}
+                        <option value="">لا يوجد علامات تجارية مسجلة</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
 
-        <div class="row g-4 mb-5">
+        <div class="row g-3 mb-4">
             <div class="col-md-4">
                 <label class="form-label">السعر</label>
-                <input type="number" class="form-control-premium" placeholder="0.00">
+                <input type="number" name="price" class="premium-input" placeholder="0.00" required>
             </div>
             <div class="col-md-4">
                 <label class="form-label">العملة</label>
-                <select id="pCurrency" class="form-control-premium">
+                <select name="currency" class="premium-input">
                     <option value="YER">ريال يمني (YER)</option>
                     <option value="SAR">ريال سعودي (SAR)</option>
                     <option value="USD">دولار أمريكي (USD)</option>
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label">المخزون (الكمية)</label>
-                <input type="number" class="form-control-premium" placeholder="100">
+                <label class="form-label">الكمية</label>
+                <input type="number" name="stock" class="premium-input" placeholder="المخزون">
             </div>
         </div>
 
-        <div class="ai-smart-engine">
-            <div class="ai-engine-header">
-                <i class="fas fa-robot"></i> محرك صياغة المحتوى الذكي
-            </div>
+        <div class="ai-engine-container">
+            <h6 class="fw-bold mb-3"><i class="fas fa-magic"></i> مساعد صياغة الوصف الذكي</h6>
             
-            <label class="form-label">أدخل المواصفات الأساسية (نقاط سريعة):</label>
-            <textarea id="pSpecs" class="form-control-premium mb-3" rows="3" placeholder="مثلاً: معالج i7، رام 16GB، شاشة لمس..."></textarea>
+            <label class="form-label small">المواصفات الأساسية:</label>
+            <textarea id="pSpecs" class="premium-input mb-3" rows="3" placeholder="اكتب المواصفات هنا مفصولة بفاصلة..."></textarea>
             
-            <label class="form-label">اختر أسلوب الكتابة المستهدف:</label>
-            <div class="style-selector-grid">
-                <div class="style-chip active" onclick="selectStyle(this, 'خبير')">👨‍🏫 خبير تقني</div>
-                <div class="style-chip" onclick="selectStyle(this, 'احترافي')">💼 احترافي</div>
-                <div class="style-chip" onclick="selectStyle(this, 'ودي')">😊 ودي</div>
-                <div class="style-chip" onclick="selectStyle(this, 'بسيط')">📝 بسيط</div>
+            <label class="form-label small">اختر أسلوب العرض:</label>
+            <div class="style-grid">
+                <div class="style-card active" onclick="setStyle(this, 'خبير تقني')">👨‍🏫 خبير تقني</div>
+                <div class="style-card" onclick="setStyle(this, 'احترافي')">💼 احترافي</div>
+                <div class="style-card" onclick="setStyle(this, 'ودي')">😊 ودي</div>
+                <div class="style-card" onclick="setStyle(this, 'بسيط')">📝 بسيط</div>
             </div>
 
-            <button type="button" class="btn-generate" onclick="callAI()">
-                استدعاء الذكاء الاصطناعي للتوليد <i class="fas fa-sparkles"></i>
+            <button type="button" class="btn-ai-generate" onclick="generatePremiumDesc()">
+                توليد الوصف الاحترافي ✨
             </button>
-            <div id="loader" class="generating-overlay text-center">
-                <i class="fas fa-spinner fa-spin"></i> جاري استدعاء المحرك الذكي وتحليل المواصفات...
-            </div>
         </div>
 
-        <div class="mb-5">
-            <label class="form-label">الوصف النهائي المولد</label>
-            <textarea id="pDesc" class="form-control-premium" rows="8" placeholder="سيظهر الوصف الاحترافي هنا..."></textarea>
+        <div class="mb-4">
+            <label class="form-label">الوصف النهائي للمنتج</label>
+            <textarea id="pDesc" name="description" class="premium-input" rows="8" placeholder="سيتم تعبئة الوصف هنا..."></textarea>
         </div>
 
-        <div class="mb-5">
-            <label class="form-label">صور وفيديوهات المنتج</label>
-            <input type="file" class="form-control-premium" multiple onchange="smartRename(this)">
-            <p id="renameMsg" class="text-success mt-2 small d-none fw-bold">✓ تم تفعيل إعادة التسمية التلقائية بناءً على اسم المنتج.</p>
+        <div class="mb-4">
+            <label class="form-label">المرفقات (صور وفيديو)</label>
+            <input type="file" id="mediaUpload" name="files" class="premium-input" multiple onchange="autoRename(this)">
+            <p id="renameMsg" class="text-success small mt-2 d-none fw-bold">✓ تم ربط الملفات بهوية المنتج بنجاح.</p>
         </div>
 
-        <button type="submit" class="btn-publish">
-            نشر المنتج في "سوقك الذكي" عالمياً <i class="fas fa-globe"></i>
+        <button type="submit" class="publish-btn">
+             حفظ ونشر المنتج الآن 🚀
         </button>
     </form>
 </div>
 
 <script>
-    let selectedStyle = 'خبير';
+    let currentStyle = 'خبير تقني';
 
-    function selectStyle(element, style) {
-        document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('active'));
-        element.classList.add('active');
-        selectedStyle = style;
+    function setStyle(el, style) {
+        document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        currentStyle = style;
     }
 
-    async function callAI() {
+    function generatePremiumDesc() {
         const name = document.getElementById('pName').value;
+        const brandSelect = document.getElementById('pBrand');
+        const brandName = brandSelect.options[brandSelect.selectedIndex].text;
         const specs = document.getElementById('pSpecs').value;
-        const output = document.getElementById('pDesc');
-        const loader = document.getElementById('loader');
+        const target = document.getElementById('pDesc');
 
         if(!name || !specs) {
-            alert("يرجى إدخال اسم المنتج والمواصفات أولاً.");
-            return;
+            alert("يرجى ملء الاسم والمواصفات أولاً."); return;
         }
 
-        loader.style.display = 'block';
-        output.value = "";
+        // صياغة النص بذكاء مع دمج البراند والمنصة
+        let result = `🌟 المنتج: ${name}\n`;
+        result += `🏢 العلامة التجارية: ${brandName}\n`;
+        result += `🔗 متوفر حصرياً عبر "محجوب أونلاين" - سوقك الذكي 🇾🇪\n\n`;
+        result += `🚀 المزايا والخصائص الرئيسية:\n`;
+        
+        const specArray = specs.split('،');
+        specArray.forEach(s => {
+            if(s.trim()) result += `✅ ${s.trim()}\n`;
+        });
 
-        // ملاحظة للمطور علي: هنا يتم الربط بـ API السيرفر
-        // سأضع لك محاكاة ذكية (Simulation) تظهر لك كيف يتم استدعاء البيانات
-        try {
-            // هتا نرسل الطلب للسيرفر الخاص بك (Backend)
-            // fetch('/api/generate-description', { method: 'POST', body: ... })
-            
-            setTimeout(() => {
-                let response = `[وصف احترافي مولد بالذكاء الاصطناعي] \nنقدم لكم ${name}، الخيار الأمثل الذي يجمع بين القوة والأناقة. \n\nالمميزات الرئيسية:\n${specs.split('،').map(s => '• ' + s.trim()).join('\n')}\n\nتمت صياغة هذا الوصف بأسلوب (${selectedStyle}) لضمان أفضل تجربة تسويقية في سوقك الذكي.`;
-                output.value = response;
-                loader.style.display = 'none';
-            }, 2000);
-            
-        } catch (error) {
-            loader.style.display = 'none';
-            alert("فشل الاتصال بمحرك الذكاء الاصطناعي.");
-        }
+        result += `\n🛡️ لماذا تختار محجوب أونلاين؟\n`;
+        result += `نحن المنصة الأولى اللامركزية في اليمن التي تضمن لك تجربة تسوق آمنة وموثوقة بنسبة 100%.\n\n`;
+        result += `📥 اطلب الآن وانضم لمستقبل التسوق الذكي!`;
+
+        target.value = result;
     }
 
-    function smartRename(input) {
+    function autoRename(input) {
         const name = document.getElementById('pName').value;
         if(input.files.length > 0 && name) {
             document.getElementById('renameMsg').classList.remove('d-none');
