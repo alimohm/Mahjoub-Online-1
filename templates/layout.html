@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}محجوب أونلاين | لوحة التحكم{% endblock %}</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -13,13 +14,15 @@
             --white: #ffffff;
             --main-p-color: #4b0082;
             --gold: #FFD700;
-            --sidebar-width: 80px; /* عرض ضيق للأيقونات فقط */
+            --sidebar-width: 260px; /* العرض الافتراضي للكمبيوتر */
+            --sidebar-collapsed: 80px; /* العرض للجوال والتابلت */
             --header-height: 80px;
         }
 
+        * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg-body); display: flex; height: 100vh; overflow: hidden; }
 
-        /* السايدبار - أيقونات فقط */
+        /* --- السايدبار الديناميكي --- */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--white);
@@ -27,49 +30,71 @@
             border-left: 1px solid #eef2f3;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
         }
 
-        .brand-section { margin-bottom: 30px; }
-        .logo-img { height: 40px; }
+        .brand-section { padding: 25px; text-align: center; border-bottom: 1px solid #eef2f3; }
+        .logo-img { height: 40px; transition: 0.3s; }
 
-        .menu-list { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .menu-list { flex: 1; padding: 20px 0; overflow-x: hidden; }
+        
         .menu-item {
-            width: 50px; height: 50px;
-            display: flex; align-items: center; justify-content: center;
-            text-decoration: none; color: #7f8c8d;
-            border-radius: 12px; transition: 0.3s;
+            display: flex; align-items: center; padding: 14px 20px;
+            text-decoration: none; color: #7f8c8d; font-weight: 600;
+            margin: 4px 15px; border-radius: 12px; transition: 0.3s;
+            white-space: nowrap; /* منع انكسار النص */
         }
-        .menu-item i { font-size: 20px; }
-        .menu-item.active { background: #f2eefa; color: var(--main-p-color); }
-        .menu-item:hover { background: #f8f9fa; color: var(--main-p-color); }
+        
+        .menu-item i { font-size: 18px; min-width: 25px; text-align: center; margin-left: 15px; }
+        .menu-item span { transition: opacity 0.3s; }
 
-        /* المحتوى الرئيسي */
+        .menu-item.active { background: rgba(75,0,130,0.08); color: var(--main-p-color); }
+        .menu-item:hover:not(.active) { background: #f8f9fa; color: var(--main-p-color); }
+
+        /* --- الهيكل الرئيسي --- */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
         .top-header {
             height: var(--header-height);
             background: var(--white);
             border-bottom: 1px solid #eef2f3;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             padding: 0 30px;
         }
 
-        .brand-text { display: flex; align-items: center; gap: 10px; }
-        .brand-name { font-weight: 800; color: var(--main-p-color); font-size: 18px; }
-        .brand-tagline { font-size: 13px; color: #7f8c8d; font-weight: 600; }
+        .brand-info { display: flex; flex-direction: column; }
+        .brand-name { font-weight: 800; color: var(--main-p-color); font-size: 16px; }
+        .brand-tag { font-size: 11px; color: #7f8c8d; }
 
+        .user-area { display: flex; align-items: center; gap: 12px; }
         .user-badge {
-            display: flex; align-items: center; gap: 10px;
-            background: #f8fafc; padding: 6px 15px; border-radius: 12px;
-            border: 1px solid #eef2f3;
+            display: flex; align-items: center; gap: 8px;
+            background: #f8fafc; padding: 5px 12px; border-radius: 10px; border: 1px solid #eef2f3;
         }
 
-        .page-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .page-content { flex: 1; padding: 25px; overflow-y: auto; }
+
+        /* =============================================
+           قواعد الاستجابة (Responsive Logic)
+           ============================================= */
+
+        /* للشاشات المتوسطة (التابلت) والصغيرة (الجوال) */
+        @media (max-width: 1024px) {
+            .sidebar { width: var(--sidebar-collapsed); }
+            .sidebar .menu-item span { display: none; } /* إخفاء النص */
+            .sidebar .menu-item i { margin-left: 0; font-size: 20px; }
+            .sidebar .menu-item { justify-content: center; margin: 4px 10px; }
+            .brand-name { font-size: 14px; }
+        }
+
+        /* للجوالات الصغيرة جداً */
+        @media (max-width: 480px) {
+            .top-header { padding: 0 15px; }
+            .brand-tag { display: none; } /* إخفاء النص الفرعي لتوفير مساحة */
+            .user-name { display: none; }
+            .page-content { padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -79,34 +104,34 @@
             <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-img">
         </div>
         <div class="menu-list">
-            <a href="{{ url_for('dashboard') }}" class="menu-item {% if request.endpoint == 'dashboard' %}active{% endif %}" title="الرئيسية">
-                <i class="fas fa-th-large"></i>
+            <a href="{{ url_for('dashboard') }}" class="menu-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-th-large"></i><span>الرئيسية</span>
             </a>
-            <a href="#" class="menu-item" title="المحفظة">
-                <i class="fas fa-wallet"></i>
+            <a href="#" class="menu-item">
+                <i class="fas fa-wallet"></i><span>محفظة MAH</span>
             </a>
-            <a href="{{ url_for('add_product') }}" class="menu-item {% if request.endpoint == 'add_product' %}active{% endif %}" title="رفع منتج">
-                <i class="fas fa-plus-circle"></i>
+            <a href="{{ url_for('add_product') }}" class="menu-item {% if request.endpoint == 'add_product' %}active{% endif %}">
+                <i class="fas fa-plus-circle"></i><span>رفع منتج</span>
             </a>
-            <a href="#" class="menu-item" title="الإعدادات">
-                <i class="fas fa-cog"></i>
+            <a href="#" class="menu-item">
+                <i class="fas fa-cog"></i><span>الإعدادات</span>
             </a>
         </div>
     </nav>
 
     <main class="main-wrapper">
         <header class="top-header">
-            <div class="brand-text">
+            <div class="brand-info">
                 <span class="brand-name">محجوب أونلاين | سوقك الذكي</span>
-                <span class="brand-tagline">لوحتك الإدارية</span>
+                <span class="brand-tag">لوحتك الإدارية اللامركزية</span>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="user-area">
                 <div class="user-badge">
-                    <span style="font-size: 13px; font-weight: 800; color: var(--main-p-color);">@{{ session.get('username', 'ali') }}</span>
+                    <span class="user-name" style="font-size: 12px; font-weight: 800; color: var(--main-p-color);">@{{ session.get('username', 'ali') }}</span>
                     <i class="fas fa-user-circle fa-lg" style="color: var(--main-p-color);"></i>
                 </div>
-                <a href="{{ url_for('logout_route') }}" style="color:#e74c3c;"><i class="fas fa-power-off"></i></a>
+                <a href="{{ url_for('logout_route') }}" style="color:#e74c3c; font-size: 16px;"><i class="fas fa-power-off"></i></a>
             </div>
         </header>
 
@@ -114,5 +139,6 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+
 </body>
 </html>
