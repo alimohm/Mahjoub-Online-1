@@ -1,179 +1,264 @@
 {% extends "layout.html" %}
 
-{% block title %}إضافة منتج - سوقك الذكي{% endblock %}
+{% block title %}إضافة منتج احترافي | سوقك الذكي{% endblock %}
 
 {% block content %}
 <style>
     :root {
         --royal-purple: #4b0082;
-        --accent-purple: #6a11cb;
-        --soft-gray: #f4f7f6;
+        --soft-purple: #f4f0ff;
+        --border-color: #e2e8f0;
+        --text-main: #1a202c;
     }
 
-    .upload-card {
+    body { background-color: #f7fafc; font-family: 'Cairo', sans-serif; }
+
+    .main-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .glass-card {
         background: #ffffff;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        max-width: 800px;
-        margin: 20px auto;
-        border: 1px solid #eee;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.04);
+        border: 1px solid var(--border-color);
     }
 
-    .form-control {
-        border-radius: 12px;
-        border: 1px solid #ddd;
-        padding: 12px;
-        font-family: 'Cairo', sans-serif;
-        transition: 0.3s;
+    .section-title {
+        color: var(--royal-purple);
+        font-weight: 800;
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
-    /* أداة المساعد الذكي المدمجة */
+    .form-group { margin-bottom: 24px; }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 14px;
+        border: 1.5px solid var(--border-color);
+        background: #fdfdfd;
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        border-color: var(--royal-purple);
+        box-shadow: 0 0 0 4px rgba(75, 0, 130, 0.05);
+        background: #fff;
+        outline: none;
+    }
+
+    /* أداة مساعد الكتابة الذكي المدمجة */
     .ai-smart-tool {
-        background: #fdfbff;
-        border: 2px dashed var(--accent-purple);
-        border-radius: 15px;
+        background: var(--soft-purple);
+        border: 2px dashed #9d50bb;
+        border-radius: 18px;
         padding: 20px;
-        margin: 20px 0;
+        margin: 30px 0;
+        position: relative;
     }
 
-    .ai-btn {
+    .ai-trigger-btn {
         background: var(--royal-purple);
         color: white;
         border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
+        padding: 12px 28px;
+        border-radius: 12px;
         font-weight: 700;
         cursor: pointer;
-        display: inline-flex;
+        display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        margin: 0 auto;
+        transition: 0.3s;
     }
 
-    /* القائمة المنسدلة الاحترافية */
-    .ai-dropdown-content {
+    .ai-trigger-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(75, 0, 130, 0.2); }
+
+    .ai-dropdown-menu {
         display: none;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         margin-top: 15px;
-        overflow: hidden;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
         border: 1px solid #eee;
+        overflow: hidden;
+        animation: slideUp 0.3s ease;
     }
 
     .style-option {
-        padding: 12px 20px;
+        padding: 15px 25px;
         cursor: pointer;
-        border-bottom: 1px solid #f9f9f9;
+        border-bottom: 1px solid #f8f8f8;
+        display: flex;
+        align-items: center;
+        gap: 12px;
         transition: 0.2s;
     }
 
-    .style-option:hover { background: #f0ebff; color: var(--royal-purple); }
+    .style-option:hover { background: #f9f6ff; color: var(--royal-purple); font-weight: 700; }
 
-    .btn-submit-main {
+    .publish-btn-premium {
         width: 100%;
         background: var(--royal-purple);
         color: white;
         border: none;
-        padding: 16px;
-        border-radius: 12px;
+        padding: 20px;
+        border-radius: 18px;
         font-weight: 800;
+        font-size: 1.1rem;
         cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        transition: 0.4s;
+    }
+
+    .publish-btn-premium:hover { background: #32005a; transform: scale(1.01); }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* تحسين الشاشات الصغيرة */
+    @media (max-width: 768px) {
+        .glass-card { padding: 25px; }
+        .row > div { margin-bottom: 15px; }
     }
 </style>
 
-<div class="upload-card" dir="rtl">
-    <h5 class="text-center mb-4 fw-bold" style="color: var(--royal-purple);">✨ إضافة منتج جديد</h5>
+<div class="main-container" dir="rtl">
+    <div class="glass-card">
+        <h3 class="section-title">
+            <i class="fas fa-plus-circle"></i> إضافة منتج جديد للمنصة
+        </h3>
 
-    <form id="productForm" method="POST" enctype="multipart/form-data">
-        <div class="row g-3 mb-4">
-            <div class="col-md-8">
-                <label class="form-label fw-bold small">اسم المنتج</label>
-                <input type="text" id="prodName" name="name" class="form-control" placeholder="أدخل اسم المنتج..." required>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-bold small">الفئة</label>
-                <select name="category" class="form-control">
-                    <option value="electronics">إلكترونيات</option>
-                    <option value="fashion">أزياء</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="ai-smart-tool text-center">
-            <button type="button" class="ai-btn" onclick="toggleAIDropdown()">
-                <i class="fas fa-magic"></i> مساعد الكتابة الذكي
-            </button>
-            
-            <div id="aiDropdown" class="ai-dropdown-content text-end">
-                <div class="p-3 border-bottom">
-                    <label class="small fw-bold">المواصفات (اختياري):</label>
-                    <textarea id="aiSpecsInput" class="form-control mt-1" rows="2" placeholder="أدخل نقاط مثل: جودة عالية، شحن سريع..."></textarea>
+        <form id="productForm" method="POST" enctype="multipart/form-data">
+            <div class="row gx-4">
+                <div class="col-lg-8 col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">اسم المنتج الاحترافي</label>
+                        <input type="text" id="prodName" name="name" class="form-input" placeholder="مثلاً: ساعة يد ذكية الترا - الجيل الثامن" required>
+                    </div>
                 </div>
-                <div class="style-option" onclick="generateContent('خبير')">👨‍🏫 خبير (تركيز على التفاصيل التقنية)</div>
-                <div class="style-option" onclick="generateContent('احترافي')">💼 احترافي (رسمي وتسويقي)</div>
-                <div class="style-option" onclick="generateContent('ودي')">😊 ودي (جذاب وقريب للمستهلك)</div>
-                <div class="style-option" onclick="generateContent('بسيط')">📝 بسيط (واضح ومباشر)</div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">تصنيف المنتج</label>
+                        <select name="category" class="form-input">
+                            <option value="electronics">الأجهزة الإلكترونية</option>
+                            <option value="fashion">الأزياء والموضة</option>
+                            <option value="beauty">الجمال والعناية</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="mb-4">
-            <label class="form-label fw-bold small">وصف المنتج</label>
-            <textarea id="finalDescription" name="description" class="form-control" rows="5" placeholder="اكتب الوصف هنا..."></textarea>
-        </div>
+            <div class="row gx-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">سعر البيع</label>
+                        <input type="number" name="price" class="form-input" placeholder="0.00" required>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">العملة المتوفرة</label>
+                        <select name="currency" class="form-input">
+                            <option value="YER">ريال يمني</option>
+                            <option value="SAR">ريال سعودي</option>
+                            <option value="USD">دولار أمريكي</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">الكمية في المخزن</label>
+                        <input type="number" name="stock" class="form-input" placeholder="100" required>
+                    </div>
+                </div>
+            </div>
 
-        <div class="mb-4">
-            <label class="form-label fw-bold small">الصور والفيديوهات</label>
-            <input type="file" id="mediaFiles" name="files" class="form-control" multiple accept="image/*,video/*" onchange="safeRename(this)">
-            <div id="renameNotice" class="mt-2 text-success small d-none"><i class="fas fa-check"></i> تم ربط الملفات باسم المنتج برمجياً.</div>
-        </div>
+            <div class="ai-smart-tool text-center">
+                <p class="small fw-bold mb-3" style="color: #6a11cb;">✨ ذكاء اصطناعي لصياغة الوصف</p>
+                <button type="button" class="ai-trigger-btn" onclick="toggleAI()">
+                     مساعد الكتابة الذكي <i class="fas fa-chevron-down small"></i>
+                </button>
+                
+                <div id="aiDropdown" class="ai-dropdown-menu text-end">
+                    <div class="p-3 bg-light border-bottom">
+                        <textarea id="aiSpecs" class="form-input" rows="2" placeholder="اكتب المواصفات هنا (مثال: ضد الماء، شاشة Retina...)"></textarea>
+                    </div>
+                    <div class="style-option" onclick="generateNow('خبير')"><span>👨‍🏫</span> خبير (تركيز على التفاصيل التقنية)</div>
+                    <div class="style-option" onclick="generateNow('احترافي')"><span>💼</span> احترافي (رسمي وتسويقي)</div>
+                    <div class="style-option" onclick="generateNow('ودي')"><span>😊</span> ودي (جذاب وقريب للمستهلك)</div>
+                    <div class="style-option" onclick="generateNow('بسيط')"><span>📝</span> بسيط (واضح ومباشر)</div>
+                </div>
+            </div>
 
-        <button type="submit" class="btn-submit-main">نشر المنتج الآن 🚀</button>
-    </form>
+            <div class="form-group">
+                <label class="form-label">وصف المنتج الكامل</label>
+                <textarea id="finalDesc" name="description" class="form-input" rows="6" placeholder="سيتم تعبئة الوصف بذكاء أو اكتبه يدوياً..."></textarea>
+            </div>
+
+            <div class="form-group mb-5">
+                <label class="form-label">صور وفيديو المنتج</label>
+                <input type="file" id="mediaFiles" name="files" class="form-input" multiple onchange="renameFiles(this)">
+                <div id="renameLabel" class="mt-2 text-success small fw-bold d-none">
+                    <i class="fas fa-check-double"></i> تم ربط جميع الملفات باسم المنتج تلقائياً
+                </div>
+            </div>
+
+            <button type="submit" class="publish-btn-premium">
+                رفع المنتج للمراجعة  <i class="fas fa-rocket"></i>
+            </button>
+        </form>
+    </div>
 </div>
 
 <script>
-    // فتح وإغلاق القائمة بأمان
-    function toggleAIDropdown() {
-        const dropdown = document.getElementById('aiDropdown');
-        dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+    function toggleAI() {
+        const menu = document.getElementById('aiDropdown');
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     }
 
-    // توليد المحتوى مع الحماية من الأخطاء
-    function generateContent(style) {
-        const name = document.getElementById('prodName').value.trim();
-        const specs = document.getElementById('aiSpecsInput').value.trim();
-        const target = document.getElementById('finalDescription');
+    function generateNow(style) {
+        const name = document.getElementById('prodName').value;
+        const specs = document.getElementById('aiSpecs').value;
+        const target = document.getElementById('finalDesc');
 
-        if (!name) {
-            alert("يرجى كتابة اسم المنتج أولاً لتخصيص الوصف.");
-            return;
-        }
+        if(!name) { alert("لطفاً أدخل اسم المنتج أولاً."); return; }
 
-        target.value = "جاري التوليد بذكاء لأسلوبك الـ " + style + "...";
+        target.value = "جاري التوليد بذكاء لأسلوب " + style + "...";
         
-        // محاكاة سريعة
         setTimeout(() => {
-            let text = "";
-            if(style === 'خبير') text = `المواصفات الفنية لـ ${name}: (${specs}). أداء احترافي فائق الدقة.`;
-            else if(style === 'ودي') text = `يا هلا! جبنا لك ${name} الرهيب. بميزات مثل (${specs})، بيخلي حياتك أسهل وأحلى.`;
-            else text = `نقدم لكم ${name} الجديد بمواصفات (${specs}). متوفر الآن بجودة عالية في سوقك الذكي.`;
+            let result = "";
+            if(style === 'خبير') result = `المواصفات الفنية لـ ${name}:\nيتميز بـ (${specs})، تم اختباره لضمان أعلى مستويات الكفاءة.`;
+            else if(style === 'ودي') result = `أهلاً بك! جبنا لك ${name} الرهيب. بمواصفات مثل (${specs})، بيخلي حياتك أسهل وأجمل!`;
+            else result = `نقدم لكم ${name} المتوفر الآن بمواصفات (${specs}). جودة عالمية تجدونها دائماً في سوقك الذكي.`;
             
-            target.value = text;
-            toggleAIDropdown();
-        }, 800);
+            target.value = result;
+            toggleAI();
+        }, 1000);
     }
 
-    // إعادة التسمية الآمنة للملفات
-    function safeRename(input) {
-        const name = document.getElementById('prodName').value.trim();
-        if (!name && input.files.length > 0) {
-            alert("اكتب اسم المنتج أولاً ليتمكن النظام من تسمية الميديا تلقائياً.");
-            input.value = ""; 
-            return;
-        }
-        if (input.files.length > 0) {
-            document.getElementById('renameNotice').classList.remove('d-none');
+    function renameFiles(input) {
+        const name = document.getElementById('prodName').value;
+        if(input.files.length > 0 && name) {
+            document.getElementById('renameLabel').classList.remove('d-none');
         }
     }
 </script>
