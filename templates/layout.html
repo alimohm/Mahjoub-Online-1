@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محجوب أونلاين | سحب الرصيد</title>
+    <title>{% block title %}محجوب أونلاين{% endblock %} | 2026</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -17,122 +17,178 @@
             --text-dark: #2c3e50;
             --border-color: #eef2f3;
             --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
             --header-height: 80px;
         }
 
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg-body); display: flex; height: 100vh; overflow: hidden; }
-
-        /* --- التصميم الأساسي للهيكل --- */
-        .sidebar { width: var(--sidebar-width); background: var(--white); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; }
-        .top-header { height: var(--header-height); background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
-        .page-content { padding: 30px; flex: 1; overflow-y: auto; }
-
-        /* --- زر الأصبع المتحرك --- */
-        .withdraw-card { background: linear-gradient(135deg, var(--main-p-color), #2d004d); padding: 30px; border-radius: 20px; color: white; display: flex; justify-content: space-between; align-items: center; max-width: 500px; box-shadow: 0 10px 25px rgba(75, 0, 130, 0.2); }
-        
-        .finger-btn {
-            position: relative; width: 60px; height: 60px; background: var(--gold); border: none; border-radius: 50%; cursor: pointer; color: var(--main-p-color); font-size: 24px;
-            animation: jump 2s infinite ease-in-out; transition: 0.3s;
-        }
-        .finger-btn:hover { background: #fff; transform: scale(1.1); }
-        @keyframes jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background-color: var(--bg-body); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
 
         /* =========================================
-           تصميم النافذة المنبثقة (Modal CSS)
+           1. الشريط الجانبي (المحافظة على التنسيق الأصلي)
            ========================================= */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); display: none; /* مخفية افتراضياً */
-            align-items: center; justify-content: center; z-index: 2000;
-            backdrop-filter: blur(5px);
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--white);
+            height: 100%;
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
 
-        .modal-content {
-            background: white; width: 400px; border-radius: 20px; padding: 30px;
-            text-align: center; position: relative; animation: slideDown 0.4s ease;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        .brand-container {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 12px;
         }
 
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .logo-img { height: 45px; width: auto; object-fit: contain; }
+        .brand-info { display: flex; flex-direction: column; }
+        .brand-name { font-size: 17px; font-weight: 800; color: var(--main-p-color); line-height: 1.2; }
+        .brand-tagline { font-size: 13px; font-weight: 600; color: #7f8c8d; }
 
-        .modal-header h3 { margin: 0; color: var(--main-p-color); font-weight: 800; }
-        .modal-body { margin-top: 20px; }
-        .modal-body input {
-            width: 100%; padding: 12px; border: 2px solid var(--border-color);
-            border-radius: 12px; text-align: center; font-size: 18px; font-weight: 700;
-            color: var(--main-p-color);
+        .menu-list { flex: 1; padding: 20px 0; overflow-y: auto; }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            color: #7f8c8d;
+            font-size: 15px;
+            font-weight: 600;
+            transition: 0.3s;
+            margin: 4px 15px;
+            border-radius: 12px;
         }
-        .confirm-pull-btn {
-            margin-top: 20px; width: 100%; padding: 12px; background: var(--main-p-color);
-            color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s;
+        .menu-item i { margin-left: 15px; font-size: 18px; width: 25px; text-align: center; }
+        .menu-item:hover, .menu-item.active { background-color: rgba(75,0,130,0.08); color: var(--main-p-color); }
+
+        /* =========================================
+           2. الهيدر والمحتوى
+           ========================================= */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; overflow: hidden; }
+
+        .top-header {
+            height: var(--header-height);
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
         }
-        .confirm-pull-btn:hover { background: #6a0dad; }
-        .close-modal { position: absolute; top: 15px; right: 15px; cursor: pointer; color: #95a5a6; font-size: 20px; }
+
+        .platform-status { font-size: 14px; font-weight: 700; color: #2c3e50; }
+        .platform-status span { color: var(--main-p-color); font-weight: 600; margin-right: 5px; }
+
+        /* البروفايل (اسم المستخدم بجانب الأيقونة) */
+        .header-profile { display: flex; align-items: center; gap: 12px; }
+        .user-meta { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 5px 12px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .vendor-user { font-size: 13px; font-weight: 700; color: var(--main-p-color); }
+        .avatar { width: 35px; height: 35px; border-radius: 10px; background: var(--main-p-color); display: flex; align-items: center; justify-content: center; color: white; }
+
+        .page-content { flex: 1; padding: 30px; overflow-y: auto; }
+
+        /* =========================================
+           3. زر السحب والنافذة (الميزات الجديدة)
+           ========================================= */
+        .withdraw-box { text-align: center; }
+        .finger-btn {
+            position: relative; width: 55px; height: 55px; background: var(--gold); border: none; border-radius: 50%;
+            cursor: pointer; color: var(--main-p-color); font-size: 22px;
+            animation: finger-wobble 2s infinite; transition: 0.3s;
+        }
+        .pulse-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--gold); animation: pulse 2s infinite; top:0; left:0; }
+
+        @keyframes finger-wobble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
+
+        /* Modal CSS */
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:9999; backdrop-filter: blur(4px); }
+        .modal-content { background:white; padding:30px; border-radius:20px; width:90%; max-width:400px; text-align:center; position:relative; }
+        .close-modal { position:absolute; top:15px; right:15px; cursor:pointer; color:#95a5a6; }
+
+        /* =========================================
+           4. التجاوب (الريسبونسيف)
+           ========================================= */
+        @media (max-width: 1024px) {
+            .sidebar { width: var(--sidebar-collapsed-width); }
+            .brand-info, .menu-item span, .platform-status { display: none; }
+            .menu-item { justify-content: center; margin: 5px; }
+            .menu-item i { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <div style="padding: 20px; text-align: center;">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" style="height: 40px;">
+        <div class="brand-container">
+            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" alt="Logo" class="logo-img">
+            <div class="brand-info">
+                <span class="brand-name">محجوب أونلاين</span>
+                <span class="brand-tagline">سوقك الذكي</span>
+            </div>
+        </div>
+        <div class="menu-list">
+            <a href="/dashboard" class="menu-item active"><i class="fas fa-th-large"></i><span>الرئيسية</span></a>
+            <a href="#" class="menu-item"><i class="fas fa-wallet"></i><span>محفظة MAH</span></a>
+            <a href="/add_product" class="menu-item"><i class="fas fa-plus-circle"></i><span>رفع منتج جديد</span></a>
+            <a href="#" class="menu-item"><i class="fas fa-chart-line"></i><span>الإحصائيات</span></a>
+            <a href="#" class="menu-item"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
         </div>
     </nav>
 
-    <div class="main-wrapper">
+    <main class="main-wrapper">
         <header class="top-header">
-            <div class="platform-status">نظامك الإداري <span>| المنصة اللامركزية الأولى في اليمن</span></div>
-            <div style="font-weight: 800; color: var(--main-p-color);">@ali <i class="fas fa-user-circle"></i></div>
+            <div class="header-right">
+                <div class="platform-status">أهلاً بك في نظامك الإداري <span>| المنصة اللامركزية الأولى في اليمن</span></div>
+            </div>
+            <div class="header-profile">
+                <div class="user-meta">
+                    <span class="vendor-user">@{{ session.get('username', 'ali') }}</span>
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                </div>
+                <a href="/logout" style="color:#e74c3c; font-size: 18px;"><i class="fas fa-power-off"></i></a>
+            </div>
         </header>
 
         <div class="page-content">
-            <div class="withdraw-card">
+            <div style="background: linear-gradient(135deg, var(--main-p-color), #2d004d); padding: 25px; border-radius: 20px; color: white; display: flex; justify-content: space-between; align-items: center; max-width: 500px; margin-bottom: 30px;">
                 <div>
-                    <p style="margin:0; opacity: 0.7;">رصيد MAH</p>
-                    <h2>0.00 <span style="color: var(--gold);">MAH</span></h2>
+                    <p style="margin:0; opacity: 0.7; font-size: 13px;">رصيد محفظة MAH</p>
+                    <h2 style="margin: 5px 0;">0.00 <span style="color: var(--gold);">MAH</span></h2>
                 </div>
-                <div style="text-align: center;">
-                    <button class="finger-btn" onclick="openWithdrawModal()">
+                <div class="withdraw-box" onclick="openModal()">
+                    <button class="finger-btn">
                         <i class="fas fa-hand-pointer"></i>
+                        <div class="pulse-ring"></div>
                     </button>
-                    <span style="display:block; margin-top:5px; font-size:11px; color:var(--gold); font-weight:800;">سحب الرصيد</span>
+                    <span style="display:block; margin-top:5px; font-size:10px; color:var(--gold); font-weight:800;">سحب الرصيد</span>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="modal-overlay" id="withdrawModal">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modal">
         <div class="modal-content">
-            <i class="fas fa-times close-modal" onclick="closeWithdrawModal()"></i>
-            <div class="modal-header">
-                <i class="fas fa-wallet" style="font-size: 40px; color: var(--gold); margin-bottom: 10px;"></i>
-                <h3>طلب سحب رصيد</h3>
-                <p style="font-size: 13px; color: #7f8c8d;">أدخل المبلغ الذي تود سحبه من محفظتك</p>
-            </div>
-            <div class="modal-body">
-                <input type="number" placeholder="0.00" id="withdrawAmount">
-                <button class="confirm-pull-btn">تأكيد عملية السحب</button>
-            </div>
+            <i class="fas fa-times close-modal" onclick="closeModal()"></i>
+            <h3 style="color: var(--main-p-color);">طلب سحب رصيد</h3>
+            <p style="font-size: 13px; color: #7f8c8d;">أدخل المبلغ المراد سحبه</p>
+            <input type="number" placeholder="0.00" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; text-align:center; font-size:18px;">
+            <button style="width:100%; padding:12px; background:var(--main-p-color); color:white; border:none; border-radius:10px; margin-top:15px; font-weight:700; cursor:pointer;">تأكيد السحب</button>
         </div>
     </div>
 
     <script>
-        function openWithdrawModal() {
-            document.getElementById('withdrawModal').style.display = 'flex';
-        }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdrawModal').style.display = 'none';
-        }
-
-        // إغلاق النافذة عند الضغط خارجها
-        window.onclick = function(event) {
-            let modal = document.getElementById('withdrawModal');
-            if (event.target == modal) {
-                closeWithdrawModal();
-            }
-        }
+        function openModal() { document.getElementById('modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
     </script>
-
 </body>
 </html>
