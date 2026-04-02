@@ -6,10 +6,10 @@ from werkzeug.utils import secure_filename
 from config import Config
 from database import db, init_db
 
-# 2. استيراد الجداول من models.py (المكان الجديد والآمن)
+# 2. استيراد الجداول من models.py
 from models import Product, Vendor
 
-# 3. استيراد منطق العمل (تسجيل الدخول والتحقق)
+# 3. استيراد منطق العمل
 from logic import login_vendor, logout, is_logged_in
 
 # 4. استيراد خدمة المزامنة مع قمرة
@@ -18,24 +18,22 @@ from sync_service import send_to_qumra_webhook
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# إعدادات المجلدات والرفع (للملفات المؤقتة قبل المزامنة)
+# إعدادات المجلدات والرفع
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# تهيئة قاعدة البيانات (PostgreSQL في Railway)
+# تهيئة قاعدة البيانات
 init_db(app)
 
 # --- المسارات (Routes) ---
 
-# 1. الصفحة الرئيسية (توجيه ذكي)
 @app.route('/')
 def index():
     if is_logged_in():
         return redirect(url_for('dashboard'))
     return redirect(url_for('login_page'))
 
-# 2. بوابة تسجيل الدخول
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if is_logged_in():
@@ -45,41 +43,39 @@ def login_page():
         user = request.form.get('username')
         pw = request.form.get('password')
         
+        # استدعاء المنطق الجديد الذي يحدد نوع الخطأ
         if login_vendor(user, pw):
             return redirect(url_for('dashboard'))
-        # تنبيه الخطأ يأتي من دالة login_vendor داخل logic.py
     
     return render_template('login.html')
 
-# 3. لوحة التحكم (الداشبورد) - مع ميزة الفلترة (الاختفاء)
 @app.route('/dashboard')
 def dashboard():
     if not is_logged_in():
         return redirect(url_for('login_page'))
     
     user_session = session.get('username')
-    
-    # جلب المنتجات التي لم تُنشر بعد فقط (is_published=False) لكي تختفي بعد المزامنة
     try:
         vendor = Vendor.query.filter_by(username=user_session).first()
         products = Product.query.filter_by(vendor_username=user_session, is_published=False).all()
         products_count = len(products)
     except Exception as e:
-        print(f"⚠️ خطأ في قاعدة البيانات: {e}")
-        products = []
-        products_count = 0
+        print(f"⚠️ خطأ: {e}")
+        products, products_count = [], 0
 
-    return render_template('dashboard.html', 
-                           vendor=vendor, 
-                           products=products, 
-                           products_count=products_count)
+    return render_template('dashboard.html', vendor=vendor, products=products, products_count=products_count)
 
-# 4. إضافة منتج جديد (الربط مع قمرة)
-@app.route('/add_product', methods=['POST'])
+# --- التعديل الجوهري هنا ---
+@app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     if not is_logged_in():
         return redirect(url_for('login_page'))
     
+    # إذا كان المستخدم يفتح الصفحة
+    if request.method == 'GET':
+        return render_template('add_product.html')
+    
+    # إذا كان المستخدم يرسل بيانات المنتج
     p_name = request.form.get('name')
     p_price = request.form.get('price')
     p_desc = request.form.get('description', '')
@@ -87,14 +83,12 @@ def add_product():
 
     if p_name and p_price:
         try:
-            # معالجة الصورة
             image_filename = None
             if p_image and p_image.filename != '':
                 ext = os.path.splitext(p_image.filename)[1]
                 image_filename = f"{secure_filename(p_name)}_{os.urandom(2).hex()}{ext}"
                 p_image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
 
-            # حفظ المنتج محلياً في PostgreSQL
             new_item = Product(
                 name=p_name,
                 price=float(p_price),
@@ -105,17 +99,17 @@ def add_product():
             db.session.add(new_item)
             db.session.commit()
 
-            # --- البدء في عملية المزامنة مع قمرة ---
-            # نرسل البيانات لـ GraphQL
+            # المزامنة مع قمرة
             success = send_to_qumra_webhook(p_name, p_price, p_desc, image_filename)
             
             if success:
-                # إذا نجحت المزامنة، نجعل المنتج "مخفياً" من لوحة المورد
                 new_item.is_published = True
                 db.session.commit()
                 flash(f"✅ تم رفع {p_name} بنجاح إلى متجر قمرة!", "success")
             else:
-                flash(f"⚠️ تم حفظ المنتج محلياً، لكن فشل إرساله لقمرة. سيبقى ظاهراً للمراجعة.", "warning")
+                flash(f"⚠️ تم الحفظ محلياً فقط، فشل الإرسال لقمرة.", "warning")
+
+            return redirect(url_for('dashboard'))
 
         except Exception as e:
             db.session.rollback()
@@ -123,12 +117,10 @@ def add_product():
 
     return redirect(url_for('dashboard'))
 
-# 5. تسجيل الخروج
 @app.route('/logout')
 def logout_route():
-    return logout() # يستدعي الدالة من logic.py
+    return logout()
 
 if __name__ == '__main__':
-    # وضع التصحيح مفعل لكشف أي أخطاء في Railway
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
