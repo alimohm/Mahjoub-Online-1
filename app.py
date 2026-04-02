@@ -2,31 +2,21 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
 
-# 1. استيراد الإعدادات والتهيئة
 from config import Config
 from database import db, init_db
-
-# 2. استيراد الجداول من models.py
 from models import Product, Vendor
-
-# 3. استيراد منطق العمل
 from logic import login_vendor, logout, is_logged_in
-
-# 4. استيراد خدمة المزامنة مع قمرة
 from sync_service import send_to_qumra_webhook
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# إعدادات المجلدات والرفع
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# تهيئة قاعدة البيانات
+# تهيئة القاعدة (PostgreSQL)
 init_db(app)
-
-# --- المسارات (Routes) ---
 
 @app.route('/')
 def index():
@@ -40,11 +30,11 @@ def login_page():
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
-        user = request.form.get('username')
-        pw = request.form.get('password')
+        user_input = request.form.get('username')
+        pass_input = request.form.get('password')
         
-        # استدعاء المنطق الجديد الذي يحدد نوع الخطأ
-        if login_vendor(user, pw):
+        # استدعاء دالة التحقق من قاعدة البيانات
+        if login_vendor(user_input, pass_input):
             return redirect(url_for('dashboard'))
     
     return render_template('login.html')
@@ -55,27 +45,19 @@ def dashboard():
         return redirect(url_for('login_page'))
     
     user_session = session.get('username')
-    try:
-        vendor = Vendor.query.filter_by(username=user_session).first()
-        products = Product.query.filter_by(vendor_username=user_session, is_published=False).all()
-        products_count = len(products)
-    except Exception as e:
-        print(f"⚠️ خطأ: {e}")
-        products, products_count = [], 0
+    vendor = Vendor.query.filter_by(username=user_session).first()
+    products = Product.query.filter_by(vendor_username=user_session, is_published=False).all()
+    
+    return render_template('dashboard.html', vendor=vendor, products=products)
 
-    return render_template('dashboard.html', vendor=vendor, products=products, products_count=products_count)
-
-# --- التعديل الجوهري هنا ---
 @app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     if not is_logged_in():
         return redirect(url_for('login_page'))
     
-    # إذا كان المستخدم يفتح الصفحة
     if request.method == 'GET':
         return render_template('add_product.html')
     
-    # إذا كان المستخدم يرسل بيانات المنتج
     p_name = request.form.get('name')
     p_price = request.form.get('price')
     p_desc = request.form.get('description', '')
@@ -99,21 +81,20 @@ def add_product():
             db.session.add(new_item)
             db.session.commit()
 
-            # المزامنة مع قمرة
+            # مزامنة قمرة
             success = send_to_qumra_webhook(p_name, p_price, p_desc, image_filename)
             
             if success:
                 new_item.is_published = True
                 db.session.commit()
-                flash(f"✅ تم رفع {p_name} بنجاح إلى متجر قمرة!", "success")
+                flash(f"✅ تم رفع {p_name} بنجاح!", "success")
             else:
-                flash(f"⚠️ تم الحفظ محلياً فقط، فشل الإرسال لقمرة.", "warning")
+                flash(f"⚠️ حفظ محلي، فشل الإرسال لقمرة.", "warning")
 
             return redirect(url_for('dashboard'))
-
         except Exception as e:
             db.session.rollback()
-            flash(f"❌ خطأ فني: {str(e)}", "danger")
+            flash(f"❌ خطأ: {str(e)}", "danger")
 
     return redirect(url_for('dashboard'))
 
