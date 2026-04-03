@@ -1,32 +1,38 @@
 from flask import session, flash, redirect, url_for
-from models import Vendor
+from models import AdminUser
 
-def login_vendor(username, password):
-    # 1. محاولة جلب المورد من قاعدة البيانات المطابقة للاسم المدخل
-    vendor = Vendor.query.filter_by(username=username).first()
+def verify_admin_credentials(username, password):
+    """
+    التحقق من بيانات الإدارة المركزية (برج المراقبة)
+    بنفس أسلوب منطق الموردين.
+    """
+    # 1. محاولة جلب المدير من قاعدة البيانات (صبري)
+    admin = AdminUser.query.filter_by(username=username).first()
     
-    # 2. التحقق من وجود المستخدم أولاً
-    if not vendor:
-        flash("عذراً، اسم المستخدم هذا غير مسجل في المنصة اللامركزية.", "danger")
+    # 2. التحقق من وجود المستخدم في نظام الإدارة أولاً
+    if not admin:
+        flash("🚫 هذا المستخدم غير مسجل في المنصة اللامركزية لـ محجوب أونلاين.", "warning")
         return False
     
-    # 3. التحقق من مطابقة كلمة المرور للمستخدم الموجود في القاعدة
-    if vendor.password != password:
-        flash("كلمة المرور غير صحيحة، يرجى التأكد والمحاولة مرة أخرى.", "danger")
+    # 3. التحقق من مطابقة كلمة المرور المركزية
+    if admin.password != password:
+        flash("⚠️ كلمة المرور غير صحيحة، يرجى التأكد والمحاولة مرة أخرى كمدير.", "danger")
         return False
 
-    # 4. في حال التطابق التام، يتم تفعيل الجلسة
-    session['username'] = vendor.username
-    session['brand_name'] = vendor.brand_name
-    session['wallet'] = vendor.wallet_address
+    # 4. في حال التطابق التام، يتم تفعيل جلسة "برج المراقبة"
+    session['is_admin'] = True
+    session['admin_user'] = admin.username
     
-    flash(f"تم تسجيل الدخول بنجاح. مرحباً بك {vendor.brand_name}", "success")
+    flash(f"🛡️ تم تفعيل برج المراقبة بنجاح. مرحباً بك يا سيد {admin.username}", "success")
     return True
 
-def is_logged_in():
-    return 'username' in session
+def is_admin_logged_in():
+    """التحقق من حالة جلسة الإدارة"""
+    return session.get('is_admin', False)
 
-def logout():
-    session.clear()
-    flash("تم تسجيل الخروج وتأمين الجلسة بنجاح.", "info")
-    return redirect(url_for('login_page'))
+def logout_admin():
+    """تسجيل خروج آمن للمدير وتطهير الجلسة"""
+    session.pop('is_admin', None)
+    session.pop('admin_user', None)
+    flash("🔒 تم الخروج من برج المراقبة وتأمين النظام بنجاح.", "info")
+    return redirect(url_for('admin_login_route'))
