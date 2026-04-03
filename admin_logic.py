@@ -1,39 +1,31 @@
 from flask import session
 from werkzeug.security import check_password_hash
-from models import AdminUser
+from models import Vendor
 
-def verify_admin_credentials(u, p):
-    """
-    التحقق من صلاحيات الإدارة المركزية (علي محجوب)
-    u: اسم المستخدم القادم من الفورم (admin_user)
-    p: كلمة المرور القادمة من الفورم (admin_pass)
-    """
-    
-    # 1. التأكد من أن الحقول ليست فارغة
+def login_vendor(u, p):
+    """منطق دخول الموردين - التحقق الصارم من الهوية"""
     if not u or not p:
-        return False, "يرجى إدخال اسم المستخدم وكلمة المرور للوصول لبرج المراقبة."
+        return False, "يرجى إدخال اسم المستخدم وكلمة المرور."
 
-    # 2. البحث عن المدير في قاعدة البيانات
-    # ملاحظة: يجب أن يتطابق 'u' مع الاسم المحقون 'علي محجوب'
-    admin = AdminUser.query.filter_by(username=u).first()
+    # 1. البحث عن المورد في القاعدة
+    vendor = Vendor.query.filter_by(username=u).first()
     
-    # حالة 1: المعرف غير موجود في السجلات
-    if not admin:
-        return False, "تنبيه: هذا المعرف غير مسجل ضمن طاقم الإدارة المركزية."
+    # حالة 1: الحساب غير موجود
+    if not vendor:
+        return False, "عذراً، هذا الحساب غير مسجل في المنصة اللامركزية."
     
-    # 3. حالة 2: المعرف موجود، نتحقق من كلمة المرور (الهاش)
-    if check_password_hash(admin.password, p):
-        # نجاح التحقق - تنظيف الجلسة وإنشاء هوية الإدارة
+    # حالة 2: التحقق من كلمة المرور
+    if check_password_hash(vendor.password, p):
         session.clear()
-        session['admin_id'] = admin.id
-        session['role'] = 'admin'
-        session['admin_user'] = admin.username
-        return True, "تم تأكيد الصلاحيات. مرحباً بك في لوحة التحكم المركزية."
+        session['user_id'] = vendor.id
+        session['role'] = 'vendor'
+        session['username'] = vendor.username
+        return True, f"تم الاتصال بنجاح. أهلاً بك يا {vendor.brand_name}."
     
-    # حالة 3: كلمة المرور لا تطابق الهاش المخزن
+    # حالة 3: كلمة المرور خطأ
     else:
-        return False, "خطأ في كلمة المرور: لا تملك صلاحية الوصول لبرج المراقبة."
+        return False, "كلمة المرور غير صحيحة، يرجى التأكد من مفاتيح الدخول."
 
-def is_admin_logged_in():
-    """التحقق هل المستخدم الحالي هو مدير مسجل الدخول فعلاً"""
-    return session.get('role') == 'admin' and 'admin_id' in session
+def is_logged_in():
+    """هذه هي الدالة التي يطلبها السيرفر وينهار بسبب فقدانها"""
+    return session.get('role') == 'vendor' and 'user_id' in session
