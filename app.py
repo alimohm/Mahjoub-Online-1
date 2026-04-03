@@ -12,45 +12,97 @@ from admin_logic import is_admin_logged_in, verify_admin_credentials, logout_adm
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# إعدادات الرفع
+# إعدادات الرفع (الميديا)
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # حد أقصى 16 ميجا
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# --- 2. تفعيل قاعدة البيانات وحقن الهوية (علي محجوب) ---
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# --- 2. تفعيل قاعدة البيانات وحقن الهوية ---
 init_db(app)
 with app.app_context():
     db.create_all()
     seed_admin() 
 
 # ==========================================
-# --- 3. مسار المورد (Dashboard) - تم التأمين ---
+# --- 3. مسار المورد (Dashboard) ---
 # ==========================================
 @app.route('/dashboard')
 def dashboard():
-    # التأكد من أن المستخدم "مورد" وليس مديراً أو زائراً
     if not is_logged_in(): 
         return redirect(url_for('login_page'))
     
-    # جلب بيانات المورد بناءً على الجلسة
     vendor_data = Vendor.query.filter_by(username=session.get('username')).first()
     
-    # الخلل المحتمل كان هنا: إذا فقدت الجلسة أو لم يجد المورد
     if not vendor_data:
         flash("فشلت عملية التحقق من الهوية اللامركزية.", "danger")
         session.clear()
         return redirect(url_for('login_page'))
         
-    # جلب المنتجات المرتبطة ببراند المورد
     products_list = Product.query.filter_by(brand=vendor_data.brand_name).all()
     
-    # تمرير 'vendor' لكي يقرأه layout.html و 'products' لملء الجداول
-    return render_template('dashboard.html', 
-                           vendor=vendor_data, 
-                           products=products_list)
+    return render_template('dashboard.html', vendor=vendor_data, products=products_list)
 
 # ==========================================
-# --- 4. مسار الإدارة (برج المراقبة) ---
+# --- 4. مسار رفع المنتجات (الذكاء الاصطناعي والميديا) ---
+# ==========================================
+@app.route('/add_product', methods=['GET', 'POST'])
+def add_product():
+    if not is_logged_in(): 
+        return redirect(url_for('login_page'))
+    
+    vendor_data = Vendor.query.filter_by(username=session.get('username')).first()
+
+    if request.method == 'POST':
+        # سحب البيانات من فورم التصميم الاحترافي
+        name = request.form.get('name')
+        price = request.form.get('price')
+        currency = request.form.get('currency')
+        stock = request.form.get('stock')
+        description = request.form.get('description')
+        brand = request.form.get('brand')
+
+        # معالجة رفع ألبوم الميديا (صور وفيديو)
+        files = request.files.getlist('product_media')
+        saved_files = []
+        
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                # إضافة اسم المورد لضمان عدم تكرار الأسماء
+                unique_name = f"{vendor_data.username}_{filename}"
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_name))
+                saved_files.append(unique_name)
+
+        # إنشاء كائن المنتج الجديد
+        new_product = Product(
+            name=name,
+            price=float(price),
+            description=description,
+            brand=brand,
+            image_url=",".join(saved_files) if saved_files else "default.jpg",
+            status='pending' # المراجعة في برج المراقبة
+        )
+        
+        # ملاحظة: إذا أضفت حقول currency و stock في الـ Models، قم بتفعيلها هنا:
+        # new_product.currency = currency
+        # new_product.stock = int(stock)
+
+        db.session.add(new_product)
+        db.session.commit()
+
+        flash(f"🚀 تم رفع '{name}' بنجاح! سيظهر في المتجر بعد مراجعة الإدارة.", "success")
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_product.html', vendor=vendor_data)
+
+# ==========================================
+# --- 5. مسار الإدارة (برج المراقبة) ---
 # ==========================================
 @app.route('/admin/dashboard')
 def admin_dashboard_route():
@@ -66,36 +118,28 @@ def admin_dashboard_route():
                            pending_items=pending_items)
 
 # ==========================================
-# --- 5. مسارات الدخول (Login) ---
+# --- 6. بقية المسارات والتشغيل ---
 # ==========================================
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if is_logged_in(): return redirect(url_for('dashboard'))
-    
     if request.method == 'POST':
         u = request.form.get('username')
         p = request.form.get('password')
         if login_vendor(u, p):
             return redirect(url_for('dashboard'))
-            
     return render_template('login.html')
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login_route():
     if is_admin_logged_in(): return redirect(url_for('admin_dashboard_route'))
-    
     if request.method == 'POST':
         u = request.form.get('admin_user')
         p = request.form.get('admin_pass')
         if verify_admin_credentials(u, p):
             return redirect(url_for('admin_dashboard_route'))
-            
     return render_template('admin_login.html')
-
-# ==========================================
-# --- 6. العمليات المشتركة ---
-# ==========================================
 
 @app.route('/')
 def home_redirect():
@@ -108,12 +152,6 @@ def logout_route():
     session.clear()
     flash("تم تأمين الجلسة والخروج بنجاح.", "info")
     return redirect(url_for('login_page'))
-
-# إضافة مسار لرفع المنتجات (لأن الهيكل يطلبه)
-@app.route('/add_product')
-def add_product():
-    if not is_logged_in(): return redirect(url_for('login_page'))
-    return "صفحة رفع المنتجات قيد البرمجة..."
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
