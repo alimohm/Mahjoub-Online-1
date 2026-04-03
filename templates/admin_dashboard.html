@@ -1,1 +1,63 @@
+{% extends "layout.html" %}
+{% block title %}لوحة التحكم المركزية | محجوب أونلاين{% endblock %}
 
+{% block content %}
+<div class="container py-4" dir="rtl">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h3 class="fw-bold" style="color: var(--royal-purple);">📊 برج المراقبة: سوقك الذكي</h3>
+        <span class="badge bg-success p-2">متصل: المدير العام علي</span>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="master-card p-4 border-start border-primary border-4 text-center">
+                <p class="text-muted mb-1">إجمالي الموردين</p>
+                <h2 class="fw-bold">{{ vendors|length }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="master-card p-4 border-start border-warning border-4 text-center">
+                <p class="text-muted mb-1">بانتظار الموافقة</p>
+                <h2 class="fw-bold">{{ pending_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="master-card p-4 shadow-sm">
+        <h5 class="fw-bold mb-4">الموردين النشطين في المنصة</h5>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>المؤسسة (Brand)</th>
+                        <th>الموظف المسؤول</th>
+                        <th>محفظة MAH</th>
+                        <th>حالة الحساب</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vendors %}
+                    <tr>
+                        <td class="fw-bold text-purple">{{ v.brand_name }}</td>
+                        <td>{{ v.employee_name }}</td>
+                        <td><code>{{ v.wallet_address }}</code></td>
+                        <td>
+                            {% if v.is_active %}
+                            <span class="badge bg-success">نشط</span>
+                            {% else %}
+                            <span class="badge bg-danger">مجمد</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">مراجعة</button>
+                            <button class="btn btn-sm btn-outline-danger">تجميد</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
