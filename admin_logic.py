@@ -1,34 +1,38 @@
 from flask import session
-from models import AdminUser  # استيراد جدول المدير من ملف الموديلات
+from models import AdminUser
 
 def is_admin_logged_in():
     """
-    التحقق مما إذا كان المدير (صبري) قد سجل دخوله بنجاح.
-    نستخدم مفتاح 'is_admin' في الجلسة (Session).
+    التحقق من حالة الجلسة (Session).
+    تعيد True إذا كان 'صبري' قد سجل دخوله بنجاح.
     """
     return session.get('is_admin', False)
 
 def verify_admin_credentials(username, password):
     """
-    التحقق من بيانات الدخول من قاعدة البيانات مباشرة.
-    تبحث الدالة عن مستخدم في جدول AdminUser يطابق الاسم وكلمة المرور.
+    منطق المطابقة: 
+    1. البحث عن اسم المستخدم في جدول AdminUser.
+    2. التأكد من تطابق كلمة المرور (123).
     """
     try:
-        # البحث عن المدير في قاعدة البيانات (مثلاً: صبري)
+        # البحث عن المدير في قاعدة البيانات
         admin = AdminUser.query.filter_by(username=username).first()
         
-        # التأكد من مطابقة اسم المستخدم وكلمة المرور
         if admin and admin.password == password:
+            # تخزين بيانات إضافية في الجلسة للترحيب به في الداشبورد
+            session['admin_name'] = admin.username 
             return True
+        
         return False
     except Exception as e:
-        print(f"❌ خطأ في الاتصال بقاعدة البيانات أثناء التحقق: {e}")
+        # في حال حدوث خطأ في الاتصال بقاعدة البيانات
+        print(f"❌ خطأ إداري في التحقق: {e}")
         return False
 
 def logout_admin():
     """
-    إنهاء جلسة المدير وتطهير بيانات الدخول من المتصفح.
+    تطهير الجلسة وتسجيل الخروج الآمن من برج المراقبة.
     """
     session.pop('is_admin', None)
-    session.pop('admin_user', None)
+    session.pop('admin_name', None)
     return True
