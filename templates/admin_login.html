@@ -2,25 +2,104 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>دخول الإدارة | محجوب أونلاين</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دخول الإدارة المركزية | محجوب أونلاين</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 40px; border-radius: 15px; shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #6f42c1; width: 100%; max-width: 400px; text-align: center; }
-        .premium-input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
-        .publish-btn { background: #6f42c1; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
+        :root { --royal-purple: #4b0082; }
+        body, html { height: 100%; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        
+        .login-wrapper { display: flex; height: 100vh; }
+
+        /* الجزء الأيمن (الأرجواني) */
+        .login-side { 
+            flex: 1; background-color: var(--royal-purple); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            color: white; padding: 40px; 
+        }
+
+        /* الجزء الأيسر (الأبيض) */
+        .info-side { 
+            flex: 1; background-color: white; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            padding: 40px; text-align: center;
+        }
+
+        .logo-img { width: 120px; margin-bottom: 20px; }
+        .brand-title { color: var(--royal-purple); font-weight: 800; font-size: 2.5rem; margin-bottom: 10px; }
+        .brand-subtitle { color: #666; margin-bottom: 40px; font-size: 1.1rem; }
+
+        .feature-card {
+            background: #f8f9fa; border: 1px solid #eee; border-radius: 12px;
+            padding: 15px 25px; margin-bottom: 15px; width: 80%;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .form-container { width: 100%; max-width: 400px; text-align: center; }
+        .input-group-custom {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; padding: 10px 15px;
+        }
+        .input-group-custom input {
+            background: transparent; border: none; color: white; width: 100%; outline: none; padding-right: 10px;
+        }
+        .input-group-custom input::placeholder { color: rgba(255, 255, 255, 0.6); }
+        .input-group-custom i { color: gold; }
+
+        .btn-login {
+            background-color: white; color: var(--royal-purple); font-weight: bold;
+            border: none; border-radius: 10px; padding: 12px; width: 100%;
+            transition: 0.3s; margin-top: 10px;
+        }
+        .btn-login:hover { background-color: #f0f0f0; transform: scale(1.02); }
+
+        .footer-text { margin-top: 40px; font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h3 style="color: #6f42c1; font-weight: bold;">🔐 دخول الإدارة</h3>
-        <p class="text-muted small">مرحباً بك في برج المراقبة</p>
-        <form method="POST">
-            <input type="text" name="admin_user" class="premium-input" placeholder="اسم المدير" required>
-            <input type="password" name="admin_pass" class="premium-input" placeholder="كلمة المرور" required>
-            <button type="submit" class="publish-btn">دخول اللوحة 🚀</button>
-        </form>
+
+<div class="login-wrapper">
+    <div class="info-side">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo-img" alt="لوجو">
+        <h1 class="brand-title">محجوب أونلاين</h1>
+        <p class="brand-subtitle">المنصة السيادية لدعم الموردين والنمو الرقمي</p>
+
+        <div class="feature-card">
+            <span>اللامركزية متطورة وحوكمة رقمية بنظام سيادي</span>
+            <i class="fas fa-shield-alt text-purple"></i>
+        </div>
+        <div class="feature-card">
+            <span>إدارة ذكية وآمنة لسلاسل الإمداد والربط التلقائي</span>
+            <i class="fas fa-box-open text-purple"></i>
+        </div>
+        <div class="feature-card">
+            <span>سوقك الذكي للنمو المتسارع وزيادة علامتك التجارية</span>
+            <i class="fas fa-chart-line text-purple"></i>
+        </div>
     </div>
+
+    <div class="login-side">
+        <div class="form-container">
+            <h2 class="fw-bold mb-4">تسجيل الدخول</h2>
+            <p class="mb-5 opacity-75">مرحباً بك مجدداً في نظامك الإداري الملكي</p>
+            
+            <form method="POST">
+                <div class="input-group-custom">
+                    <input type="text" name="admin_user" placeholder="اسم المستخدم" required>
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="input-group-custom">
+                    <input type="password" name="admin_pass" placeholder="كلمة المرور" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button type="submit" class="btn-login shadow">دخول للمنصة</button>
+            </form>
+
+            <p class="footer-text">© 2026 محجوب أونلاين - حوكمة رقمية رائدة</p>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
