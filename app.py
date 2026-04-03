@@ -1,14 +1,13 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
-from werkzeug.security import check_password_hash
 
-# --- 1. استيراد الإعدادات والمنطق ---
+# --- 1. استيراد الإعدادات والمنطق من الملفات المستقلة ---
 from config import Config
 from database import db, init_db
 from models import Product, Vendor, AdminUser, seed_admin
-from logic import is_logged_in # سنقوم بتحديث المنطق داخلياً هنا
-from admin_logic import is_admin_logged_in, logout_admin_logic
+from logic import login_vendor, is_logged_in
+from admin_logic import is_admin_logged_in, verify_admin_credentials, logout_admin_logic
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -31,7 +30,7 @@ with app.app_context():
     seed_admin() 
 
 # ==========================================
-# --- 3. بوابة دخول المورد (تأمين البوابة) ---
+# --- 3. بوابة دخول المورد (logic.py) ---
 # ==========================================
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -41,48 +40,20 @@ def login_page():
         u = request.form.get('username')
         p = request.form.get('password')
         
-        # الاستعلام من قاعدة البيانات (جدول الموردين)
-        vendor = Vendor.query.filter_by(username=u).first()
+        # استدعاء المنطق من ملف logic.py (الذي يفحص الحالات السيادية)
+        success, message = login_vendor(u, p)
         
-        # 1. التحقق من الوجود
-        if not vendor:
-            flash("المستخدم غير مسجل في المنصة اللامركزية.", "danger")
-            return redirect(url_for('login_page'))
+        if success:
+            if "تنبيه" in message: flash(message, "warning")
+            return redirect(url_for('dashboard'))
+        else:
+            # هنا تظهر رسائل: موقف، مقيد، تحت المراجعة، أو خطأ بيانات
+            flash(message, "danger")
             
-        # 2. التحقق من كلمة المرور
-        if not check_password_hash(vendor.password, p):
-            flash("فشل تأمين البوابة: كلمة المرور غير صحيحة.", "danger")
-            return redirect(url_for('login_page'))
-            
-        # 3. مراجعة الحالات السيادية
-        status = vendor.status.lower() if vendor.status else 'pending'
-        
-        if status == 'blocked': # موقف / محظور
-            flash("وصول مرفوض: تم حظر حسابك بقرار سيادي لمخالفة السياسات.", "danger")
-            return redirect(url_for('login_page'))
-            
-        elif status == 'restricted': # مقيد
-            flash("حساب مقيد: صلاحياتك معلقة حالياً، يرجى مراجعة إدارة السيادة.", "warning")
-            return redirect(url_for('login_page'))
-            
-        elif status == 'pending': # تحت المراجعة
-            flash("الدخول معلق: حسابك لا يزال تحت المراجعة والتدقيق الفني.", "info")
-            return redirect(url_for('login_page'))
-            
-        elif status == 'under_surveillance': # تحت الرقابة
-            session['surveillance_mode'] = True
-            flash("تنبيه: أنت الآن تحت نظام الرقابة الرقمية المستمرة.", "warning")
-
-        # 4. النجاح وتفعيل الجلسة
-        session['user_id'] = vendor.id
-        session['username'] = vendor.username
-        session['role'] = 'vendor'
-        return redirect(url_for('dashboard'))
-        
     return render_template('login.html')
 
 # ==========================================
-# --- 4. بوابة دخول الإدارة (برج المراقبة) ---
+# --- 4. بوابة دخول الإدارة (admin_logic.py) ---
 # ==========================================
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login_route():
@@ -92,29 +63,29 @@ def admin_login_route():
         u = request.form.get('admin_user')
         p = request.form.get('admin_pass')
         
-        admin = AdminUser.query.filter_by(username=u).first()
+        # استدعاء المنطق من ملف admin_logic.py
+        success, message = verify_admin_credentials(u, p)
         
-        if admin and check_password_hash(admin.password, p):
-            session['admin_id'] = admin.id
-            session['username'] = admin.username
-            session['role'] = 'admin'
+        if success:
             return redirect(url_for('admin_dashboard_route'))
         else:
-            flash("فشل تأمين بوابة الإدارة: بيانات الاعتماد غير صحيحة.", "danger")
+            flash(message, "danger")
             
     return render_template('admin_login.html')
 
 # ==========================================
-# --- 5. مسارات المورد (تستخدم layout.html) ---
+# --- 5. مسارات المورد (Dashboard) ---
 # ==========================================
 @app.route('/dashboard')
 def dashboard():
     if not is_logged_in(): return redirect(url_for('login_page'))
     
     vendor_data = Vendor.query.filter_by(username=session.get('username')).first()
+    if not vendor_data:
+        session.clear()
+        return redirect(url_for('login_page'))
+        
     products_list = Product.query.filter_by(brand=vendor_data.brand_name).all()
-    
-    # يتم العرض باستخدام الهيكل المخصص للمورد تلقائياً عبر وسم extends في الصفحة
     return render_template('dashboard.html', vendor=vendor_data, products=products_list)
 
 @app.route('/add_product', methods=['GET', 'POST'])
@@ -122,14 +93,41 @@ def add_product():
     if not is_logged_in(): return redirect(url_for('login_page'))
     
     vendor_data = Vendor.query.filter_by(username=session.get('username')).first()
+    
     if request.method == 'POST':
-        # (نفس منطق الرفع الذي أرسلته سابقاً دون تغيير)
-        pass # ... كود الرفع الخاص بك ...
+        name = request.form.get('name')
+        price = request.form.get('price')
+        description = request.form.get('description')
+        brand = request.form.get('brand')
+
+        files = request.files.getlist('product_media')
+        saved_files = []
         
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                unique_name = f"{vendor_data.username}_{filename}"
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_name))
+                saved_files.append(unique_name)
+
+        new_product = Product(
+            name=name,
+            price=float(price),
+            description=description,
+            brand=brand,
+            image_url=",".join(saved_files) if saved_files else "default.jpg",
+            status='pending' # خاضع لمراجعة برج المراقبة
+        )
+        
+        db.session.add(new_product)
+        db.session.commit()
+        flash(f"🚀 تم رفع '{name}'! بانتظار الاعتماد السيادي.", "success")
+        return redirect(url_for('dashboard'))
+
     return render_template('add_product.html', vendor=vendor_data)
 
 # ==========================================
-# --- 6. مسارات الإدارة (تستخدم admin_layout.html) ---
+# --- 6. مسارات الإدارة (برج المراقبة) ---
 # ==========================================
 @app.route('/admin/dashboard')
 def admin_dashboard_route():
@@ -138,7 +136,6 @@ def admin_dashboard_route():
     all_vendors = Vendor.query.all()
     pending_items = Product.query.filter_by(status='pending').all()
     
-    # يتم العرض باستخدام هيكل برج المراقبة
     return render_template('admin_dashboard.html', 
                            vendors=all_vendors, 
                            pending_count=len(pending_items),
@@ -156,7 +153,7 @@ def home_redirect():
 @app.route('/logout')
 def logout_route():
     session.clear()
-    flash("تم تأمين الجلسة والخروج بنجاح من المنصة.", "info")
+    flash("تم تأمين البوابات والخروج بنجاح.", "info")
     return redirect(url_for('login_page'))
 
 if __name__ == '__main__':
