@@ -1,117 +1,109 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
-# --- 1. استدعاء المحركات والبيانات السيادية ---
+# --- 1. استدعاء ملفاتك الجاهزة (يجب أن تتطابق الأسماء) ---
 from config import Config
 from database import db, init_db
 from models import Product, Vendor, AdminUser, seed_admin
-# استدعاء المنطق (Logic) من ملفك الذي جهزته
-from logic import login_vendor_logic, verify_admin_credentials 
+# استيراد الدوال حسب مسمياتك في logic.py
+from logic import login_vendor, is_logged_in 
 
-# --- 2. تعريف التطبيق (يجب أن يكون هنا لمنع خطأ NameError) ---
+# --- 2. تعريف التطبيق السيادي ---
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# إعدادات الميديا والرفع
+# إعدادات الرفع
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# --- 3. تهيئة القاعدة وحل مشكلة الأعمدة المفقودة ---
+# --- 3. تهيئة القاعدة وتحديث الهيكل ---
 init_db(app)
 
 with app.app_context():
-    # إنشاء الجداول وتحديثها لضمان وجود أعمدة (status, wallet_address)
+    # تحديث الجداول لإنهاء خطأ column vendor.status does not exist
     db.create_all() 
-    # حقن بيانات الهوية (علي محجوب)
+    # حقن بيانات "علي محجوب"
     seed_admin() 
 
-# --- 4. توابع التحقق من الجلسات (Security) ---
-def is_logged_in():
-    return session.get('role') == 'vendor' and 'user_id' in session
-
+# --- 4. حراس البوابات (Security Guards) ---
 def is_admin_logged_in():
     return session.get('role') == 'admin' and 'admin_id' in session
 
 # ==========================================
-# --- 5. المسارات وبوابات تسجيل الدخول ---
+# --- 5. المسارات (Routes) المترابطة ---
 # ==========================================
 
-# [توجيه الصفحة الرئيسية]
 @app.route('/')
-def home_redirect():
-    if is_admin_logged_in(): 
-        return redirect(url_for('admin_dashboard_route'))
-    if is_logged_in(): 
-        return redirect(url_for('dashboard'))
+def home():
+    if is_admin_logged_in(): return redirect(url_for('admin_dashboard'))
+    if is_logged_in(): return redirect(url_for('vendor_dashboard')) # استخدام دالتك
     return redirect(url_for('login_page'))
 
-# [بوابة دخول المورد]
+# بوابة دخول المورد
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
-    if is_logged_in(): return redirect(url_for('dashboard'))
+    if is_logged_in(): return redirect(url_for('vendor_dashboard'))
     
     if request.method == 'POST':
-        # استخدام .strip() لضمان دقة البيانات المدخلة
         u = request.form.get('username', '').strip()
         p = request.form.get('password', '').strip()
         
-        # استدعاء المنطق الجاهز من ملف logic.py
-        success, message = login_vendor_logic(u, p)
+        # استدعاء دالتك بالاسم الصحيح: login_vendor
+        success, message = login_vendor(u, p)
         
         if success:
             flash(message, "success")
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('vendor_dashboard'))
         else:
             flash(message, "danger")
             
     return render_template('login.html')
 
-# [لوحة تحكم المورد]
+# لوحة تحكم المورد
 @app.route('/dashboard')
-def dashboard():
+def vendor_dashboard():
     if not is_logged_in(): return redirect(url_for('login_page'))
     
-    vendor_data = Vendor.query.get(session.get('user_id'))
-    products_list = Product.query.filter_by(vendor_id=vendor_data.id).all()
-    return render_template('dashboard.html', vendor=vendor_data, products=products_list)
+    vendor = Vendor.query.get(session.get('user_id'))
+    products = Product.query.filter_by(vendor_id=vendor.id).all()
+    return render_template('dashboard.html', vendor=vendor, products=products)
 
-# [بوابة دخول الإدارة - برج المراقبة]
+# بوابة دخول الإدارة (برج المراقبة)
 @app.route('/admin/login', methods=['GET', 'POST'])
-def admin_login_route():
-    if is_admin_logged_in(): return redirect(url_for('admin_dashboard_route'))
+def admin_login():
+    if is_admin_logged_in(): return redirect(url_for('admin_dashboard'))
     
     if request.method == 'POST':
+        # هنا سنفترض وجود دالة verify_admin في logic أو نتحقق مباشرة
         u = request.form.get('admin_user', '').strip()
         p = request.form.get('admin_pass', '').strip()
         
-        # استخدام منطق التحقق الإداري المستدعى
-        success, message = verify_admin_credentials(u, p)
-        
-        if success:
-            flash("مرحباً بك في برج المراقبة.", "success")
-            return redirect(url_for('admin_dashboard_route'))
-        else:
-            flash(message, "danger")
+        admin = AdminUser.query.filter_by(username=u).first()
+        from werkzeug.security import check_password_hash
+        if admin and check_password_hash(admin.password, p):
+            session.clear()
+            session['admin_id'] = admin.id
+            session['role'] = 'admin'
+            return redirect(url_for('admin_dashboard'))
+        flash("بيانات دخول برج المراقبة غير صحيحة.", "danger")
             
     return render_template('admin_login.html')
 
-# [لوحة تحكم الإدارة]
+# لوحة تحكم الإدارة
 @app.route('/admin/dashboard')
-def admin_dashboard_route():
-    if not is_admin_logged_in(): return redirect(url_for('admin_login_route'))
-    
+def admin_dashboard():
+    if not is_admin_logged_in(): return redirect(url_for('admin_login'))
     all_vendors = Vendor.query.all()
     return render_template('admin_dashboard.html', vendors=all_vendors)
 
-# [تأمين الخروج والمسح الكامل للجلسة]
+# تسجيل الخروج
 @app.route('/logout')
-def logout_route():
-    session.clear() # مسح شامل لمنع الاختراق
-    flash("تم تأمين البوابات بنجاح.", "info")
+def logout():
+    session.clear() # تنظيف الجلسة السيادية
+    flash("تم تأمين البوابات.", "info")
     return redirect(url_for('login_page'))
 
-# --- 6. تشغيل المحرك على Railway ---
+# --- 6. التشغيل النهائي ---
 if __name__ == '__main__':
-    # تشغيل المنفذ 8080 المعتمد للسيرفرات السحابية
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080)
