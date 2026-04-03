@@ -6,99 +6,76 @@ from config import Config
 from database import db, init_db
 from models import Vendor, AdminUser, Product, seed_admin
 
-# استيراد منطق البوابات (الذي يفرق بين عدم التسجيل وخطأ الباسورد)
-from logic import login_vendor, is_logged_in
-from admin_logic import verify_admin_credentials, is_admin_logged_in
+# --- [2] استيراد المنطق (تأكد من وجود الدوال في الملفات المقابلة) ---
+try:
+    from logic import login_vendor, is_logged_in
+    from admin_logic import verify_admin_credentials, is_admin_logged_in
+except ImportError as e:
+    print(f"❌ خطأ في الاستيراد: {e}")
+    # هذا السطر سيخبرك في السجلات (Logs) أي دالة بالضبط مفقودة
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# ربط قاعدة البيانات Postgres في Railway
+# ربط قاعدة البيانات
 init_db(app)
 
-# --- [2] تهيئة النظام وحقن البيانات (علي محجوب / 123) ---
+# --- [3] تهيئة النظام (بناء الجداول وحقن علي محجوب) ---
 with app.app_context():
     db.create_all() 
     seed_admin() 
 
-# --- [3] توجيه الرابط الرئيسي (Smart Redirect) ---
+# --- [4] المسارات الرسمية (Routes) ---
+
 @app.route('/')
 def index():
     if is_admin_logged_in(): return redirect(url_for('admin_dashboard'))
     if is_logged_in(): return redirect(url_for('vendor_dashboard'))
     return redirect(url_for('login_page'))
 
-# --- [4] 🏛️ قسم الإدارة المركزية (برج المراقبة) ---
-
-# الرابط: /admin/login (صفحة تسجيل دخول الإدارة)
-@app.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    if is_admin_logged_in(): return redirect(url_for('admin_dashboard'))
-    
-    if request.method == 'POST':
-        # استخدام الحقول admin_user و admin_pass كما في تصميمك
-        u = request.form.get('admin_user')
-        p = request.form.get('admin_pass')
-        
-        success, msg = verify_admin_credentials(u, p)
-        if success:
-            flash(msg, "success")
-            return redirect(url_for('admin_dashboard'))
-        
-        # هنا ستظهر رسالة: "غير مسجل ضمن طاقم الإدارة" أو "خطأ في كلمة المرور"
-        flash(msg, "danger")
-        
-    return render_template('admin_login.html')
-
-# الرابط: /admin/dashboard (لوحة التحكم المركزية)
-@app.route('/admin/dashboard')
-def admin_dashboard():
-    if not is_admin_logged_in(): return redirect(url_for('admin_login'))
-    
-    vendors = Vendor.query.all()
-    products = Product.query.all()
-    return render_template('admin_dashboard.html', vendors=vendors, products=products)
-
-
-# --- [5] 📦 قسم الموردين (المنصة اللامركزية) ---
-
-# الرابط: /login (بوابة دخول الموردين العادية)
+# بوابة دخول الموردين
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if is_logged_in(): return redirect(url_for('vendor_dashboard'))
-    
     if request.method == 'POST':
-        u = request.form.get('username')
-        p = request.form.get('password')
-        
+        u, p = request.form.get('username'), request.form.get('password')
         success, msg = login_vendor(u, p)
         if success:
             flash(msg, "success")
             return redirect(url_for('vendor_dashboard'))
-        
-        # هنا ستظهر رسالة: "غير مسجل في المنصة اللامركزية" أو "خطأ كلمة المرور"
         flash(msg, "danger")
-        
     return render_template('login.html')
 
-# الرابط: /dashboard (لوحة تحكم المورد)
+# بوابة دخول الإدارة المركزية
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if is_admin_logged_in(): return redirect(url_for('admin_dashboard'))
+    if request.method == 'POST':
+        u, p = request.form.get('admin_user'), request.form.get('admin_pass')
+        success, msg = verify_admin_credentials(u, p)
+        if success:
+            flash(msg, "success")
+            return redirect(url_for('admin_dashboard'))
+        flash(msg, "danger")
+    return render_template('admin_login.html')
+
+# لوحات التحكم
 @app.route('/dashboard')
 def vendor_dashboard():
     if not is_logged_in(): return redirect(url_for('login_page'))
-    
     vendor = Vendor.query.get(session.get('user_id'))
-    products = Product.query.filter_by(vendor_id=vendor.id).all()
-    return render_template('dashboard.html', vendor=vendor, products=products)
+    return render_template('dashboard.html', vendor=vendor)
 
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if not is_admin_logged_in(): return redirect(url_for('admin_login'))
+    return render_template('admin_dashboard.html')
 
-# --- [6] الخروج وتأمين النظام ---
 @app.route('/logout')
 def logout():
     session.clear()
-    flash("تم تأمين الجلسة وقطع الاتصال بنجاح.", "info")
     return redirect(url_for('login_page'))
 
-# التشغيل المتوافق مع Railway
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
