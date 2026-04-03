@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash
 from database import db 
 
 def generate_mah_wallet():
-    """توليد عنوان محفظة فريد للمنصة"""
+    """توليد عنوان محفظة فريد للمنصة يبدأ بـ MAH"""
     suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     return f"MAH-{suffix}"
 
@@ -18,7 +18,7 @@ class Vendor(db.Model):
     brand_name = db.Column(db.String(120), nullable=False)    
     phone_number = db.Column(db.String(20))
     is_active = db.Column(db.Boolean, default=True) 
-    status = db.Column(db.String(30), default='active') # الحقل الذي كان مفقوداً
+    status = db.Column(db.String(30), default='active') # الحقل المكتشف في سجلات الأخطاء
     wallet_address = db.Column(db.String(255), unique=True, default=generate_mah_wallet)
     products = db.relationship('Product', backref='vendor_owner', lazy=True)
 
