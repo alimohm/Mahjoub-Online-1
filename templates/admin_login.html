@@ -1,1 +1,24 @@
 
+{% extends "layout.html" %}
+{% block title %}دخول الإدارة | محجوب أونلاين{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="master-card p-5 text-center shadow-lg" dir="rtl" style="max-width: 450px; border: 2px solid var(--royal-purple);">
+        <h3 class="fw-bold mb-4" style="color: var(--royal-purple);">🔐 دخول الإدارة المركزية</h3>
+        <p class="text-muted small mb-4">مرحباً بك يا سيد علي في برج المراقبة</p>
+        
+        <form method="POST">
+            <div class="mb-3 text-start">
+                <label class="form-label fw-bold small">اسم المدير</label>
+                <input type="text" name="admin_user" class="premium-input" placeholder="اسم المستخدم" required>
+            </div>
+            <div class="mb-4 text-start">
+                <label class="form-label fw-bold small">كلمة المرور</label>
+                <input type="password" name="admin_pass" class="premium-input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="publish-btn w-100">دخول اللوحة 🚀</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
