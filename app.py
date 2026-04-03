@@ -1,37 +1,35 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
-# --- 1. تعريف التطبيق فوراً (لحل خطأ NameError) ---
+# --- 1. تعريف التطبيق أولاً (لحل خطأ NameError) ---
 app = Flask(__name__) #
 
-# --- 2. استدعاء الإعدادات والقاعدة من ملفاتك الجاهزة ---
+# --- 2. استيراد المحركات بعد تعريف الـ app ---
 from config import Config
 from database import db, init_db
 from models import Product, Vendor, AdminUser, seed_admin
+from logic import login_vendor, is_logged_in # استدعاء منطقك من logic.py
 
-app.config.from_object(Config) #
+app.config.from_object(Config)
 
-# --- 3. استدعاء المنطق من ملف logic.py حصراً ---
-from logic import login_vendor, is_logged_in #
-
-# إعدادات الرفع والميديا
+# إعدادات الميديا
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True) #
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# --- 4. تهيئة القاعدة وحل مشكلة الأعمدة (status) ---
-init_db(app) #
+# --- 3. تهيئة القاعدة وتحديث الهيكل ---
+init_db(app)
 
 with app.app_context():
-    # تحديث الجداول لضمان وجود أعمدة (status, wallet_address)
+    # هذا السطر سيقوم بإضافة الأعمدة المفقودة (status, wallet_address) آلياً
     db.create_all() #
-    # حقن بيانات الهوية الرقمية
+    # حقن بيانات الإدارة (علي محجوب)
     seed_admin() #
 
-# --- 5. بوابات العبور (المسارات) ---
+# --- 4. المسارات السيادية (Routes) ---
 
 @app.route('/')
-def home():
+def index():
     if is_logged_in(): return redirect(url_for('dashboard'))
     return redirect(url_for('login_page'))
 
@@ -41,12 +39,15 @@ def login_page():
     if is_logged_in(): return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
-        # تنظيف المدخلات لضمان الدقة
-        u = request.form.get('username', '').strip() #
+        u = request.form.get('username', '').strip()
         p = request.form.get('password', '').strip()
         
-        # استدعاء دالتك السيادية من logic.py
-        success, message = login_vendor(u, p) #
+        if not u or not p:
+            flash("يرجى إدخال اسم المستخدم وكلمة المرور", "warning")
+            return redirect(url_for('login_page'))
+            
+        # استدعاء دالتك من ملف logic.py
+        success, message = login_vendor(u, p)
         
         if success:
             flash(message, "success")
@@ -54,7 +55,7 @@ def login_page():
         else:
             flash(message, "danger")
             
-    return render_template('login.html')
+    return render_template('login.html') #
 
 # لوحة تحكم المورد
 @app.route('/dashboard')
@@ -62,16 +63,15 @@ def dashboard():
     if not is_logged_in(): return redirect(url_for('login_page'))
     vendor = Vendor.query.get(session.get('user_id'))
     products = Product.query.filter_by(vendor_id=vendor.id).all()
-    return render_template('dashboard.html', vendor=vendor, products=products)
+    return render_template('dashboard.html', vendor=vendor, products=products) #
 
 # بوابة الخروج الآمن
 @app.route('/logout')
 def logout():
-    session.clear() # مسح الجلسة السيادية
-    flash("تم تأمين البوابات بنجاح.", "info") #
+    session.clear()
+    flash("تم تأمين البوابات بنجاح.", "info")
     return redirect(url_for('login_page'))
 
-# --- 6. التشغيل النهائي على Railway ---
+# --- 5. تشغيل المحرك ---
 if __name__ == '__main__':
-    # التشغيل على المنفذ 8080 المعتمد
-    app.run(host='0.0.0.0', port=8080, debug=True) #
+    app.run(host='0.0.0.0', port=8080)
