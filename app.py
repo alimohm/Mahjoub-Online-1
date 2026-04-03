@@ -1,3 +1,24 @@
+import os
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from database import db, init_db
+
+# 1. هذا السطر هو الأهم، بدونه لن يعمل أي شيء (تعريف التطبيق)
+app = Flask(__name__)
+
+# 2. إعدادات قاعدة البيانات (تأكد من وجودها)
+from config import Config
+app.config.from_object(Config)
+
+# 3. ربط قاعدة البيانات بالتطبيق
+init_db(app)
+
+# --- الآن يمكنك البدء بوضع المسارات (Routes) ---
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login_route():
+    # كود الدخول هنا...
+    pass
+    
 # ... الكود السابق (مسارات الموردين وغيرها) ...
 
 # ==========================================
