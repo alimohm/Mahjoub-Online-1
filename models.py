@@ -2,6 +2,7 @@ import random
 import string
 from datetime import datetime
 from database import db
+from werkzeug.security import generate_password_hash
 
 def generate_mah_wallet():
     """توليد عنوان محفظة فريد يبدأ بـ MAH متبوع بـ 10 رموز"""
@@ -16,15 +17,16 @@ class Vendor(db.Model):
     
     # بيانات الدخول للمورد
     username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
+    password = db.Column(db.String(255), nullable=False) # تم زيادة الطول لاستيعاب التشفير
     
     # الحقول التشغيلية والمعلومات الشخصية
     employee_name = db.Column(db.String(120), nullable=True) 
     brand_name = db.Column(db.String(120), nullable=False)    
-    phone_number = db.Column(db.String(20), nullable=True) # تم إضافة حقل رقم الهاتف هنا
+    phone_number = db.Column(db.String(20), nullable=True)
     
-    # --- صلاحيات المدير العام ---
-    is_active = db.Column(db.Boolean, default=True) # تجميد أو تفعيل المورد
+    # --- صلاحيات المدير العام والحالات السيادية ---
+    is_active = db.Column(db.Boolean, default=True) 
+    status = db.Column(db.String(30), default='active') # active, blocked, restricted, pending, under_surveillance
     
     # الهوية الرقمية اللامركزية للمؤسسة
     wallet_address = db.Column(db.String(255), unique=True, default=generate_mah_wallet)
@@ -71,30 +73,34 @@ class AdminUser(db.Model):
     __tablename__ = 'admin_user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
+    password = db.Column(db.String(255), nullable=False) # تم زيادة الطول لاستيعاب التشفير
 
-# --- دالة حقن البيانات المحدثة (علي محجوب) ---
+# --- دالة حقن البيانات المحدثة (تأمين الهوية) ---
 def seed_admin():
-    """تأكد من وجود حساب علي محجوب كمدير وكمورد في قاعدة البيانات"""
+    """تأكد من وجود حسابات الإدارة والموردين مشفرة وجاهزة"""
     
-    # 1. تحديث حساب المدير العام
+    # تشفير كلمة المرور الافتراضية
+    secure_password = generate_password_hash('123')
+
+    # 1. تحديث حساب المدير العام (برج المراقبة)
     admin = AdminUser.query.filter_by(username='علي محجوب').first()
     if not admin:
-        new_admin = AdminUser(username='علي محجوب', password='123')
+        new_admin = AdminUser(username='علي محجوب', password=secure_password)
         db.session.add(new_admin)
         db.session.commit()
-        print("✅ تم تفعيل حساب المدير العام: علي محجوب")
+        print("✅ تم تفعيل حساب المدير العام المشفر: علي محجوب")
 
-    # 2. إضافة علي محجوب كمورد (Vendor) افتراضي للمنصة
+    # 2. إضافة علي محجوب كمورد (Vendor) مع الحالة النشطة
     vendor = Vendor.query.filter_by(username='ali_mahjoub').first()
     if not vendor:
         new_vendor = Vendor(
             username='ali_mahjoub',
-            password='123',
+            password=secure_password,
             employee_name='علي محجوب',
             brand_name='Mahjoub Online',
-            phone_number='777777777' # يمكنك تعديله لاحقاً
+            phone_number='777777777',
+            status='active' # الحالة الافتراضية للبدء
         )
         db.session.add(new_vendor)
         db.session.commit()
-        print("✅ تم إضافة علي محجوب كمورد معتمد للمنصة")
+        print("✅ تم إضافة حساب المورد المشفر: ali_mahjoub")
