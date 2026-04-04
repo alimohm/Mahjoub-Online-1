@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from database import db 
 
 def generate_mah_wallet():
+    """توليد عنوان محفظة فريد للمنصة"""
     suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     return f"MAH-{suffix}"
 
@@ -37,30 +38,32 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 def seed_admin():
-    """حقن البيانات لضمان دخولك الفوري بكلمة مرور 123"""
+    """حقن الأسماء العربية الرسمية لـ محجوب أونلاين وتأمين الدخول"""
     try:
         secure_pw = generate_password_hash('123')
         
-        # 🏛️ حساب الإدارة (برج المراقبة)
-        # غيرنا الاسم لـ ali_admin لتفادي مشاكل الحروف العربية في تسجيل الدخول
-        admin = AdminUser.query.filter_by(username='ali_admin').first()
+        # 🏛️ حساب الإدارة المركزية (علي محجوب)
+        admin_username = "علي محجوب"
+        admin = AdminUser.query.filter_by(username=admin_username).first()
         if not admin:
-            new_admin = AdminUser(username='ali_admin', password=secure_pw)
+            new_admin = AdminUser(username=admin_username, password=secure_pw)
             db.session.add(new_admin)
+            print(f"✅ تم إنشاء حساب الإدارة: {admin_username}")
         
-        # 📦 حساب المورد (المنصة اللامركزية)
-        vendor = Vendor.query.filter_by(username='ali_mahjoub').first()
+        # 📦 حساب المورد الرسمي (محجوب أونلاين)
+        vendor_username = "محجوب أونلاين"
+        vendor = Vendor.query.filter_by(username=vendor_username).first()
         if not vendor:
             new_vendor = Vendor(
-                username='ali_mahjoub', 
+                username=vendor_username, 
                 password=secure_pw, 
                 brand_name='Mahjoub Online', 
                 status='active'
             )
             db.session.add(new_vendor)
+            print(f"✅ تم إنشاء حساب المورد: {vendor_username}")
             
         db.session.commit()
-        print("✅ تم تحديث بيانات الدخول: ali_admin و ali_mahjoub جاهزان.")
     except Exception as e:
         db.session.rollback()
         print(f"❌ Seed Error: {e}")
