@@ -61,7 +61,7 @@ def vendor_dashboard():
                            balance=balance,
                            show_wallet=show_wallet)
 
-# --- [ بوابة الإدارة العليا - نسخة واحدة نظيفة ] ---
+# --- [ بوابة الإدارة العليا ] ---
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -81,7 +81,9 @@ def admin_dashboard():
     if session.get('role') != 'super_admin':
         flash("🚫 محاولة دخول غير مصرحة لبرج المراقبة!", "danger")
         return redirect(url_for('admin_login'))
-    return render_template('admin_dashboard_content.html', username=session.get('username'))
+    
+    # تم التصحيح هنا ليتوافق مع اسم ملفك: admin_accounts.html
+    return render_template('admin_accounts.html', username=session.get('username'))
 
 # --- [ التوجيهات العامة ] ---
 @app.route('/')
