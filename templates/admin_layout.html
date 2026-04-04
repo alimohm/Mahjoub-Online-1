@@ -1,31 +1,119 @@
-{% extends 'admin_layout.html' %}
-
-{% block title %}إدارة الموردين والاعتماد{% endblock %}
+{% extends "admin_layout.html" %}
 
 {% block content %}
-<div class="admin-card shadow-sm p-4" style="background: white; border-radius: 20px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 style="font-weight: 800; color: var(--royal-p);">
-            <i class="fas fa-users-cog ml-2"></i> قائمة الموردين والطلبات المعلقة
-        </h4>
-        <button class="btn btn-primary" style="background: var(--royal-p); border: none; border-radius: 12px; padding: 10px 20px;" data-bs-toggle="modal" data-bs-target="#addVendorModal">
-            <i class="fas fa-plus-circle"></i> إضافة مورد سيادي
-        </button>
-    </div>
+<style>
+    /* تنسيقات برج المراقبة الملكي */
+    .dashboard-header { margin-bottom: 30px; border-right: 5px solid #FFD700; padding-right: 15px; }
+    .dashboard-header h2 { color: #1a0033; font-weight: 800; margin: 0; }
+    .dashboard-header p { color: #666; margin: 5px 0 0 0; }
 
-    <table class="table">
+    .stats-grid { 
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+        gap: 20px; margin-bottom: 40px; 
+    }
+
+    .stat-card {
+        background: white; padding: 25px; border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        display: flex; align-items: center; justify-content: space-between;
+        transition: 0.3s; border: 1px solid #eee;
+    }
+    .stat-card:hover { transform: translateY(-5px); border-color: #4b0082; }
+    .stat-card i { font-size: 35px; color: #4b0082; opacity: 0.8; }
+    .stat-card .info h3 { margin: 0; font-size: 28px; color: #1a0033; }
+    .stat-card .info span { font-size: 14px; color: #888; font-weight: 600; }
+
+    .admin-table-container {
+        background: white; border-radius: 20px; padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #eee;
+    }
+    .table-header { 
+        display: flex; justify-content: space-between; align-items: center; 
+        margin-bottom: 20px; padding: 0 10px;
+    }
+    .table-header h3 { color: #4b0082; margin: 0; }
+
+    table { width: 100%; border-collapse: collapse; text-align: right; }
+    th { padding: 15px; background: #f8f9fa; color: #4b0082; font-weight: 700; border-radius: 10px; }
+    td { padding: 15px; border-bottom: 1px solid #eee; color: #444; font-size: 15px; }
+    
+    .status-badge {
+        padding: 5px 12px; border-radius: 50px; font-size: 12px; font-weight: 700;
+        background: #e1fcef; color: #1db954; /* أخضر للمورد النشط */
+    }
+    
+    .btn-action {
+        padding: 8px 15px; border-radius: 10px; border: none;
+        background: #4b0082; color: white; cursor: pointer; font-family: 'Cairo';
+        transition: 0.3s; font-size: 13px;
+    }
+    .btn-action:hover { background: #FFD700; color: #1a0033; }
+</style>
+
+<div class="dashboard-header">
+    <h2>أهلاً بك في برج المراقبة، {{ username }}</h2>
+    <p>إدارة السيادة الرقمية لمنصة محجوب أونلاين</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="info">
+            <h3>{{ vendors|length }}</h3>
+            <span>الموردين المعتمدين</span>
+        </div>
+        <i class="fas fa-store-alt"></i>
+    </div>
+    <div class="stat-card">
+        <div class="info">
+            <h3>24</h3> <span>منتجات بانتظار المراجعة</span>
+        </div>
+        <i class="fas fa-boxes"></i>
+    </div>
+    <div class="stat-card">
+        <div class="info">
+            <h3>MAH 45,200</h3>
+            <span>إجمالي حركة المحافظ</span>
+        </div>
+        <i class="fas fa-wallet"></i>
+    </div>
+</div>
+
+<div class="admin-table-container">
+    <div class="table-header">
+        <h3>قائمة الموردين والكيانات</h3>
+        <button class="btn-action" onclick="location.href='#add-vendor-section'">+ إضافة مورد جديد</button>
+    </div>
+    
+    <table>
         <thead>
             <tr>
-                <th>المورد</th>
+                <th>اسم المورد</th>
+                <th>العلامة التجارية</th>
+                <th>رقم المحفظة</th>
                 <th>الحالة</th>
-                <th>العمليات</th>
+                <th>الإجراءات</th>
             </tr>
         </thead>
         <tbody>
-            </tbody>
+            {% for vendor in vendors %}
+            <tr>
+                <td>{{ vendor.username }}</td>
+                <td><strong>{{ vendor.brand_name }}</strong></td>
+                <td><code style="color: #4b0082;">{{ vendor.wallet.wallet_number if vendor.wallet else 'بدون محفظة' }}</code></td>
+                <td><span class="status-badge">نشط سيادياً</span></td>
+                <td>
+                    <button class="btn-action" style="background: #eee; color: #333;">تفاصيل</button>
+                    <button class="btn-action">تعديل</button>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not vendors %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: #999;">لا يوجد موردون مسجلون في النظام حالياً.</td>
+            </tr>
+            {% endif %}
+        </tbody>
     </table>
 </div>
-
-{% include 'modals/add_vendor_modal.html' %}
 
 {% endblock %}
