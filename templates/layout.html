@@ -66,7 +66,6 @@
 
         .page-content { flex: 1; padding: 30px; overflow-y: auto; background: var(--bg-body); }
 
-        /* تنبيهات النظام */
         .flashes { list-style: none; padding: 0; margin-bottom: 20px; }
         .alert { padding: 12px 20px; border-radius: 10px; margin-bottom: 10px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
         .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
@@ -98,7 +97,7 @@
             </a>
             
             {% if session.get('role') == 'super_admin' %}
-            <a href="#" class="menu-item">
+            <a href="{{ url_for('manage_vendors') }}" class="menu-item">
                 <i class="fas fa-users-cog"></i><span>إدارة الموردين</span>
             </a>
             <a href="#" class="menu-item">
