@@ -1,30 +1,40 @@
 import os
-from flask import Flask, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from config import Config
 from database import db, init_db
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
-# 1. تهيئة القاعدة
 init_db(app)
 
-# 2. إنشاء الجداول وحقن البيانات (الحل النهائي للخطأ)
 with app.app_context():
-    # استيراد الموديلات داخل السياق يمنع الدوران العكسي
-    import models 
+    import models
+    # هام: قم بإلغاء التعليق عن السطر التالي لمرة واحدة فقط لمسح الخطأ القديم
+    # db.drop_all() 
     db.create_all() 
     models.seed_system()
 
-# 3. استيراد المنطق (Logic) بعد تهيئة التطبيق
-# تأكد أن الملفات موجودة في مجلد المشروع كما في صورتك
-from vendor_logic import login_vendor, is_logged_in
-from admin_logic import verify_admin_credentials
-
-# --- [ هنا تضع الـ Routes (المسارات) ] ---
 @app.route('/')
 def index():
-    return "منصة محجوب أونلاين جاهزة للعمل بنجاح يا عظيم!"
+    return redirect(url_for('vendor_login'))
+
+@app.route('/vendor/login', methods=['GET', 'POST'])
+def vendor_login():
+    if request.method == 'POST':
+        from vendor_logic import login_vendor
+        u = request.form.get('username')
+        p = request.form.get('password')
+        success, msg = login_vendor(u, p)
+        if success: return redirect(url_for('vendor_dashboard'))
+        flash(msg, "danger")
+    return render_template('vendor_login.html')
+
+@app.route('/vendor/dashboard')
+def vendor_dashboard():
+    if 'role' not in session: return redirect(url_for('vendor_login'))
+    # عرض المحفظة فقط إذا كان المستخدم owner
+    show_wallet = (session.get('role') == 'vendor_owner')
+    return render_template('dashboard.html', show_wallet=show_wallet)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(host='0.0.0.0', port=8080, debug=True)
