@@ -63,3 +63,16 @@ class Product(db.Model):
         chars = string.ascii_uppercase + string.digits
         random_part = ''.join(random.choices(chars, k=8))
         self.wallet_id = f"MAH-{random_part}"
+
+# استيراد الدالة في بداية app.py
+from models import seed_system 
+
+# ... كود تهيئة التطبيق (app = Flask...)
+
+# المكان الصحيح للاستدعاء:
+with app.app_context():
+    db.create_all()  # ينشئ الجداول أولاً
+    seed_system()    # يحقن البيانات (علي محجوب ومحجوب أونلاين) ثانياً
+    print("✅ تم فحص قاعدة البيانات وتجهيز الحسابات السيادية.")
+
+# ... بقية المسارات (Routes)
