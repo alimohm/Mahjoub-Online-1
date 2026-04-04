@@ -37,16 +37,30 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 def seed_admin():
-    """حقن بيانات علي محجوب وتأمين الدخول بـ 123"""
+    """حقن البيانات لضمان دخولك الفوري بكلمة مرور 123"""
     try:
         secure_pw = generate_password_hash('123')
-        # تأمين حساب الإدارة
-        if not AdminUser.query.filter_by(username='علي محجوب').first():
-            db.session.add(AdminUser(username='علي محجوب', password=secure_pw))
-        # تأمين حساب المورد
-        if not Vendor.query.filter_by(username='ali_mahjoub').first():
-            db.session.add(Vendor(username='ali_mahjoub', password=secure_pw, brand_name='Mahjoub Online', status='active'))
+        
+        # 🏛️ حساب الإدارة (برج المراقبة)
+        # غيرنا الاسم لـ ali_admin لتفادي مشاكل الحروف العربية في تسجيل الدخول
+        admin = AdminUser.query.filter_by(username='ali_admin').first()
+        if not admin:
+            new_admin = AdminUser(username='ali_admin', password=secure_pw)
+            db.session.add(new_admin)
+        
+        # 📦 حساب المورد (المنصة اللامركزية)
+        vendor = Vendor.query.filter_by(username='ali_mahjoub').first()
+        if not vendor:
+            new_vendor = Vendor(
+                username='ali_mahjoub', 
+                password=secure_pw, 
+                brand_name='Mahjoub Online', 
+                status='active'
+            )
+            db.session.add(new_vendor)
+            
         db.session.commit()
+        print("✅ تم تحديث بيانات الدخول: ali_admin و ali_mahjoub جاهزان.")
     except Exception as e:
         db.session.rollback()
-        print(f"Seed Error: {e}")
+        print(f"❌ Seed Error: {e}")
