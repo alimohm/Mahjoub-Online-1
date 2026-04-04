@@ -1,17 +1,13 @@
 {% extends "layout.html" %}
 
+{% block title %}رفع منتج جديد | محجوب أونلاين{% endblock %}
+
 {% block content %}
-<div class="product-form-container">
-    <h2><i class="fas fa-upload"></i> رفع منتج جديد إلى سوقك الذكي</h2>
-    </div>
-{% endblock %}
 <style>
     :root {
-        --royal-purple: #4b0082;
+        --royal-purple: #1a0033; /* تم توحيده مع الهيكل الملكي */
         --soft-bg: #f8f9ff;
     }
-
-    body { background-color: var(--soft-bg); font-family: 'Cairo', sans-serif; }
 
     .master-card {
         background: #ffffff;
@@ -19,7 +15,7 @@
         padding: 40px;
         box-shadow: 0 15px 45px rgba(0,0,0,0.06);
         max-width: 1000px;
-        margin: 2rem auto;
+        margin: 1rem auto;
         border: 1px solid #edf2f7;
     }
 
@@ -32,11 +28,12 @@
         border-radius: 15px;
         transition: 0.3s ease;
         background: #fdfdfd;
+        font-family: 'Cairo', sans-serif;
     }
 
     .premium-input:focus {
         border-color: var(--royal-purple);
-        box-shadow: 0 0 0 4px rgba(75, 0, 130, 0.08);
+        box-shadow: 0 0 0 4px rgba(26, 0, 51, 0.08);
         outline: none;
     }
 
@@ -78,9 +75,10 @@
         width: 100%;
         font-weight: 800;
         cursor: pointer;
+        transition: 0.3s;
     }
+    .btn-ai-generate:hover { opacity: 0.9; transform: translateY(-2px); }
 
-    /* تصميم قسم المعاينة للميديا */
     .preview-container {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -88,64 +86,48 @@
         margin-top: 15px;
     }
     .preview-item {
-        width: 100px;
-        height: 100px;
-        border-radius: 10px;
-        object-fit: cover;
-        border: 2px solid #eee;
+        width: 100px; height: 100px; border-radius: 10px; object-fit: cover; border: 2px solid #eee;
     }
     .video-badge {
-        position: relative;
-        background: #000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 10px;
+        background: #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;
     }
 
     .publish-btn {
         background: linear-gradient(135deg, var(--royal-purple), #2d004d);
-        color: white;
-        border: none;
-        padding: 20px;
-        border-radius: 18px;
-        width: 100%;
-        font-weight: 900;
-        font-size: 1.2rem;
-        cursor: pointer;
-        margin-top: 20px;
+        color: white; border: none; padding: 20px; border-radius: 18px;
+        width: 100%; font-weight: 900; font-size: 1.2rem; cursor: pointer;
+        margin-top: 20px; transition: 0.3s;
     }
+    .publish-btn:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(26,0,51,0.2); }
 
     .locked-identity { background: #f0f0f0; color: #555; font-weight: 700; cursor: not-allowed; }
 </style>
 
 <div class="master-card" dir="rtl">
-    <div class="text-center mb-5">
-        <h3 class="fw-bold" style="color: var(--royal-purple);">✨ إدارة منتجات محجوب أونلاين</h3>
+    <div class="text-center mb-5" style="text-align: center; margin-bottom: 30px;">
+        <h3 class="fw-bold" style="color: var(--royal-purple); margin-bottom: 5px;">✨ إدارة منتجات محجوب أونلاين</h3>
         <p class="text-muted">سوقك الذكي | المنصة اللامركزية الأولى في اليمن</p>
     </div>
 
     <form id="productForm" action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
-        <div class="row g-4 mb-4">
-            <div class="col-md-6">
+        <div class="row g-4 mb-4" style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div class="col-md-6" style="flex: 1;">
                 <label class="form-label">اسم المنتج</label>
                 <input type="text" id="pName" name="name" class="premium-input" placeholder="مثلاً: هاتف ذكي سامسونج..." required>
             </div>
-            <div class="col-md-6">
-                <label class="form-label">اسم المستخدم مربوط بالعلامة التجارية أو المورد</label>
+            <div class="col-md-6" style="flex: 1;">
+                <label class="form-label">الهوية المعتمدة (المورد)</label>
                 <input type="text" id="pBrandDisplay" class="premium-input locked-identity" 
-                       value="{{ session.get('username', 'محجوب أونلاين') }} | {{ vendor.brand_name if vendor else 'الشركة الرسمية' }}" readonly>
-                <input type="hidden" name="brand" value="{{ vendor.brand_name if vendor else 'Mahjoub Online' }}">
+                       value="{{ session.get('username', 'محجوب أونلاين') }} | {{ vendor.brand_name if vendor else 'المركز الرئيسي' }}" readonly>
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-4">
+        <div class="row g-3 mb-4" style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <div style="flex: 1;">
                 <label class="form-label">السعر</label>
                 <input type="number" name="price" class="premium-input" placeholder="0.00" step="0.01" required>
             </div>
-            <div class="col-md-4">
+            <div style="flex: 1;">
                 <label class="form-label">العملة</label>
                 <select name="currency" class="premium-input">
                     <option value="YER">ريال يمني (YER)</option>
@@ -153,15 +135,15 @@
                     <option value="USD">دولار أمريكي (USD)</option>
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">الكمية</label>
+            <div style="flex: 1;">
+                <label class="form-label">الكمية المتوفرة</label>
                 <input type="number" name="stock" class="premium-input" value="1" required>
             </div>
         </div>
 
         <div class="ai-engine-container">
-            <h6 class="fw-bold mb-3"><i class="fas fa-magic"></i> مساعد صياغة الوصف الذكي</h6>
-            <textarea id="pSpecs" class="premium-input mb-3" rows="3" placeholder="اكتب المواصفات هنا مفصولة بفاصلة..."></textarea>
+            <h6 class="fw-bold mb-3" style="margin-bottom: 15px;"><i class="fas fa-magic"></i> مساعد صياغة الوصف الذكي</h6>
+            <textarea id="pSpecs" class="premium-input mb-3" rows="3" placeholder="اكتب المواصفات هنا (مثلاً: رامات 8، شاشة OLED، بطارية 5000)..."></textarea>
             
             <div class="style-grid">
                 <div class="style-card active" onclick="setStyle(this, 'خبير تقني')">👨‍🏫 خبير تقني</div>
@@ -173,21 +155,20 @@
             <button type="button" class="btn-ai-generate" onclick="generatePremiumDesc()">توليد الوصف الاحترافي ✨</button>
         </div>
 
-        <div class="mb-4">
-            <label class="form-label">الوصف النهائي للمنتج</label>
-            <textarea id="pDesc" name="description" class="premium-input" rows="8"></textarea>
+        <div class="mb-4" style="margin-bottom: 20px;">
+            <label class="form-label">الوصف النهائي (سيظهر للزبائن)</label>
+            <textarea id="pDesc" name="description" class="premium-input" rows="8" placeholder="الوصف الذي تم توليده سيظهر هنا، ويمكنك التعديل عليه..."></textarea>
         </div>
 
         <div class="mb-4">
             <label class="form-label">ألبوم الميديا (صور وفيديو المنتج)</label>
             <input type="file" name="product_media" class="premium-input" id="mediaInput" accept="image/*,video/mp4" multiple onchange="previewMedia()">
-            <small class="text-muted">يمكنك اختيار أكثر من صورة وفيديو واحد للمنتج (الحد الأقصى للمجموع 10 ملفات).</small>
+            <small style="color: #666; display: block; margin-top: 5px;">يمكنك اختيار عدة صور وفيديو واحد (الحد الأقصى 10 ملفات).</small>
             
-            <div id="mediaPreview" class="preview-container">
-                </div>
+            <div id="mediaPreview" class="preview-container"></div>
         </div>
 
-        <button type="submit" class="publish-btn">رفع المنتج الآن 🚀</button>
+        <button type="submit" class="publish-btn">إرسال المنتج للمراجعة والرفع 🚀</button>
     </form>
 </div>
 
@@ -203,15 +184,19 @@
     function generatePremiumDesc() {
         const name = document.getElementById('pName').value;
         const identity = document.getElementById('pBrandDisplay').value;
-        const brandName = identity.split('|')[1]?.trim() || "موردنا الموثوق";
+        const brandName = identity.split('|')[1]?.trim() || "محجوب أونلاين";
         const specs = document.getElementById('pSpecs').value;
         const target = document.getElementById('pDesc');
 
-        if(!name || !specs) { alert("يرجى ملء الاسم والمواصفات أولاً."); return; }
+        if(!name || !specs) { alert("يرجى ملء اسم المنتج والمواصفات أولاً لتوليد الوصف."); return; }
 
-        let result = `🌟 المنتج: ${name}\n🏢 العلامة التجارية: ${brandName}\n🔗 متوفر حصرياً عبر "محجوب أونلاين" - سوقك الذكي 🇾🇪\n\n🚀 المزايا الرئيسية:\n`;
-        specs.split('،').forEach(s => { if(s.trim()) result += `✅ ${s.trim()}\n`; });
-        result += `\n🛡️ نحن نضمن لك الشفافية والأمان في كل عملية شراء.\n📥 اطلب الآن!`;
+        let result = `🌟 المنتج: ${name}\n🏢 العلامة التجارية: ${brandName}\n🔗 متوفر حصرياً عبر "محجوب أونلاين" - سوقك الذكي 🇾🇪\n\n🚀 المواصفات والمزايا:\n`;
+        
+        // تحويل الفواصل العادية والإنجليزية لنقاط مرتبة
+        const specList = specs.split(/[،,]/);
+        specList.forEach(s => { if(s.trim()) result += `✅ ${s.trim()}\n`; });
+        
+        result += `\n🛡️ نحن نضمن لك الجودة والأمان في كل عملية شراء.\n📥 اطلب الآن واستمتع بتجربة تسوق ذكية!`;
         target.value = result;
     }
 
@@ -227,7 +212,7 @@
                 if (file.type.startsWith('image/')) {
                     div.innerHTML = `<img src="${e.target.result}" class="preview-item">`;
                 } else if (file.type.startsWith('video/')) {
-                    div.innerHTML = `<div class="preview-item video-badge">🎥 Video</div>`;
+                    div.innerHTML = `<div class="preview-item video-badge">🎥 فيديو</div>`;
                 }
                 preview.appendChild(div);
             }
