@@ -83,3 +83,26 @@ def seed_system():
 
     db.session.commit()
     print("✨ تم تحديث النظام بنجاح مع أرقام المحفظة الجديدة.")
+
+class Product(db.Model):
+    __tablename__ = 'products'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False) # اسم المنتج
+    brand = db.Column(db.String(100)) # العلامة التجارية (تؤخذ من المورد)
+    price = db.Column(db.Float, nullable=False) # السعر
+    currency = db.Column(db.String(10), default='YER') # العملة
+    stock = db.Column(db.Integer, default=1) # الكمية
+    description = db.Column(db.Text) # الوصف الذكي
+    media_path = db.Column(db.String(500)) # مسار الصور أو الفيديو
+    
+    # حالة المنتج: pending (قيد الانتظار)، approved (مقبول)، rejected (مرفوض)
+    status = db.Column(db.String(20), default='pending') 
+    
+    # ربط المنتج بالمورد الذي رفعه
+    vendor_id = db.Column(db.Integer, db.ForeignKey('vendors.id'), nullable=False)
+    
+    # توقيت الرفع
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f'<Product {self.name}>'
