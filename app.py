@@ -99,3 +99,13 @@ def logout():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
+
+@app.route('/admin/manage-vendors')
+def manage_vendors():
+    # التأكد من أن الداخل هو المدير فقط
+    if session.get('role') != 'super_admin':
+        flash("🚫 غير مصرح لك بدخول هذه الصفحة", "danger")
+        return redirect(url_for('admin_login'))
+    
+    # استدعاء الصفحة التي طلبتها
+    return render_template('vendor_add_product.html')
