@@ -5,14 +5,14 @@ from config import Config
 from database import db, init_db
 import models
 
-# استدعاء المنطق البرمجي المطور
+# استدعاء المنطق البرمجي (تأكد من وجود هذه الملفات في المستودع)
 from vendor_logic import login_vendor 
 from admin_logic import verify_admin_credentials
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# تهيئة قاعدة البيانات (SQLite أو Postgres حسب البيئة)
+# تهيئة قاعدة البيانات
 init_db(app)
 
 # --- [ منطقة السيادة: بناء القاعدة وحقن البيانات ] ---
@@ -27,7 +27,6 @@ with app.app_context():
 # --- [ التوجيهات العامة ] ---
 @app.route('/')
 def index():
-    # توجيه ذكي بناءً على الجلسة النشطة
     if 'role' in session:
         if session['role'] == 'super_admin':
             return redirect(url_for('admin_dashboard'))
@@ -39,7 +38,6 @@ def index():
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
-    # منع إعادة تسجيل الدخول إذا كانت الجلسة نشطة
     if session.get('role') == 'super_admin':
         return redirect(url_for('admin_dashboard'))
 
@@ -49,26 +47,23 @@ def admin_login():
         
         success, msg = verify_admin_credentials(u, p)
         if success:
-            session.clear() 
+            session.clear()
             session.permanent = True
             session['username'] = u
             session['role'] = 'super_admin'
             flash("تم الدخول لبرج المراقبة بنجاح 🛡️", "success")
-            # التحويل المباشر لداشبورد الإدارة
             return redirect(url_for('admin_dashboard'))
-        
         flash(msg, "danger")
     return render_template('login_admin.html')
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
-    # حماية المسار: لا يدخل إلا السوبر آدمن
     if session.get('role') != 'super_admin':
         flash("🚫 صلاحيات غير كافية للوصول لبرج المراقبة", "danger")
         return redirect(url_for('admin_login'))
     
-    # جلب البيانات لجدول الموردين
     all_vendors = models.Vendor.query.all()
+    # يتم استدعاء القالب الذي يرث من admin_layout.html
     return render_template('admin_dashboard.html', 
                            username=session.get('username'), 
                            vendors=all_vendors)
@@ -82,14 +77,13 @@ def create_vendor():
     p = request.form.get('password', '').strip()
 
     if models.Vendor.query.filter_by(username=u).first():
-        flash("⚠️ اسم المستخدم موجود مسبقاً في نظام محجوب أونلاين.", "warning")
+        flash("⚠️ اسم المستخدم موجود مسبقاً.", "warning")
     else:
         try:
             new_v = models.Vendor(username=u, brand_name=b, password=p)
             db.session.add(new_v)
             db.session.flush() 
 
-            # توليد رقم محفظة سيادي
             wallet_num = f"MAH-{random.randint(100,999)}-{random.randint(1000,9999)}"
             new_wallet = models.Wallet(wallet_number=wallet_num, balance=0.0, vendor_id=new_v.id)
             db.session.add(new_wallet)
@@ -106,7 +100,6 @@ def create_vendor():
 
 @app.route('/vendor/login', methods=['GET', 'POST'])
 def vendor_login():
-    # إذا كان المورد مسجلاً، ارفعه للوحة تحكمه فوراً
     if 'role' in session and session.get('role') in ['vendor_owner', 'vendor_staff']:
         return redirect(url_for('vendor_dashboard'))
 
@@ -121,22 +114,18 @@ def vendor_login():
             session['username'] = u
             session['role'] = role
             flash(msg, "success")
-            # التحويل المباشر لداشبورد المورد
             return redirect(url_for('vendor_dashboard'))
-        
         flash(msg, "danger")
     return render_template('login_vendor.html')
 
 @app.route('/vendor/dashboard')
 def vendor_dashboard():
-    # حماية المسار: التأكد من هوية المورد
-    allowed_roles = ['vendor_owner', 'vendor_staff']
-    if 'role' not in session or session.get('role') not in allowed_roles:
+    if 'role' not in session or session.get('role') not in ['vendor_owner', 'vendor_staff']:
         return redirect(url_for('vendor_login'))
     
     vendor_data = models.Vendor.query.filter_by(username=session.get('username')).first()
     
-    # جلب بيانات المحفظة البنفسجية
+    # استخراج بيانات المحفظة لعرضها في القالب الذي يرث من vendor_layout.html
     wallet_no = vendor_data.wallet.wallet_number if vendor_data and vendor_data.wallet else "MAH-000-0000"
     balance = vendor_data.wallet.balance if vendor_data and vendor_data.wallet else 0.0
     
@@ -146,18 +135,18 @@ def vendor_dashboard():
                            wallet_no=wallet_no,
                            balance=balance)
 
-# --- [ نظام الخروج والسيادة ] ---
+# --- [ نظام الخروج ] ---
 
 @app.route('/logout')
 def logout():
     role = session.get('role')
     session.clear()
-    flash("تم تسجيل الخروج بنجاح. نراك قريباً.", "info")
-    
+    flash("تم تسجيل الخروج بنجاح.", "info")
     if role == 'super_admin':
         return redirect(url_for('admin_login'))
     return redirect(url_for('vendor_login'))
 
 if __name__ == '__main__':
+    # تشغيل السيرفر مع تفعيل Debug لمراقبة الأخطاء في Railway
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
