@@ -1,31 +1,28 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
-# --- [1] استيراد المحركات والإعدادات ---
+# 1. استيراد المحركات (تأكد من ترتيب الاستيراد لمنع التداخل)
 from config import Config
 from database import db, init_db
 from models import Vendor, AdminUser, Product, seed_admin
 
-# --- [2] استيراد المنطق (تأكد من وجود الدوال في الملفات المقابلة) ---
-try:
-    from logic import login_vendor, is_logged_in
-    from admin_logic import verify_admin_credentials, is_admin_logged_in
-except ImportError as e:
-    print(f"❌ خطأ في الاستيراد: {e}")
-    # هذا السطر سيخبرك في السجلات (Logs) أي دالة بالضبط مفقودة
+# 2. استيراد المنطق المطور (الذي يستخدم .strip والرسائل الدقيقة)
+from logic import login_vendor, is_logged_in
+from admin_logic import verify_admin_credentials, is_admin_logged_in
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# ربط قاعدة البيانات
+# ربط قاعدة البيانات Postgres
 init_db(app)
 
-# --- [3] تهيئة النظام (بناء الجداول وحقن علي محجوب) ---
+# 3. تهيئة الجداول وحقن البيانات العربية (علي محجوب / محجوب أونلاين)
 with app.app_context():
+    # هذا السطر مهم جداً لإنشاء الحسابات العربية فوراً
     db.create_all() 
     seed_admin() 
 
-# --- [4] المسارات الرسمية (Routes) ---
+# --- [ البوابات والروابط ] ---
 
 @app.route('/')
 def index():
@@ -33,33 +30,46 @@ def index():
     if is_logged_in(): return redirect(url_for('vendor_dashboard'))
     return redirect(url_for('login_page'))
 
-# بوابة دخول الموردين
+# 📦 بوابة الموردين (محجوب أونلاين)
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if is_logged_in(): return redirect(url_for('vendor_dashboard'))
+    
     if request.method == 'POST':
-        u, p = request.form.get('username'), request.form.get('password')
+        # أخذ البيانات من حقول الـ HTML
+        u = request.form.get('username')
+        p = request.form.get('password')
+        
         success, msg = login_vendor(u, p)
         if success:
             flash(msg, "success")
             return redirect(url_for('vendor_dashboard'))
-        flash(msg, "danger")
+        else:
+            flash(msg, "danger")
+            
     return render_template('login.html')
 
-# بوابة دخول الإدارة المركزية
+# 🏛️ بوابة الإدارة (علي محجوب)
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if is_admin_logged_in(): return redirect(url_for('admin_dashboard'))
+    
     if request.method == 'POST':
-        u, p = request.form.get('admin_user'), request.form.get('admin_pass')
+        # التأكد من أسماء الحقول في ملف admin_login.html
+        u = request.form.get('admin_user')
+        p = request.form.get('admin_pass')
+        
         success, msg = verify_admin_credentials(u, p)
         if success:
             flash(msg, "success")
             return redirect(url_for('admin_dashboard'))
-        flash(msg, "danger")
+        else:
+            flash(msg, "danger")
+            
     return render_template('admin_login.html')
 
-# لوحات التحكم
+# --- [ لوحات التحكم ] ---
+
 @app.route('/dashboard')
 def vendor_dashboard():
     if not is_logged_in(): return redirect(url_for('login_page'))
@@ -74,6 +84,7 @@ def admin_dashboard():
 @app.route('/logout')
 def logout():
     session.clear()
+    flash("تم تسجيل الخروج بنجاح.", "info")
     return redirect(url_for('login_page'))
 
 if __name__ == '__main__':
