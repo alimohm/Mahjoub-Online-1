@@ -15,10 +15,8 @@ init_db(app)
 # --- [ منطقة السيادة: بناء القاعدة وحقن البيانات ] ---
 with app.app_context():
     try:
-        # ملاحظة: فعل drop_all فقط إذا قمت بتغيير جذري في الهيكل وتريد تصفير البيانات
-        # db.drop_all() 
         db.create_all() 
-        models.seed_system() # يحقن (علي، علي محمد، الموظف التجريبي) والمحافظ تلقائياً
+        models.seed_system()
         print("✅ تم فحص القاعدة وتوليد المحافظ السيادية بنجاح.")
     except Exception as e:
         print(f"❌ خطأ في القاعدة: {e}")
@@ -29,45 +27,33 @@ def vendor_login():
     if request.method == 'POST':
         u = request.form.get('username', '').strip()
         p = request.form.get('password', '').strip()
-        
-        # المنطق المطور الذي يفحص (الحالة، كلمة السر، وجود الحساب)
         success, msg, role = login_vendor(u, p) 
-        
         if success:
             session['username'] = u
-            session['role'] = role # 'vendor_owner' أو 'vendor_staff'
+            session['role'] = role
             flash(msg, "success")
             return redirect(url_for('vendor_dashboard'))
-        
         flash(msg, "danger")
     return render_template('login_vendor.html')
 
 @app.route('/vendor/dashboard')
 def vendor_dashboard():
-    # 1. التحقق من الهوية: هل يملك رتبة مورد أو موظف؟
     allowed_roles = ['vendor_owner', 'vendor_staff']
     if 'role' not in session or session.get('role') not in allowed_roles:
         return redirect(url_for('vendor_login'))
     
-    # 2. جلب كائن المورد من القاعدة لجلب بيانات المحفظة
-    # نبحث أولاً في جدول الموردين
     vendor_data = models.Vendor.query.filter_by(username=session.get('username')).first()
-    
-    # إذا لم يجده، فهذا يعني أنه "موظف"، فنبحث عنه في جدول الموظفين لنجلب بيانات "رئيسه"
     if not vendor_data:
         staff_member = models.VendorStaff.query.filter_by(username=session.get('username')).first()
         vendor_data = staff_member.owner if staff_member else None
 
-    # 3. استخراج بيانات المحفظة (MAH-) بأمان لتجنب الانهيار
     wallet_no = "غير متوفر"
     balance = 0.0
     if vendor_data and vendor_data.wallet:
         wallet_no = vendor_data.wallet.wallet_number
         balance = vendor_data.wallet.balance
 
-    # 4. المالك فقط يرى المحفظة (علي محمد)، أما الموظف فلا يراها
     show_wallet = (session.get('role') == 'vendor_owner')
-    
     return render_template('vendor_dashboard.html', 
                            username=session.get('username'),
                            vendor=vendor_data,
@@ -75,30 +61,27 @@ def vendor_dashboard():
                            balance=balance,
                            show_wallet=show_wallet)
 
-# --- [ بوابة الإدارة العليا ] ---
+# --- [ بوابة الإدارة العليا - نسخة واحدة نظيفة ] ---
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         u = request.form.get('username', '').strip()
         p = request.form.get('password', '').strip()
-        
         success, msg = verify_admin_credentials(u, p)
         if success:
             session['username'] = u
             session['role'] = 'super_admin'
             flash(msg, "success")
             return redirect(url_for('admin_dashboard'))
-        
         flash(msg, "danger")
     return render_template('login_admin.html')
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
     if session.get('role') != 'super_admin':
-        flash("عذراً، هذه المنطقة لبرج المراقبة فقط.", "warning")
+        flash("🚫 محاولة دخول غير مصرحة لبرج المراقبة!", "danger")
         return redirect(url_for('admin_login'))
-        
-    return render_template('admin_dashboard.html', username=session.get('username'))
+    return render_template('admin_dashboard_content.html', username=session.get('username'))
 
 # --- [ التوجيهات العامة ] ---
 @app.route('/')
@@ -114,37 +97,3 @@ def logout():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
-
-
-@app.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    if request.method == 'POST':
-        # جلب البيانات من الحقول التي سميناها (username, password) في الـ HTML
-        u = request.form.get('username', '').strip()
-        p = request.form.get('password', '').strip()
-        
-        # التحقق من دالة admin_logic
-        success, msg = verify_admin_credentials(u, p)
-        
-        if success:
-            session['username'] = u
-            session['role'] = 'super_admin'  # تثبيت الهوية كمدير أعلى
-            flash(msg, "success")
-            
-            # --- التوجيه الصارم لبرج المراقبة ---
-            return redirect(url_for('admin_dashboard'))
-        
-        # في حال الفشل نعود لصفحة الدخول مع رسالة الخطأ
-        flash(msg, "danger")
-        
-    return render_template('login_admin.html')
-
-@app.route('/admin/dashboard')
-def admin_dashboard():
-    # طبقة حماية إضافية: منع أي شخص غير المدير من الدخول حتى لو كتب الرابط يدوياً
-    if session.get('role') != 'super_admin':
-        flash("🚫 محاولة دخول غير مصرحة لبرج المراقبة!", "danger")
-        return redirect(url_for('admin_login'))
-        
-    # استدعاء الهيكل الذي صممناه (layout.html) مع محتوى الإدارة
-    return render_template('admin_dashboard_content.html', username=session.get('username'))
