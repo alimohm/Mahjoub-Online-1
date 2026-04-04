@@ -10,39 +10,58 @@
         :root {
             --p-color: #4b0082; /* أرجواني ملكي */
             --gold: #FFD700;
+            --white: #ffffff;
         }
         * { box-sizing: border-box; }
         body { margin: 0; padding: 0; display: flex; height: 100vh; font-family: 'Cairo', sans-serif; background: var(--p-color); overflow: hidden; }
         
-        .brand-section { flex: 1.2; background: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #333; padding: 40px; order: 2; }
-        .login-section { flex: 1; background: var(--p-color); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; color: white; order: 1; }
+        .brand-section { flex: 1.2; background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #333; padding: 40px; order: 2; position: relative; }
+        .login-section { flex: 1; background: var(--p-color); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; color: white; order: 1; border-left: 1px solid rgba(255,215,0,0.1); }
         
         .login-card { width: 100%; max-width: 380px; text-align: center; }
-        .login-card h2 { font-size: 32px; color: white; margin-bottom: 10px; font-weight: 700; }
+        .login-card h2 { font-size: 32px; color: white; margin-bottom: 10px; font-weight: 700; letter-spacing: -1px; }
         .login-card p { font-size: 14px; opacity: 0.8; margin-bottom: 25px; }
         
-        .alert { background: #ff4d4d; color: white; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; text-align: right; display: flex; align-items: center; }
-        .alert i { margin-left: 10px; }
+        /* تحسين التنبيهات لتكون أكثر مرونة */
+        .alert { padding: 14px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; text-align: right; display: flex; align-items: center; animation: slideIn 0.4s ease-out; }
+        .alert i { margin-left: 12px; font-size: 18px; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .input-group { position: relative; margin-bottom: 15px; }
-        .input-group input { width: 100%; padding: 18px 50px 18px 15px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.1); color: white; font-size: 16px; font-family: 'Cairo'; }
-        .input-group i { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 18px; }
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group input { 
+            width: 100%; padding: 18px 50px 18px 15px; border: 1px solid rgba(255,255,255,0.15); 
+            border-radius: 14px; background: rgba(255,255,255,0.08); color: white; font-size: 16px; 
+            font-family: 'Cairo'; transition: all 0.3s ease;
+        }
+        .input-group input:focus { outline: none; border-color: var(--gold); background: rgba(255,255,255,0.12); box-shadow: 0 0 15px rgba(255,215,0,0.1); }
+        .input-group i { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 18px; transition: 0.3s; }
+        .input-group input:focus + i { transform: translateY(-50%) scale(1.2); }
         
-        .btn-login { width: 100%; padding: 18px; background: white; color: var(--p-color); border: none; border-radius: 12px; font-weight: 700; font-size: 18px; cursor: pointer; transition: 0.3s; }
-        .btn-login:hover { background: var(--gold); transform: scale(1.02); }
+        .btn-login { 
+            width: 100%; padding: 18px; background: var(--white); color: var(--p-color); 
+            border: none; border-radius: 14px; font-weight: 700; font-size: 18px; 
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .btn-login:hover { background: var(--gold); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .btn-login:active { transform: translateY(0); }
         
-        .logo { width: 140px; margin-bottom: 20px; }
-        .brand-section h1 { font-size: 40px; color: var(--p-color); margin: 0; font-weight: 700; }
-        .brand-section .slogan { font-size: 18px; color: #666; margin-bottom: 40px; }
+        .logo { width: 140px; margin-bottom: 25px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.05)); }
+        .brand-section h1 { font-size: 38px; color: var(--p-color); margin: 0; font-weight: 800; }
+        .brand-section .slogan { font-size: 17px; color: #777; margin-bottom: 45px; font-weight: 400; }
         
-        .feature-item { background: #f8f9fa; padding: 15px; margin: 8px; border-radius: 12px; width: 90%; display: flex; align-items: center; border: 1px solid #eee; text-align: right; }
-        .feature-item i { color: var(--p-color); margin-left: 15px; font-size: 20px; }
-        .feature-item span { color: #444; font-weight: 600; font-size: 15px; }
+        .feature-item { 
+            background: #fdfdfd; padding: 16px; margin: 10px; border-radius: 15px; 
+            width: 90%; display: flex; align-items: center; border: 1px solid #f0f0f0; 
+            text-align: right; transition: 0.3s;
+        }
+        .feature-item:hover { transform: translateX(-5px); border-color: var(--gold); }
+        .feature-item i { color: var(--p-color); margin-left: 15px; font-size: 22px; }
+        .feature-item span { color: #555; font-weight: 600; font-size: 14.5px; line-height: 1.4; }
         
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; }
-            .brand-section { order: 1; width: 100%; padding: 40px 20px; min-height: auto; }
-            .login-section { order: 2; width: 100%; padding: 40px 20px; }
+            .brand-section { order: 1; width: 100%; padding: 50px 20px; min-height: auto; }
+            .login-section { order: 2; width: 100%; padding: 50px 20px; border-left: none; border-top: 5px solid var(--gold); }
         }
     </style>
 </head>
@@ -52,7 +71,8 @@
         <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo">
         <h1>محجوب أونلاين</h1>
         <p class="slogan">المنصة السيادية لدعم الموردين والنمو الرقمي</p>
-        <div class="feature-item"><i class="fas fa-shield-alt"></i> <span>اللامركزية متطورة وحوكمة رقمية بنظام سيادي</span></div>
+        
+        <div class="feature-item"><i class="fas fa-shield-alt"></i> <span>لامركزية متطورة وحوكمة رقمية بنظام سيادي</span></div>
         <div class="feature-item"><i class="fas fa-box"></i> <span>إدارة ذكية وآمنة لسلاسل الإمداد والربط التلقائي</span></div>
         <div class="feature-item"><i class="fas fa-chart-line"></i> <span>سوقك الذكي للنمو المتسارع وزيادة علامتك التجارية</span></div>
     </div>
@@ -65,7 +85,7 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                 {% for category, message in messages %}
-                  <div class="alert" style="background: {% if category == 'success' %}#2ecc71{% else %}#ff4d4d{% endif %};">
+                  <div class="alert" style="background: {% if category == 'success' %}#2ecc71{% else %}rgba(255, 77, 77, 0.2){% endif %}; border-right: 4px solid {% if category == 'success' %}#27ae60{% else %}#ff4d4d{% endif %};">
                       <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i> 
                       {{ message }}
                   </div>
@@ -75,17 +95,17 @@
 
             <form method="POST" action="{{ url_for('vendor_login') }}">
                 <div class="input-group">
-                    <i class="fas fa-user"></i>
                     <input type="text" name="username" placeholder="اسم المستخدم" required>
+                    <i class="fas fa-user"></i>
                 </div>
                 <div class="input-group">
-                    <i class="fas fa-lock"></i>
                     <input type="password" name="password" placeholder="كلمة المرور" required>
+                    <i class="fas fa-lock"></i>
                 </div>
-                <button type="submit" class="btn-login">دخول للمنصة</button>
+                <button type="submit" class="btn-login">دخول للمنصة 🚀</button>
             </form>
 
-            <p style="font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 50px;">© 2026 محجوب أونلاين - حوكمة رقمية رائدة</p>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 50px; letter-spacing: 1px;">© 2026 محجوب أونلاين - حوكمة رقمية رائدة</p>
         </div>
     </div>
 
