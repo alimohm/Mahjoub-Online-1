@@ -1,14 +1,32 @@
-from models import Vendor, VendorStaff
+from models import Vendor, VendorStaff, Wallet
 
-def login_vendor(username, password):
-    # البحث في جدول الملاك (علي محمد)
-    vendor = Vendor.query.filter_by(username=username, password=password).first()
+def login_vendor(u, p):
+    # 1. البحث أولاً في جدول الموردين (الملاك)
+    vendor = Vendor.query.filter_by(username=u).first()
+    
     if vendor:
-        return True, "مرحباً بك يا سيد " + vendor.username, "vendor_owner"
+        # أ: التحقق من الحالة (محظور أم نشط)
+        if not vendor.is_active or vendor.status == "محظور":
+            return False, "❌ عذراً، حسابك محظور. يرجى التواصل مع الإدارة المركزية.", None
+        
+        # ب: التحقق من كلمة المرور
+        if vendor.password == p:
+            return True, f"مرحباً بك يا سيد {vendor.username} في مملكتك الرقمية", "vendor_owner"
+        else:
+            return False, "🔑 عذراً، كلمة المرور غير صحيحة. حاول مجدداً.", None
 
-    # البحث في جدول الموظفين (الموظف التجريبي)
-    staff = VendorStaff.query.filter_by(username=username, password=password).first()
+    # 2. إذا لم يكن مورداً، نبحث في جدول الموظفين
+    staff = VendorStaff.query.filter_by(username=u).first()
+    
     if staff:
-        return True, "دخول ناجح للموظف: " + staff.username, "vendor_staff"
+        # التحقق من حالة المورد الأصلي (هل صاحب العمل محظور؟)
+        if not staff.owner.is_active or staff.owner.status == "محظور":
+            return False, "❌ لا يمكن الدخول، حساب المورد التابع له الموظف محظور حالياً.", None
+            
+        if staff.password == p:
+            return True, f"مرحباً بك {staff.username} (دخول موظف مصرح)", "vendor_staff"
+        else:
+            return False, "🔑 كلمة المرور للموظف غير صحيحة.", None
 
-    return False, "بيانات الدخول غير صحيحة", None
+    # 3. إذا لم يجد الاسم في الجدولين نهائياً
+    return False, "🚫 هذا الحساب غير مسجل في المنصة اللامركزية. تأكد من البيانات.", None
