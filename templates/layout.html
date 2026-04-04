@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}محجوب أونلاين | سوقك الذكي - منصة الموردين{% endblock %}</title>
+    <title>{% block title %}محجوب أونلاين | سوقك الذكي{% endblock %}</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -16,6 +16,7 @@
             --sidebar-width: 280px;
             --sidebar-collapsed: 85px;
             --danger: #e74c3c;
+            --gold: #FFD700;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -23,32 +24,21 @@
         body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg-body); display: flex; height: 100vh; overflow: hidden; }
 
         .sidebar {
-            width: var(--sidebar-width);
-            background: var(--white);
-            height: 100%;
-            border-left: 1px solid #eef2f3;
-            display: flex;
-            flex-direction: column;
-            transition: var(--transition);
-            z-index: 1000;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.02);
+            width: var(--sidebar-width); background: var(--white); height: 100%;
+            border-left: 1px solid #eef2f3; display: flex; flex-direction: column;
+            transition: var(--transition); z-index: 1000; box-shadow: 10px 0 30px rgba(0,0,0,0.02);
         }
 
         .brand-container {
-            padding: 25px 20px;
-            display: flex; align-items: center; gap: 12px;
+            padding: 25px 20px; display: flex; align-items: center; gap: 12px;
             border-bottom: 1px solid #f8f9fa;
         }
-        /* اللوجو الجديد بدون خلفية */
         .logo-img { height: 48px; border-radius: 8px; flex-shrink: 0; }
         .brand-details { display: flex; flex-direction: column; line-height: 1.3; }
-        /* سوقك الذكي */
         .brand-name { font-weight: 800; color: var(--royal-p); font-size: 15px; }
-        /* المنصة الأولى اللامركزية */
         .brand-sub { font-size: 10px; color: #999; font-weight: 600; }
 
         .menu-list { flex: 1; padding: 20px 0; overflow-y: auto; }
-        
         .menu-item {
             display: flex; align-items: center; padding: 14px 20px;
             text-decoration: none; color: #6c757d; font-weight: 700;
@@ -57,35 +47,30 @@
         }
         .menu-item i { font-size: 18px; min-width: 35px; text-align: center; margin-left: 10px; }
         .menu-item:hover { background: rgba(75,0,130,0.04); color: var(--royal-p); transform: translateX(-5px); }
-        
-        .menu-item.active { 
-            background: rgba(75,0,130,0.08); 
-            color: var(--royal-p); 
-            border-right: 4px solid var(--royal-p);
-        }
+        .menu-item.active { background: rgba(75,0,130,0.08); color: var(--royal-p); border-right: 4px solid var(--royal-p); }
 
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-
         .top-header {
-            height: 80px; background: var(--white);
-            border-bottom: 1px solid #eef2f3;
+            height: 80px; background: var(--white); border-bottom: 1px solid #eef2f3;
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 30px; z-index: 99;
         }
 
-        .welcome-msg { 
-            font-size: 14px; font-weight: 700; color: #444; 
-            border-right: 4px solid var(--royal-p); padding-right: 15px;
-        }
+        .welcome-msg { font-size: 14px; font-weight: 700; color: #444; border-right: 4px solid var(--royal-p); padding-right: 15px; }
         .welcome-msg span { color: var(--royal-p); font-weight: 800; }
 
         .user-pill {
             display: flex; align-items: center; gap: 12px;
-            background: #f8fafc; padding: 8px 18px; border-radius: 50px;
-            border: 1px solid #edf2f7;
+            background: #f8fafc; padding: 8px 18px; border-radius: 50px; border: 1px solid #edf2f7;
         }
 
         .page-content { flex: 1; padding: 30px; overflow-y: auto; background: var(--bg-body); }
+
+        /* تنبيهات النظام داخل الصفحة */
+        .flashes { list-style: none; padding: 0; margin-bottom: 20px; }
+        .alert { padding: 12px 20px; border-radius: 10px; margin-bottom: 10px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
         @media (max-width: 1024px) {
             .sidebar { width: var(--sidebar-collapsed); }
@@ -97,27 +82,33 @@
 </head>
 <body>
 
-    <nav class="sidebar shadow-sm">
+    <nav class="sidebar">
         <div class="brand-container">
             <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-img" alt="محجوب أونلاين">
             <div class="brand-details">
-                <span class="brand-name">محجوب أونلاين | سوقك الذكي</span>
-                <span class="brand-sub">المنصة الأولى اللامركزية | السيادة الرقمية</span>
+                <span class="brand-name">محجوب أونلاين</span>
+                <span class="brand-sub">السيادة الرقمية | 2026</span>
             </div>
         </div>
 
         <div class="menu-list">
-            <a href="{{ url_for('dashboard') }}" class="menu-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+            <a href="{{ url_for('vendor_dashboard') if session.get('role') != 'super_admin' else url_for('admin_dashboard') }}" 
+               class="menu-item {% if 'dashboard' in request.endpoint %}active{% endif %}">
                 <i class="fas fa-th-large"></i><span>الرئيسية</span>
             </a>
             
-            <a href="{{ url_for('add_product') }}" class="menu-item {% if request.endpoint == 'add_product' %}active{% endif %}">
-                <i class="fas fa-plus-circle"></i><span>رفع المنتجات</span>
+            {% if session.get('role') == 'vendor_owner' %}
+            <a href="#" class="menu-item">
+                <i class="fas fa-plus-circle"></i><span>إضافة منتج</span>
             </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-wallet"></i><span>سحب الرصيد</span>
+            </a>
+            {% endif %}
 
             <hr style="border: 0; border-top: 1px solid #f1f3f5; margin: 15px 25px;">
             
-            <a href="{{ url_for('logout_route') }}" class="menu-item" style="color: var(--danger);">
+            <a href="{{ url_for('logout') }}" class="menu-item" style="color: var(--danger);">
                 <i class="fas fa-power-off"></i><span>خروج آمن</span>
             </a>
         </div>
@@ -130,18 +121,29 @@
             </div>
 
             <div class="user-section">
-                <div class="user-pill shadow-sm">
-                    <span style="font-size: 13px; font-weight: 800; color: var(--royal-p);">@{{ session.get('username', 'user_id') }}</span>
+                <div class="user-pill">
+                    <span style="font-size: 13px; font-weight: 800; color: var(--royal-p);">@{{ session.get('username') }}</span>
                     <i class="fas fa-store-alt fa-lg" style="color: var(--royal-p);"></i>
                 </div>
             </div>
         </header>
 
         <div class="page-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flashes">
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">
+                    <i class="fas fa-info-circle"></i> {{ message }}
+                  </div>
+                {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
             {% block content %}{% endblock %}
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
