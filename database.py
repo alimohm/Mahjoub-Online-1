@@ -1,8 +1,2 @@
-from flask_sqlalchemy import SQLAlchemy
-
-# تعريف المحرك مرة واحدة فقط
-db = SQLAlchemy()
-
-def init_db(app):
-    """ربط قاعدة البيانات بالتطبيق"""
-    db.init_app(app)
+# (يحتوي على جداول AdminUser, Vendor, VendorStaff, Product)
+# مع دالة seed_system() لحقن "علي محجوب" و "محجوب أونلاين"
