@@ -9,7 +9,7 @@ def login_vendor(u, p):
         session['user_id'] = vendor.id
         session['role'] = 'vendor_owner' # يرى المحفظة
         session['username'] = vendor.username
-        return True, "مرحباً بك يا سيد سوقك الذكي"
+        return True, "مرحباً بك يا سيد السوق الذكي"
 
     # البحث عن موظف
     staff = VendorStaff.query.filter_by(username=u).first()
