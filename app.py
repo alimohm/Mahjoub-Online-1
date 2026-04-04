@@ -21,6 +21,17 @@ with app.app_context():
     except Exception as e:
         print(f"❌ خطأ في القاعدة: {e}")
 
+# --- [ التوجيهات العامة ] ---
+@app.route('/')
+def index():
+    return redirect(url_for('vendor_login'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("تم الخروج من النظام السيادي بنجاح.", "info")
+    return redirect(url_for('vendor_login'))
+
 # --- [ بوابة الموردين والموظفين ] ---
 @app.route('/vendor/login', methods=['GET', 'POST'])
 def vendor_login():
@@ -61,6 +72,16 @@ def vendor_dashboard():
                            balance=balance,
                            show_wallet=show_wallet)
 
+# --- [ مسار رفع المنتج للمورد ] ---
+@app.route('/vendor/add-product')
+def add_product():
+    allowed_roles = ['vendor_owner', 'vendor_staff']
+    if 'role' not in session or session.get('role') not in allowed_roles:
+        flash("🚫 يرجى تسجيل الدخول كمورد للوصول لهذه الصفحة", "danger")
+        return redirect(url_for('vendor_login'))
+    return render_template('vendor_add_product.html')
+
+
 # --- [ بوابة الإدارة العليا ] ---
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -81,31 +102,18 @@ def admin_dashboard():
     if session.get('role') != 'super_admin':
         flash("🚫 محاولة دخول غير مصرحة لبرج المراقبة!", "danger")
         return redirect(url_for('admin_login'))
-    
-    # تم التصحيح هنا ليتوافق مع اسم ملفك: admin_accounts.html
     return render_template('admin_accounts.html', username=session.get('username'))
-
-# --- [ التوجيهات العامة ] ---
-@app.route('/')
-def index():
-    return redirect(url_for('vendor_login'))
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash("تم الخروج من النظام السيادي.", "info")
-    return redirect(url_for('vendor_login'))
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port, debug=True)
 
 @app.route('/admin/manage-vendors')
 def manage_vendors():
-    # التأكد من أن الداخل هو المدير فقط
     if session.get('role') != 'super_admin':
         flash("🚫 غير مصرح لك بدخول هذه الصفحة", "danger")
         return redirect(url_for('admin_login'))
-    
-    # استدعاء الصفحة التي طلبتها
+    # بناءً على طلبك، سيفتح صفحة إضافة منتج للإدارة أيضاً
     return render_template('vendor_add_product.html')
+
+# --- [ تشغيل السيرفر ] ---
+if __name__ == '__main__':
+    # تأكد من أن تشغيل التطبيق هو آخر شيء في الملف
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port, debug=True)
