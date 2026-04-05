@@ -4,9 +4,8 @@ from config import Config
 from database import db, init_db
 import models
 
-# استدعاء المنطق البرمجي الموزع
+# استدعاء المنطق البرمجي الموزع (نظيف وبدون تكرار)
 from vendor_logic import login_vendor 
-# إضافة الدوال الجديدة من ملف admin_logic
 from admin_logic import verify_admin_credentials, manage_accounts_logic, create_vendor_logic
 
 app = Flask(__name__)
@@ -27,11 +26,11 @@ with app.app_context():
 # --- [ التوجيهات العامة ] ---
 @app.route('/')
 def index():
-    if 'role' in session:
-        if session['role'] == 'super_admin':
-            return redirect(url_for('admin_dashboard'))
-        elif session['role'] in ['vendor_owner', 'vendor_staff']:
-            return redirect(url_for('vendor_dashboard'))
+    role = session.get('role')
+    if role == 'super_admin':
+        return redirect(url_for('admin_dashboard'))
+    elif role in ['vendor_owner', 'vendor_staff']:
+        return redirect(url_for('vendor_dashboard'))
     return redirect(url_for('vendor_login'))
 
 # --- [ بوابة الإدارة: برج المراقبة ] ---
@@ -47,7 +46,9 @@ def admin_login():
         
         success, msg = verify_admin_credentials(u, p)
         if success:
-            # البيانات تُحفظ في السيرفر عبر الدالة السابقة
+            # تنبيه: admin_logic يجب أن تضبط الجلسة داخلياً أو تعيد البيانات لضبطها هنا
+            session['username'] = u
+            session['role'] = 'super_admin'
             flash(msg, "success")
             return redirect(url_for('admin_dashboard'))
         flash(msg, "danger")
@@ -58,7 +59,7 @@ def admin_dashboard():
     if session.get('role') != 'super_admin':
         return redirect(url_for('admin_login'))
     
-    # استخدام المنطق من admin_logic لجلب الموردين
+    # جلب قائمة الموردين المعتمدين في الشبكة
     all_vendors = manage_accounts_logic() 
     return render_template('admin_accounts.html', 
                            username=session.get('username'), 
@@ -69,21 +70,18 @@ def create_vendor_route():
     if session.get('role') != 'super_admin': 
         return redirect(url_for('admin_login'))
     
-    # تنفيذ منطق الإنشاء التلقائي للمورد والمحفظة
+    # تنفيذ منطق الإنشاء التلقائي (المورد + المحفظة MAH)
     success, msg = create_vendor_logic()
     
-    if success:
-        flash(msg, "success")
-    else:
-        flash(msg, "danger")
-        
+    category = "success" if success else "danger"
+    flash(msg, category)
     return redirect(url_for('admin_dashboard'))
 
 # --- [ بوابة الموردين: سوقك الذكي ] ---
 
 @app.route('/vendor/login', methods=['GET', 'POST'])
 def vendor_login():
-    if 'role' in session and session.get('role') in ['vendor_owner', 'vendor_staff']:
+    if session.get('role') in ['vendor_owner', 'vendor_staff']:
         return redirect(url_for('vendor_dashboard'))
 
     if request.method == 'POST':
@@ -103,12 +101,13 @@ def vendor_login():
 
 @app.route('/vendor/dashboard')
 def vendor_dashboard():
-    if 'role' not in session or session.get('role') not in ['vendor_owner', 'vendor_staff']:
+    role = session.get('role')
+    username = session.get('username')
+
+    if role not in ['vendor_owner', 'vendor_staff']:
         return redirect(url_for('vendor_login'))
     
-    username = session.get('username')
-    role = session.get('role')
-
+    # جلب بيانات السيادة المالية للمورد
     if role == 'vendor_owner':
         vendor_data = models.Vendor.query.filter_by(username=username).first()
     else:
@@ -117,27 +116,23 @@ def vendor_dashboard():
     
     if not vendor_data:
         session.clear()
-        flash("خطأ في استعادة بيانات السيادة، يرجى إعادة الدخول.", "danger")
+        flash("فشل التحقق من بيانات السيادة المالية، يرجى تسجيل الدخول مجدداً.", "danger")
         return redirect(url_for('vendor_login'))
 
     wallet = vendor_data.wallet
-    wallet_no = wallet.wallet_number if wallet else "N/A"
-    balance = wallet.balance if wallet else 0.0
-    
     return render_template('vendor_dashboard.html', 
                            username=username,
                            vendor=vendor_data,
-                           wallet_no=wallet_no, 
-                           balance=balance)
+                           wallet_no=wallet.wallet_number if wallet else "N/A", 
+                           balance=wallet.balance if wallet else 0.0)
 
+# --- [ الخروج ] ---
 @app.route('/logout')
 def logout():
     role = session.get('role')
     session.clear()
-    flash("تم تسجيل الخروج من النظام الملكي.", "info")
-    if role == 'super_admin':
-        return redirect(url_for('admin_login'))
-    return redirect(url_for('vendor_login'))
+    flash("تم إنهاء الجلسة السيادية بنجاح.", "info")
+    return redirect(url_for('admin_login' if role == 'super_admin' else 'vendor_login'))
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
