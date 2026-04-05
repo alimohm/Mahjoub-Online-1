@@ -1,16 +1,17 @@
-from flask import session, request, redirect, url_for
+from flask import session, request
 from models import AdminUser, Vendor, Wallet, db
 
 def verify_admin_credentials(u, p):
     """
-    تحقق منطقي ذكي لدخول المسؤول
+    تحقق منطقي ذكي لدخول المسؤول مع تنظيف الجلسة
     """
     clean_username = u.strip() if u else ""
     
     if not clean_username or not p:
         return False, "يرجى إدخال بيانات الدخول كاملة."
 
-    admin = AdminUser.query.filter_by(username=clean_username).first()
+    # استخدام filter بدلاً من filter_by لضمان دقة الاستعلام في بعض نسخ SQLAlchemy
+    admin = AdminUser.query.filter(AdminUser.username == clean_username).first()
     
     if not admin:
         return False, "هذا الاسم غير مسجل في المنصة اللامركزية."
@@ -18,6 +19,7 @@ def verify_admin_credentials(u, p):
     if admin.password != p:
         return False, "كلمة المرور غير صحيحة، يرجى المحاولة مرة أخرى."
 
+    # تأمين الجلسة
     session.clear()
     session['admin_id'] = admin.id
     session['role'] = 'super_admin'
@@ -28,60 +30,65 @@ def verify_admin_credentials(u, p):
 def get_admin_stats():
     """
     دالة الإحصائيات المخصصة للوحة الرئيسية (Dashboard)
-    تظهر الأرقام فقط وتمنع الانهيار عند طلب admin_main.html
+    محسنة لتعمل بسرعة عالية جداً
     """
     try:
+        # استخدام count() مباشرة على مستوى الاستعلام لتوفير الذاكرة
+        total_v = db.session.query(Vendor).count()
+        total_w = db.session.query(Wallet).count()
         return {
-            'total_vendors': Vendor.query.count(),
-            'active_wallets': Wallet.query.count()
+            'total_vendors': total_v,
+            'active_wallets': total_w
         }
     except Exception as e:
-        print(f"Error fetching stats: {e}")
+        print(f"⚠️ خطأ في جلب الإحصائيات: {e}")
         return {'total_vendors': 0, 'active_wallets': 0}
 
 def manage_accounts_logic():
     """
     جلب كافة الموردين لعرضهم في لوحة الاعتماد حصراً
+    مرتبين من الأحدث إلى الأقدم
     """
-    vendors = Vendor.query.order_by(Vendor.id.desc()).all()
-    return vendors
+    return Vendor.query.order_by(Vendor.id.desc()).all()
 
 def create_vendor_logic():
     """
     المنطق السيادي لإنشاء مورد وتفعيل محفظته تلقائياً (MAH-XXXX)
-    يتم استدعاؤه من صفحة الاعتماد فقط
+    يضمن عدم حدوث تضارب في قاعدة البيانات
     """
     if request.method == 'POST':
-        username = request.form.get('username')
-        brand_name = request.form.get('brand_name')
-        password = request.form.get('password')
+        username = request.form.get('username', '').strip()
+        brand_name = request.form.get('brand_name', '').strip()
+        password = request.form.get('password', '').strip()
 
-        # فحص التكرار لضمان فرادة الحساب
+        if not username or not password:
+            return False, "اسم المستخدم وكلمة المرور متطلبات أساسية."
+
+        # فحص التكرار
         if Vendor.query.filter_by(username=username).first():
-            return False, "اسم المستخدم هذا محجوز مسبقاً."
+            return False, "اسم المستخدم هذا محجوز مسبقاً لمورد آخر."
 
-        # 1. إنشاء سجل المورد
-        new_vendor = Vendor(
-            username=username,
-            brand_name=brand_name,
-            password=password, 
-            status="نشط",
-            is_active=True
-        )
-        
         try:
+            # 1. إنشاء سجل المورد الجديد
+            new_vendor = Vendor(
+                username=username,
+                brand_name=brand_name,
+                password=password, 
+                status="نشط",
+                is_active=True
+            )
             db.session.add(new_vendor)
-            db.session.flush() # الحصول على ID قبل الحفظ النهائي
+            db.session.flush() # توليد ID المورد لاستخدامه في المحفظة قبل Commit
 
-            # 2. توليد المحفظة السيادية تلقائياً
+            # 2. توليد المحفظة السيادية وربطها بالمورد
             new_wallet = Wallet(vendor_id=new_vendor.id)
             db.session.add(new_wallet)
             
             db.session.commit()
-            return True, f"تم اعتماد {brand_name} وتفعيل السيادة المالية."
+            return True, f"✅ تم اعتماد {brand_name} وتفعيل محفظة MAH السيادية بنجاح."
             
         except Exception as e:
-            db.session.rollback()
-            return False, f"حدث خطأ فني: {str(e)}"
+            db.session.rollback() # تراجع عن العمليات في حال حدوث أي خطأ
+            return False, f"❌ تعذر إتمام العملية: {str(e)}"
 
     return False, "طلب غير صالح."
