@@ -65,35 +65,59 @@ def admin_dashboard():
         return redirect(url_for('admin_login'))
     
     stats = get_admin_stats()
-    # يفتح لوحة التحكم الرئيسية (ملخص الإحصائيات)
     return render_template('admin_main.html', 
                            username=session.get('username'), 
                            stats=stats)
 
 @app.route('/admin/vendors-accreditation')
 def vendors_accreditation():
-    """هذه الدالة هي المسؤولة عن فتح صفحة إدارة الحسابات والاعتماد"""
     if session.get('role') != 'super_admin':
         return redirect(url_for('admin_login'))
     
-    # جلب قائمة الموردين من قاعدة البيانات
     all_vendors = manage_accounts_logic() 
-    
-    # الربط بملفك الحقيقي admin_accounts.html
     return render_template('admin_accounts.html', 
                            username=session.get('username'), 
                            vendors=all_vendors)
 
 @app.route('/admin/create-vendor', methods=['POST'])
 def create_vendor_route():
-    """الدالة المسؤولة عن معالجة فورم إضافة مورد جديد"""
     if session.get('role') != 'super_admin': 
         return redirect(url_for('admin_login'))
     
     success, msg = create_vendor_logic()
     flash(msg, "success" if success else "danger")
-    # بعد الإضافة، نعود لصفحة الاعتماد لرؤية المورد الجديد
     return redirect(url_for('vendors_accreditation'))
+
+# --- [ الدوال الجديدة التي تمنع الانهيار عند النقر ] ---
+
+@app.route('/admin/activate-vendor/<int:vendor_id>', methods=['POST'])
+def activate_vendor(vendor_id):
+    """الدالة المسؤولة عن تفعيل حساب المورد من النافذة المنبثقة"""
+    if session.get('role') != 'super_admin':
+        return redirect(url_for('admin_login'))
+    
+    vendor = models.Vendor.query.get_or_404(vendor_id)
+    vendor.is_active = True
+    vendor.status = "نشط"
+    
+    # التأكد من وجود محفظة عند التفعيل (إذا لم تكن موجودة)
+    if not vendor.wallet:
+        new_wallet = models.Wallet(vendor_id=vendor.id)
+        db.session.add(new_wallet)
+    
+    db.session.commit()
+    flash(f"تم تفعيل سيادة المورد {vendor.brand_name} بنجاح ✨", "success")
+    return redirect(url_for('vendors_accreditation'))
+
+@app.route('/admin/vendor-profile/<int:vendor_id>')
+def view_vendor_profile(vendor_id):
+    """الدالة المسؤولة عن 'فتح حساب' المورد وعرض تفاصيله"""
+    if session.get('role') != 'super_admin':
+        return redirect(url_for('admin_login'))
+    
+    vendor = models.Vendor.query.get_or_404(vendor_id)
+    # ملاحظة: ستحتاج لملف template باسم vendor_profile.html لعرض التفاصيل
+    return render_template('vendor_profile.html', vendor=vendor)
 
 # --- [ بوابة الموردين - Vendors ] ---
 
@@ -125,7 +149,6 @@ def vendor_dashboard():
     if role not in ['vendor_owner', 'vendor_staff']:
         return redirect(url_for('vendor_login'))
     
-    # جلب بيانات المورد ومحفظته
     vendor_data = models.Vendor.query.filter_by(username=username).first() if role == 'vendor_owner' else None
     if not vendor_data and role == 'vendor_staff':
         staff = models.VendorStaff.query.filter_by(username=username).first()
@@ -152,6 +175,5 @@ def logout():
     return redirect(url_for('admin_login' if role == 'super_admin' else 'vendor_login'))
 
 if __name__ == '__main__':
-    # إعداد المنفذ ليتوافق مع بيئة Railway
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
