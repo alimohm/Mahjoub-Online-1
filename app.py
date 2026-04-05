@@ -68,14 +68,15 @@ def admin_dashboard():
                            username=session.get('username'), 
                            stats=stats)
 
-# الرابط 2: صفحة اعتماد الموردين (المستقلة)
+# الرابط 2: صفحة اعتماد الموردين (تم تعديل اسم الملف هنا)
 @app.route('/admin/vendors-accreditation')
 def vendors_accreditation():
     if session.get('role') != 'super_admin':
         return redirect(url_for('admin_login'))
     
     all_vendors = manage_accounts_logic() 
-    return render_template('admin_accounts.html', 
+    # التعديل: استدعاء ملف vendor_accreditation.html بدلاً من admin_accounts
+    return render_template('vendor_accreditation.html', 
                            username=session.get('username'), 
                            vendors=all_vendors)
 
