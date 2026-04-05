@@ -3,23 +3,23 @@ from flask import session, request
 from models import AdminUser, Vendor, Wallet, db
 from werkzeug.utils import secure_filename
 
-# إعدادات رفع الملفات (تأكد من وجود المجلدات في static/uploads)
+# إعدادات رفع الملفات
 UPLOAD_FOLDER = 'static/uploads'
 
 def verify_admin_credentials(u, p):
-    """تحقق منطقي ذكي لدخول المسؤول مع تنظيف الجلسة"""
+    """تحقق منطقي ذكي لدخول المسؤول - مستفيد من Index اليوزر"""
     clean_username = u.strip() if u else ""
     if not clean_username or not p:
         return False, "يرجى إدخال بيانات الدخول كاملة."
 
-    # الاستعلام مستفيد من الـ Index الذي أضفناه في models.py
+    # استعلام سريع جداً بفضل الفهرسة
     admin = AdminUser.query.filter(AdminUser.username == clean_username).first()
     
     if not admin:
         return False, "هذا الاسم غير مسجل في المنصة اللامركزية."
 
     if admin.password != p:
-        return False, "كلمة المرور غير صحيحة، يرجى المحاولة مرة أخرى."
+        return False, "كلمة المرور غير صحيحة."
 
     session.clear()
     session['admin_id'] = admin.id
@@ -29,7 +29,7 @@ def verify_admin_credentials(u, p):
     return True, "تم التحقق بنجاح. مرحباً بك في مركز القيادة."
 
 def get_admin_stats():
-    """دالة الإحصائيات - سريعة جداً بفضل استخدام count() المباشر"""
+    """دالة الإحصائيات - سريعة بفضل استخدام count المباشر على الإنديكس"""
     try:
         total_v = db.session.query(Vendor).count()
         total_w = db.session.query(Wallet).count()
@@ -38,11 +38,20 @@ def get_admin_stats():
         print(f"⚠️ خطأ في جلب الإحصائيات: {e}")
         return {'total_vendors': 0, 'active_wallets': 0}
 
+def manage_accounts_logic():
+    """
+    (الدالة المفقودة التي سببت الخطأ)
+    جلب كافة الموردين مرتبين حسب الـ ID (فهرس تلقائي)
+    """
+    try:
+        # ترتيب تنازلي لظهور أحدث الموردين أولاً - أداء عالي جداً
+        return Vendor.query.order_by(Vendor.id.desc()).all()
+    except Exception as e:
+        print(f"⚠️ خطأ في جلب الموردين: {e}")
+        return []
+
 def create_vendor_logic():
-    """
-    إنشاء مورد جديد مع دعم رفع الصور (الهوية/السجل) 
-    وتفعيل محفظته MAH تلقائياً.
-    """
+    """إنشاء مورد جديد مع دعم الصور وتفعيل محفظة MAH"""
     if request.method == 'POST':
         u = request.form.get('username', '').strip()
         bn = request.form.get('brand_name', '').strip()
@@ -52,30 +61,28 @@ def create_vendor_logic():
         if not u or not p:
             return False, "اسم المستخدم وكلمة المرور متطلبات أساسية."
 
+        # فحص التكرار باستخدام الإنديكس
         if Vendor.query.filter_by(username=u).first():
             return False, "اسم المستخدم هذا محجوز مسبقاً."
 
         try:
-            # معالجة رفع الصور السيادية
-            id_path, reg_path = None, None
-            
+            id_path = None
             if 'id_card' in request.files:
                 file = request.files['id_card']
                 if file and file.filename != '':
                     filename = secure_filename(f"id_{u}_{file.filename}")
                     id_path = os.path.join('uploads/ids', filename)
+                    # تأكد من وجود المجلد static/uploads/ids
                     file.save(os.path.join('static', id_path))
 
-            # 1. إنشاء سجل المورد
             new_vendor = Vendor(
                 username=u, brand_name=bn, password=p, 
                 phone=ph, id_card_image=id_path,
-                status="نشط", is_active=True # تفعيل فوري عند الإضافة من قبل الآدمن
+                status="نشط", is_active=True
             )
             db.session.add(new_vendor)
             db.session.flush() 
 
-            # 2. توليد المحفظة السيادية
             new_wallet = Wallet(vendor_id=new_vendor.id)
             db.session.add(new_wallet)
             
@@ -88,11 +95,9 @@ def create_vendor_logic():
     return False, "طلب غير صالح."
 
 def activate_existing_vendor(vendor_id):
-    """
-    هذه الدالة هي التي تعمل عند الضغط على زر 'طلب تفعيل' 
-    للموردين المسجلين مسبقاً (الذين حالتهم معلق).
-    """
+    """تفعيل مورد من قائمة الانتظار - بحث سريع بالـ Primary Key"""
     try:
+        # البحث عن طريق ID مفهرس تلقائياً
         vendor = Vendor.query.get(vendor_id)
         if not vendor:
             return False, "المورد غير موجود."
@@ -100,7 +105,6 @@ def activate_existing_vendor(vendor_id):
         vendor.is_active = True
         vendor.status = "نشط"
 
-        # التأكد من وجود محفظة، وإذا لم توجد ننشئها فوراً
         if not vendor.wallet:
             new_wallet = Wallet(vendor_id=vendor.id)
             db.session.add(new_wallet)
