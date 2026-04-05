@@ -52,6 +52,10 @@
     .v-table th { text-align: right; color: #888; padding: 15px; font-size: 13px; border-bottom: 2px solid #f4f7f6; }
     .v-table td { padding: 15px; border-bottom: 1px solid #f4f7f6; font-weight: 600; color: var(--admin-p); }
     
+    /* جعل الصف قابل للنقر */
+    .clickable-row { cursor: pointer; transition: 0.2s; }
+    .clickable-row:hover { background-color: #fcf9f0; }
+
     .wallet-badge { 
         background: #fff9e6; 
         color: #b8860b; 
@@ -74,6 +78,31 @@
     }
     .status-active { background: #e6fffa; color: #27ae60; border: 1px solid #c6f6d5; }
     .status-pending { background: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; }
+
+    /* تنسيق النافذة المنبثقة (Modal) */
+    .modal-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(26, 0, 51, 0.85); z-index: 9999; backdrop-filter: blur(8px);
+        align-items: center; justify-content: center;
+    }
+    .modal-content-royal {
+        background: white; width: 90%; max-width: 400px; border-radius: 25px;
+        overflow: hidden; animation: zoomIn 0.3s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal-header-royal { background: var(--admin-p); color: var(--gold); padding: 20px; text-align: center; border-bottom: 3px solid var(--gold); }
+    .modal-body { padding: 30px; display: grid; gap: 15px; }
+    
+    .btn-modal {
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        padding: 15px; border-radius: 15px; font-weight: 800; text-decoration: none;
+        transition: 0.3s; border: none; cursor: pointer; font-size: 14px;
+    }
+    .btn-open-acc { background: #f0f4f8; color: var(--admin-p); border: 1px solid #d1d9e0; }
+    .btn-activate-req { background: #fffdf0; color: #b8860b; border: 1px solid var(--gold); }
+    
+    .btn-modal:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+    @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     @media (max-width: 992px) {
         .admin-container { grid-template-columns: 1fr; }
@@ -106,6 +135,7 @@
 
     <div class="card-royal">
         <h3 style="color: var(--admin-p); margin-top: 0;"><i class="fas fa-users" style="color: var(--gold);"></i> الموردون المعتمدون</h3>
+        <p style="font-size: 11px; color: #999;">* انقر على أي مورد لفتح الإجراءات السيادية.</p>
         <div style="overflow-x: auto;">
             <table class="v-table">
                 <thead>
@@ -118,7 +148,7 @@
                 </thead>
                 <tbody>
                     {% for vendor in vendors %}
-                    <tr>
+                    <tr class="clickable-row" onclick="showActions('{{ vendor.id }}', '{{ vendor.brand_name }}')">
                         <td>{{ vendor.username }}</td>
                         <td>{{ vendor.brand_name }}</td>
                         <td>
@@ -148,4 +178,41 @@
         </div>
     </div>
 </div>
+
+<div id="actionModal" class="modal-overlay" onclick="closeActions(event)">
+    <div class="modal-content-royal" onclick="event.stopPropagation()">
+        <div class="modal-header-royal">
+            <h3 id="modalTitle" style="margin: 0; font-size: 18px;">إجراءات المورد</h3>
+        </div>
+        <div class="modal-body">
+            <a id="linkOpenAcc" href="#" class="btn-modal btn-open-acc">
+                <i class="fas fa-user-edit"></i> فتح حساب
+            </a>
+            
+            <form id="formActivate" method="POST" style="width: 100%;">
+                <button type="submit" class="btn-modal btn-activate-req" style="width: 100%;">
+                    <i class="fas fa-bolt"></i> طلب تفعيل
+                </button>
+            </form>
+            
+            <button onclick="closeActions(null)" style="background: none; border: none; color: #999; cursor: pointer; margin-top: 10px;">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showActions(vendorId, brandName) {
+        document.getElementById('modalTitle').innerText = brandName;
+        // ربط الروابط والـ Form بالـ ID الصحيح من قاعدة البيانات
+        document.getElementById('linkOpenAcc').href = "/admin/vendor-profile/" + vendorId;
+        document.getElementById('formActivate').action = "/admin/activate-vendor/" + vendorId;
+        
+        document.getElementById('actionModal').style.display = 'flex';
+    }
+
+    function closeActions(event) {
+        document.getElementById('actionModal').style.display = 'none';
+    }
+</script>
+
 {% endblock %}
