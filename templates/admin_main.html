@@ -42,7 +42,7 @@
             <h3 style="font-weight: 800; font-size: 24px; margin-bottom: 10px;">أهلاً بك يا علي في "برج المراقبة"</h3>
             <p style="opacity: 0.8; margin-bottom: 25px;">النظام يعمل الآن بكفاءة عالية. لإدارة طلبات الموردين وفتح حسابات جديدة، انتقل لقسم الاعتماد.</p>
             
-            <a href="{{ url_for('vendors_accreditation') }}" style="background: var(--gold); color: var(--p-color); padding: 12px 30px; border-radius: 12px; text-decoration: none; font-weight: 900; display: inline-block; transition: 0.3s;">
+            <a href="{{ url_for('vendors_accreditation') }}" style="background: var(--gold); color: var(--p-color); padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 900; display: inline-block; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
                 <i class="fas fa-user-plus"></i> اذهب للاعتماد الآن
             </a>
         </div>
@@ -51,9 +51,16 @@
 </div>
 
 <style>
+    /* تحسينات بصرية إضافية */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* تأثير التمرير على الأزرار والكروت */
+    .main-dashboard-container div:hover {
+        transform: translateY(-5px);
+        transition: 0.3s ease;
     }
 </style>
 {% endblock %}
