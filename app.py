@@ -150,3 +150,22 @@ if __name__ == '__main__':
     # تشغيل السيرفر مع تفعيل Debug لمراقبة الأخطاء في Railway
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
+
+
+
+@app.route('/vendor/dashboard')
+def vendor_dashboard():
+    # حماية المسار
+    if 'role' not in session or session.get('role') not in ['vendor_owner', 'vendor_staff']:
+        return redirect(url_for('vendor_login'))
+    
+    # جلب بيانات المورد ومحفظته
+    vendor_data = models.Vendor.query.filter_by(username=session.get('username')).first()
+    
+    # إذا لم تكن المحفظة موجودة، نضع قيم افتراضية لمنع الخطأ
+    wallet_no = vendor_data.wallet.wallet_number if vendor_data.wallet else "جاري الربط..."
+    balance = vendor_data.wallet.balance if vendor_data.wallet else 0.0
+    
+    return render_template('vendor_dashboard.html', 
+                           wallet_no=wallet_no, 
+                           balance=balance)
