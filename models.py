@@ -24,11 +24,17 @@ class Vendor(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     brand_name = db.Column(db.String(150))
-    status = db.Column(db.String(50), default="نشط")
-    is_active = db.Column(db.Boolean, default=True)
     
-    # علاقات الربط - تم إضافة overlaps لمنع تعارض التعريفات في SQLAlchemy
-    # تم تغيير backref لتجنب التكرار مع التعريفات اليدوية في الجداول الأخرى
+    # --- الإضافات المطلوبة (البيانات الشخصية) ---
+    phone = db.Column(db.String(20), nullable=True)
+    address = db.Column(db.String(255), nullable=True)
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # ضبط الحالة لتعمل مع أزرار التفعيل
+    status = db.Column(db.String(50), default="معلق")
+    is_active = db.Column(db.Boolean, default=False) 
+    
+    # علاقات الربط
     staff = db.relationship('VendorStaff', back_populates='vendor', lazy=True, overlaps="owner,staff")
     wallet = db.relationship('Wallet', backref='vendor_ref', uselist=False, cascade="all, delete-orphan")
     products = db.relationship('Product', backref='vendor_info', lazy=True)
@@ -41,8 +47,8 @@ class VendorStaff(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     national_id = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(20), nullable=True) # إضافة الهاتف للموظف
 
-    # إصلاح التداخل: ربط مباشر مع Vendor باستخدام back_populates
     vendor = db.relationship('Vendor', back_populates='staff', overlaps="owner,staff")
 
 # --- [ 4. جدول المحفظة ] ---
@@ -76,21 +82,28 @@ class Product(db.Model):
 
 # --- [ 6. دالة حقن البيانات (Seed) ] ---
 def seed_system():
-    # 1. التأكد من وجود الإدارة العليا (علي)
+    # 1. التأكد من وجود الإدارة العليا
     if not AdminUser.query.filter_by(username="علي").first():
         db.session.add(AdminUser(username="علي", password="123", role="Super Admin"))
     
-    # 2. التأكد من وجود المورد الرئيسي (علي محمد)
+    # 2. التأكد من وجود المورد الرئيسي
     vendor_acc = Vendor.query.filter_by(username="علي محمد").first()
     if not vendor_acc:
-        vendor_acc = Vendor(username="علي محمد", password="123", brand_name="محجوب أونلاين")
+        vendor_acc = Vendor(
+            username="علي محمد", 
+            password="123", 
+            brand_name="محجوب أونلاين",
+            phone="777777777",
+            status="نشط",
+            is_active=True
+        )
         db.session.add(vendor_acc)
-        db.session.commit() # الحفظ للحصول على ID للمورد
+        db.session.commit() 
 
-    # 3. التأكد من توليد المحفظة للمورد الرئيسي
+    # 3. التأكد من توليد المحفظة
     if vendor_acc and not Wallet.query.filter_by(vendor_id=vendor_acc.id).first():
         new_wallet = Wallet(vendor_id=vendor_acc.id)
         db.session.add(new_wallet)
-        print(f"✅ تم توليد محفظة للمورد الرئيسي: {new_wallet.wallet_number}")
+        print(f"✅ تم توليد محفظة: {new_wallet.wallet_number}")
 
     db.session.commit()
