@@ -21,10 +21,10 @@
             background: var(--soft-bg);
             display: flex;
             min-height: 100vh;
-            overflow-x: hidden; /* لمنع التمرير الأفقي في المتصفحات */
+            overflow-x: hidden;
         }
 
-        /*Sidebar - تصميم التطبيق الذكي */
+        /* Sidebar - تصميم التطبيق الذكي */
         .sidebar {
             width: 260px;
             background: var(--p-color);
@@ -36,15 +36,16 @@
             display: flex;
             flex-direction: column;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 1px solid rgba(255, 215, 0, 0.1);
         }
 
         .sidebar-header {
-            padding: 25px 15px;
+            padding: 30px 15px;
             text-align: center;
             position: relative;
         }
 
-        /* الخط الفاصل تحت اللوجو */
+        /* الخط الفاصل الذهبي تحت اللوجو */
         .sidebar-header::after {
             content: "";
             position: absolute;
@@ -59,11 +60,13 @@
         .logo-img {
             width: 110px;
             height: auto;
+            /* جعل اللوجو أبيض ناصع بشكل ديناميكي */
             filter: brightness(0) invert(1); 
             margin-bottom: 15px;
+            transition: 0.3s;
         }
 
-        .nav-links { flex: 1; padding: 20px 0; }
+        .nav-links { flex: 1; padding: 25px 0; }
         
         .nav-link {
             display: flex;
@@ -72,7 +75,7 @@
             color: rgba(255,255,255,0.7);
             text-decoration: none;
             transition: 0.3s;
-            margin: 4px 10px;
+            margin: 4px 15px;
             border-radius: 12px;
         }
 
@@ -80,52 +83,77 @@
             background: rgba(255, 215, 0, 0.15);
             color: var(--gold);
             font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .nav-link i { margin-left: 15px; font-size: 18px; }
 
-        /* Main Wrapper - التناسق مع الشاشات */
+        /* Main Wrapper - التناسق مع الشاشات المتعددة */
         .main-wrapper {
             margin-right: 260px;
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-width: 0; /* ضروري لتجاوب flexbox */
+            min-width: 0; 
             transition: margin-right 0.4s ease;
         }
 
         .top-bar {
-            height: 70px;
+            height: 75px;
             background: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            padding: 0 35px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
             position: sticky;
             top: 0;
             z-index: 999;
         }
 
         .content-area {
-            padding: 25px;
+            padding: 30px;
             flex: 1;
         }
 
-        /* التجاوب الديناميكي للهواتف والمتصفحات الصغيرة */
+        /* زر الخروج بتنسيق التطبيقات */
+        .logout-section {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logout-link {
+            color: #ff4d4d;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 12px 25px;
+            transition: 0.3s;
+        }
+
+        .logout-link:hover {
+            background: rgba(255, 77, 77, 0.1);
+            border-radius: 10px;
+        }
+
+        /* التجاوب الديناميكي للهواتف والمتصفحات */
         @media (max-width: 992px) {
-            .sidebar { width: 80px; }
+            .sidebar { width: 85px; }
             .sidebar span, .sidebar-header h3 { display: none; }
-            .sidebar-header::after { left: 10%; right: 10%; }
-            .main-wrapper { margin-right: 80px; }
-            .logo-img { width: 50px; }
-            .nav-link { justify-content: center; padding: 15px 0; }
+            .sidebar-header::after { left: 15%; right: 15%; }
+            .main-wrapper { margin-right: 85px; }
+            .logo-img { width: 55px; }
+            .nav-link { justify-content: center; padding: 15px 0; margin: 5px; }
             .nav-link i { margin-left: 0; }
+            .logout-link { justify-content: center; padding: 15px 0; }
+            .logout-link i { margin-left: 0; }
         }
 
         @media (max-width: 576px) {
-            .top-bar { padding: 0 15px; }
-            .content-area { padding: 15px; }
+            .top-bar { padding: 0 20px; }
+            .content-area { padding: 20px; }
         }
     </style>
 </head>
@@ -134,34 +162,39 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" 
-                 class="logo-img" alt="Logo">
-            <h3 style="font-size: 13px; color: var(--gold); margin: 0; opacity: 0.9;">برج المراقبة</h3>
+                 class="logo-img" alt="محجوب أونلاين">
+            <h3 style="font-size: 14px; color: var(--gold); margin: 0; font-weight: 800; letter-spacing: 1px;">برج المراقبة</h3>
         </div>
 
         <nav class="nav-links">
             <a href="{{ url_for('admin_dashboard') }}" class="nav-link active">
-                <i class="fas fa-shield-alt"></i> 
-                <span>التحكم السيادي</span>
+                <i class="fas fa-user-check"></i> 
+                <span>اعتماد الموردين</span>
             </a>
         </nav>
 
-        <a href="{{ url_for('logout') }}" style="color: #ff4d4d; text-decoration: none; padding: 25px; display: flex; align-items: center; font-weight: 700; font-size: 14px;">
-            <i class="fas fa-power-off" style="margin-left: 10px;"></i> 
-            <span>خروج</span>
-        </a>
+        <div class="logout-section">
+            <a href="{{ url_for('logout') }}" class="logout-link">
+                <i class="fas fa-power-off" style="margin-left: 12px;"></i> 
+                <span>خروج آمن</span>
+            </a>
+        </div>
     </aside>
 
     <div class="main-wrapper">
         <header class="top-bar">
-            <div style="font-weight: 900; color: var(--p-color); letter-spacing: -0.5px;">
-                <i class="fas fa-cube" style="color: var(--gold); margin-left: 8px;"></i>
+            <div style="font-weight: 900; color: var(--p-color); font-size: 17px;">
+                <i class="fas fa-layer-group" style="color: var(--gold); margin-left: 10px;"></i>
                 نظام سوقك الذكي 2026
             </div>
             
-            <div class="user-info" style="display: flex; align-items: center; gap: 12px;">
-                <div style="text-align: left; line-height: 1.2;">
-                    <div style="font-weight: 800; font-size: 14px;">{{ username }}</div>
-                    <span style="font-size: 10px; background: var(--gold); padding: 1px 6px; border-radius: 4px; font-weight: 900;">مدير النظام</span>
+            <div class="user-info" style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: left; line-height: 1.3;">
+                    <div style="font-weight: 800; font-size: 15px; color: var(--p-color);">{{ username }}</div>
+                    <span style="font-size: 10px; background: var(--gold); color: var(--p-color); padding: 2px 8px; border-radius: 5px; font-weight: 900; display: inline-block;">مدير النظام</span>
+                </div>
+                <div style="width: 40px; height: 40px; background: var(--soft-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--p-color); border: 1px solid #eee;">
+                    <i class="fas fa-user-shield"></i>
                 </div>
             </div>
         </header>
