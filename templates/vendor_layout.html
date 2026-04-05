@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>برج الإدارة - محجوب أونلاين</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مركز سيادة الموردين - محجوب أونلاين</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -15,16 +15,22 @@
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; overflow-x: hidden; }
+        /* إخفاء شريط التمرير تماماً لمظهر التطبيق */
+        * { scrollbar-width: none; -ms-overflow-style: none; }
+        *::-webkit-scrollbar { display: none; }
 
-        /* القائمة الجانبية الذكية */
+        body { 
+            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); display: flex; overflow: hidden; height: 100vh;
+        }
+
+        /* القائمة الجانبية للمورد */
         .sidebar { 
             width: 260px; height: 100vh; background: var(--p-color); 
             color: white; position: fixed; transition: var(--transition); z-index: 1000;
             box-shadow: 4px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column;
         }
         
-        /* الشريط العلوي المتجاوب */
         .top-bar {
             position: fixed; top: 0; left: 0; right: 260px; height: 70px;
             background: var(--white); display: flex; align-items: center; 
@@ -32,13 +38,14 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: var(--transition); z-index: 999;
         }
 
-        /* حاوية المحتوى الرئيسي */
         .main-content { 
-            margin-right: 260px; margin-top: 70px; width: calc(100% - 260px); 
-            padding: 30px; transition: var(--transition); min-height: calc(100vh - 70px);
+            margin-right: 260px; margin-top: 70px; 
+            width: calc(100% - 260px); padding: 30px; 
+            transition: var(--transition); height: calc(100vh - 70px);
+            overflow-y: auto; box-sizing: border-box;
         }
 
-        /* هوية المستخدم */
+        /* هوية المورد الملكية */
         .user-profile { display: flex; align-items: center; gap: 12px; }
         .user-info .name { font-weight: 800; color: var(--p-color); display: block; text-align: left; }
         .user-info .badge { 
@@ -55,20 +62,18 @@
         .nav-link.active { background: rgba(255,215,0,0.1); color: var(--gold); }
         .nav-link span { margin-right: 15px; }
 
-        /* اللوجو الأبيض */
         .sidebar-logo { padding: 25px; text-align: center; border-bottom: 1px solid var(--soft-white); }
         .sidebar-logo img { width: 140px; height: auto; filter: brightness(0) invert(1); } 
         .sidebar-logo p { color: var(--gold); font-size: 11px; margin-top: 8px; font-weight: 800; }
 
-        /* تعديلات الشاشات الصغيرة (Mobile) */
         @media (max-width: 768px) {
             .sidebar { width: 80px; }
             .sidebar-logo p, .nav-link span { display: none; }
             .sidebar-logo img { width: 45px; }
             .top-bar { right: 80px; }
             .main-content { margin-right: 80px; width: calc(100% - 80px); padding: 20px; }
-            .nav-link { justify-content: center; padding: 15px 0; }
-            .user-info { display: none; } /* إخفاء النص في الجوال لزيادة المساحة */
+            .nav-link { justify-content: center; }
+            .user-info { display: none; }
         }
     </style>
 </head>
@@ -80,28 +85,28 @@
             <p>سوقك الذكي | محجوب أونلاين</p>
         </div>
         <nav style="margin-top: 15px; flex-grow: 1;">
-            <a href="{{ url_for('vendor_dashboard') }}" class="nav-link active"><i class="fas fa-th-large"></i> <span>الرئيسية</span></a>
-            <a href="{{ url_for('add_product') }}" class="nav-link"><i class="fas fa-plus-circle"></i> <span>إضافة منتج</span></a>
-            <a href="#" class="nav-link"><i class="fas fa-box-open"></i> <span>منتجاتي</span></a>
-            <a href="#" class="nav-link"><i class="fas fa-chart-line"></i> <span>التقارير المالية</span></a>
+            <a href="{{ url_for('vendor_dashboard') }}" class="nav-link active"><i class="fas fa-chart-pie"></i> <span>لوحة المورد</span></a>
+            <a href="{{ url_for('add_product') }}" class="nav-link"><i class="fas fa-plus-circle"></i> <span>إضافة مخزون</span></a>
+            <a href="#" class="nav-link"><i class="fas fa-boxes-stacked"></i> <span>إدارة المنتجات</span></a>
+            <a href="#" class="nav-link"><i class="fas fa-file-invoice-dollar"></i> <span>المالية والتقارير</span></a>
         </nav>
         <div style="padding-bottom: 20px;">
-            <a href="{{ url_for('logout') }}" class="nav-link" style="color: #ff4d4d;"><i class="fas fa-power-off"></i> <span>خروج</span></a>
+            <a href="{{ url_for('logout') }}" class="nav-link" style="color: #ff4d4d;"><i class="fas fa-power-off"></i> <span>إنهاء الجلسة</span></a>
         </div>
     </aside>
 
     <main style="width: 100%;">
         <header class="top-bar">
-            <div style="font-weight: 800; color: var(--p-color); font-size: 18px;">سوقك الذكي 2026</div>
+            <div style="font-weight: 800; color: var(--p-color); font-size: 18px;">مركز سيادة الموردين 2026</div>
             <div class="user-profile">
-                <a href="#" style="color: var(--p-color); font-size: 20px; transition: 0.3s; margin-left: 15px;"><i class="fas fa-cog"></i></a>
+                <a href="#" style="color: var(--p-color); font-size: 20px; margin-left: 15px;"><i class="fas fa-sliders-h"></i></a>
                 
                 <div class="user-info">
-                    <span class="name">{{ username if username else 'علي' }}</span>
-                    <span class="badge">مدير النظام الملكي</span>
+                    <span class="name">{{ username if username else 'شريك النجاح' }}</span>
+                    <span class="badge">المورد المعتمد</span>
                 </div>
                 <div style="width: 45px; height: 45px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--gold);">
-                    <i class="fas fa-user-tie" style="color: var(--p-color); font-size: 20px;"></i>
+                    <i class="fas fa-store-alt" style="color: var(--p-color); font-size: 20px;"></i>
                 </div>
             </div>
         </header>
