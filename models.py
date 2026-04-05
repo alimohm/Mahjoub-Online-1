@@ -19,7 +19,7 @@ class AdminUser(db.Model):
 
 # --- [ 2. جدول الموردين ] ---
 class Vendor(db.Model):
-    __tablename__ = 'vendor' # تأكد من أن الاسم مفرد كما في الصورة السابقة
+    __tablename__ = 'vendor' 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
@@ -27,10 +27,10 @@ class Vendor(db.Model):
     status = db.Column(db.String(50), default="نشط")
     is_active = db.Column(db.Boolean, default=True)
     
-    # علاقات الربط
-    staff = db.relationship('VendorStaff', backref='owner', lazy=True)
+    # علاقات الربط - تم إضافة overlaps لمنع تعارض التعريفات في SQLAlchemy
+    # تم تغيير backref لتجنب التكرار مع التعريفات اليدوية في الجداول الأخرى
+    staff = db.relationship('VendorStaff', back_populates='vendor', lazy=True, overlaps="owner,staff")
     wallet = db.relationship('Wallet', backref='vendor_ref', uselist=False, cascade="all, delete-orphan")
-    # إضافة علاقة مع المنتجات لتسهيل جلبها في الداشبورد
     products = db.relationship('Product', backref='vendor_info', lazy=True)
 
 # --- [ 3. جدول موظفي المورد ] ---
@@ -42,8 +42,8 @@ class VendorStaff(db.Model):
     password = db.Column(db.String(200), nullable=False)
     national_id = db.Column(db.String(100), nullable=False)
 
-    # إضافة علاقة عكسية للوصول للمورد بسهولة
-    vendor = db.relationship('Vendor', backref=db.backref('staff_members', lazy=True))
+    # إصلاح التداخل: ربط مباشر مع Vendor باستخدام back_populates
+    vendor = db.relationship('Vendor', back_populates='staff', overlaps="owner,staff")
 
 # --- [ 4. جدول المحفظة ] ---
 class Wallet(db.Model):
@@ -55,7 +55,7 @@ class Wallet(db.Model):
     pending_balance = db.Column(db.Float, default=0.0)
     last_update = db.Column(db.DateTime, default=datetime.utcnow)
 
-# --- [ 5. جدول المنتجات - تم تصحيح الربط هنا ] ---
+# --- [ 5. جدول المنتجات ] ---
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
@@ -68,31 +68,29 @@ class Product(db.Model):
     media_path = db.Column(db.String(500))
     status = db.Column(db.String(20), default='pending') 
     
-    # تصحيح الخطأ: كان يشير لـ 'vendors.id' بينما اسم الجدول هو 'vendor'
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'), nullable=False)
-    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f'<Product {self.name}>'
 
-# --- [ 6. دالة حقن البيانات ] ---
+# --- [ 6. دالة حقن البيانات (Seed) ] ---
 def seed_system():
-    # التحقق من وجود الإدارة
+    # 1. التأكد من وجود الإدارة العليا (علي)
     if not AdminUser.query.filter_by(username="علي").first():
         db.session.add(AdminUser(username="علي", password="123", role="Super Admin"))
     
-    # التحقق من وجود مورد رئيسي
+    # 2. التأكد من وجود المورد الرئيسي (علي محمد)
     vendor_acc = Vendor.query.filter_by(username="علي محمد").first()
     if not vendor_acc:
         vendor_acc = Vendor(username="علي محمد", password="123", brand_name="محجوب أونلاين")
         db.session.add(vendor_acc)
-        db.session.commit()
+        db.session.commit() # الحفظ للحصول على ID للمورد
 
-    # توليد المحفظة إذا لم توجد
+    # 3. التأكد من توليد المحفظة للمورد الرئيسي
     if vendor_acc and not Wallet.query.filter_by(vendor_id=vendor_acc.id).first():
         new_wallet = Wallet(vendor_id=vendor_acc.id)
         db.session.add(new_wallet)
-        print(f"✅ محفظة سيادية جديدة: {new_wallet.wallet_number}")
+        print(f"✅ تم توليد محفظة للمورد الرئيسي: {new_wallet.wallet_number}")
 
     db.session.commit()
