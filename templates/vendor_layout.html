@@ -1,114 +1,95 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}بوابة الموردين | محجوب أونلاين{% endblock %}</title>
+{% extends "vendor_layout.html" %}
+
+{% block content %}
+<style>
+    .vendor-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.02);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #f0f4f8;
+        transition: var(--transition);
+    }
+
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--gold); }
+
+    .stat-info h3 { margin: 0; font-size: 32px; color: var(--vendor-primary); font-weight: 800; }
+    .stat-info p { margin: 5px 0 0; color: #718096; font-size: 14px; font-weight: 600; }
+
+    .stat-icon {
+        width: 60px; height: 60px;
+        background: #f7fafc;
+        border-radius: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 24px; color: var(--vendor-primary);
+    }
+
+    /* قسم المحفظة الخاصة */
+    .wallet-section {
+        background: linear-gradient(135deg, var(--vendor-primary) 0%, #34495e 100%);
+        color: white; padding: 40px; border-radius: 25px;
+        margin-bottom: 40px; position: relative; overflow: hidden;
+    }
+
+    .wallet-section::after {
+        content: '\f51e'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+        position: absolute; left: -20px; bottom: -20px;
+        font-size: 150px; opacity: 0.05;
+    }
+
+    .wallet-balance { font-size: 45px; font-weight: 900; margin: 15px 0; color: var(--gold); }
+    .wallet-num { font-family: monospace; opacity: 0.8; letter-spacing: 2px; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 10px; }
+
+    .btn-add-p {
+        background: var(--gold); color: var(--vendor-primary);
+        padding: 15px 30px; border-radius: 15px; text-decoration: none;
+        font-weight: 800; display: inline-block; transition: 0.3s;
+    }
+    .btn-add-p:hover { background: white; transform: scale(1.05); }
+</style>
+
+<div class="wallet-section">
+    <p style="margin: 0; font-weight: 600;">رصيد محفظة السيادة الرقمية</p>
+    <div class="wallet-balance">MAH {{ "{:,.2f}".format(balance) }}</div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="wallet-num">{{ wallet_no }}</span>
+        <span style="font-size: 12px; opacity: 0.7;">محفظة معتمدة من محجوب أونلاين</span>
+    </div>
+</div>
+
+<div class="vendor-stats">
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>0</h3>
+            <p>إجمالي المنتجات المعروضة</p>
+        </div>
+        <div class="stat-icon"><i class="fas fa-boxes"></i></div>
+    </div>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --bg-body: #f8fafc;
-            --white: #ffffff;
-            --vendor-primary: #2c3e50; /* لون احترافي للموردين */
-            --sidebar-width: 260px;
-            --gold: #FFD700;
-            --danger: #e74c3c;
-            --transition: all 0.3s ease;
-        }
-
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg-body); display: flex; height: 100vh; overflow: hidden; }
-
-        .sidebar {
-            width: var(--sidebar-width); background: var(--white); height: 100%;
-            border-left: 1px solid #eef2f3; display: flex; flex-direction: column;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.02);
-        }
-
-        .brand-section { padding: 30px 20px; text-align: center; border-bottom: 1px solid #f8f9fa; }
-        .logo-img { height: 50px; margin-bottom: 10px; }
-        .brand-name { display: block; font-weight: 800; color: var(--vendor-primary); font-size: 16px; }
-
-        .menu-list { flex: 1; padding: 20px 0; }
-        .menu-item {
-            display: flex; align-items: center; padding: 12px 20px;
-            text-decoration: none; color: #5a67d8; font-weight: 700;
-            margin: 5px 15px; border-radius: 12px; transition: var(--transition);
-        }
-        .menu-item i { margin-left: 12px; font-size: 18px; width: 25px; text-align: center; }
-        .menu-item:hover { background: #f0f4f8; color: var(--vendor-primary); }
-        .menu-item.active { background: #edf2f7; color: var(--vendor-primary); border-right: 4px solid var(--gold); }
-
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header {
-            height: 70px; background: var(--white); border-bottom: 1px solid #eef2f3;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
-        }
-
-        .user-info { font-weight: 700; color: #4a5568; }
-        .user-info span { color: var(--vendor-primary); }
-
-        .page-body { flex: 1; padding: 25px; overflow-y: auto; }
-        
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; }
-        .alert-success { background: #c6f6d5; color: #22543d; }
-        .alert-danger { background: #fed7d7; color: #822727; }
-    </style>
-</head>
-<body>
-
-    <nav class="sidebar">
-        <div class="brand-section">
-            <img src="https://cdn.qumra.cloud/media/67f7f6d5f0b82f44a47bf845/1770229315912-117966978.webp" class="logo-img" alt="Logo">
-            <span class="brand-name">بوابة الموردين</span>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>0</h3>
+            <p>الطلبات الجديدة</p>
         </div>
+        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+    </div>
+</div>
 
-        <div class="menu-list">
-            <a href="{{ url_for('vendor_dashboard') }}" class="menu-item {% if request.endpoint == 'vendor_dashboard' %}active{% endif %}">
-                <i class="fas fa-home"></i><span>لوحة التحكم</span>
-            </a>
+<div style="text-align: center; padding: 40px; background: white; border-radius: 20px; border: 2px dashed #e2e8f0;">
+    <i class="fas fa-plus-circle" style="font-size: 50px; color: #cbd5e0; margin-bottom: 20px;"></i>
+    <h2 style="color: var(--vendor-primary);">ابدأ رحلة مبيعاتك اليوم</h2>
+    <p style="color: #718096; margin-bottom: 30px;">قم بإضافة منتجك الأول لتبدأ في جني الأرباح عبر سوقك الذكي</p>
+    <a href="{{ url_for('add_product') }}" class="btn-add-p">رفع منتج جديد الآن</a>
+</div>
 
-            <a href="{{ url_for('add_product') }}" class="menu-item {% if request.endpoint == 'add_product' %}active{% endif %}">
-                <i class="fas fa-plus-circle"></i><span>إضافة منتج جديد</span>
-            </a>
-
-            <a href="#" class="menu-item">
-                <i class="fas fa-boxes"></i><span>منتجاتي</span>
-            </a>
-
-            <div style="margin-top: auto; padding: 20px 0;">
-                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
-                <a href="{{ url_for('logout') }}" class="menu-item" style="color: var(--danger);">
-                    <i class="fas fa-sign-out-alt"></i><span>خروج</span>
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="main-content">
-        <header class="header">
-            <div class="user-info">
-                مرحباً بشريك النجاح | <span>{{ session.get('username') }}</span>
-            </div>
-            <div class="badge" style="background: #e2e8f0; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800;">
-                حساب مورد معتمد
-            </div>
-        </header>
-
-        <div class="page-body">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            {% block content %}{% endblock %}
-        </div>
-    </main>
-
-</body>
-</html>
+{% endblock %}
