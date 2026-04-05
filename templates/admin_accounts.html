@@ -46,7 +46,7 @@
         transition: 0.3s;
     }
     
-    .btn-create:hover { background: var(--gold); color: var(--admin-p); }
+    .btn-create:hover { background: var(--gold); color: var(--admin-p); transform: translateY(-2px); }
 
     .v-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     .v-table th { text-align: right; color: #888; padding: 15px; font-size: 13px; border-bottom: 2px solid #f4f7f6; }
@@ -59,18 +59,21 @@
         border-radius: 8px; 
         font-size: 12px; 
         border: 1px solid #ffeeba; 
-        font-family: monospace;
+        font-family: 'Courier New', monospace;
         font-weight: 800;
     }
 
     .status-pill {
-        padding: 4px 10px;
-        border-radius: 6px;
+        padding: 6px 12px;
+        border-radius: 8px;
         font-size: 11px;
         font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
-    .status-active { background: #e6fffa; color: #27ae60; }
-    .status-pending { background: #fff5f5; color: #e53e3e; }
+    .status-active { background: #e6fffa; color: #27ae60; border: 1px solid #c6f6d5; }
+    .status-pending { background: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; }
 
     @media (max-width: 992px) {
         .admin-container { grid-template-columns: 1fr; }
@@ -79,9 +82,9 @@
 
 <div class="admin-container" dir="rtl">
     <div class="card-royal">
-        <h3 style="color: var(--admin-p); margin-top: 0;"><i class="fas fa-user-shield"></i> اعتماد مورد جديد</h3>
+        <h3 style="color: var(--admin-p); margin-top: 0;"><i class="fas fa-user-shield" style="color: var(--gold);"></i> اعتماد مورد جديد</h3>
         <p style="font-size: 12px; color: #666; margin-bottom: 20px;">
-            بمجرد النقر، سيتم تفعيل "السيادة المالية" ومنح رقم محفظة <strong>MAH</strong> فريد.
+            بمجرد النقر، سيتم تفعيل "السيادة المالية" ومنح رقم محفظة <strong>MAH</strong> فريد للمورد.
         </p>
         
         <form action="{{ url_for('create_vendor_route') }}" method="POST">
@@ -102,7 +105,7 @@
     </div>
 
     <div class="card-royal">
-        <h3 style="color: var(--admin-p); margin-top: 0;"><i class="fas fa-users"></i> الموردون المعتمدون في النظام</h3>
+        <h3 style="color: var(--admin-p); margin-top: 0;"><i class="fas fa-users" style="color: var(--gold);"></i> الموردون المعتمدون</h3>
         <div style="overflow-x: auto;">
             <table class="v-table">
                 <thead>
@@ -120,7 +123,7 @@
                         <td>{{ vendor.brand_name }}</td>
                         <td>
                             {% if vendor.wallet %}
-                                <span class="wallet-badge">{{ vendor.wallet.wallet_number }}</span>
+                                <span class="wallet-badge"><i class="fas fa-wallet"></i> {{ vendor.wallet.wallet_number }}</span>
                             {% else %}
                                 <span style="color: #ccc; font-size: 11px;">قيد التوليد...</span>
                             {% endif %}
@@ -128,14 +131,15 @@
                         <td>
                             <span class="status-pill {{ 'status-active' if vendor.is_active else 'status-pending' }}">
                                 <i class="fas {{ 'fa-check-circle' if vendor.is_active else 'fa-clock' }}"></i> 
-                                {{ vendor.status }}
+                                {{ vendor.status or ('نشط' if vendor.is_active else 'معلق') }}
                             </span>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="4" style="text-align: center; color: #999; padding: 30px;">
-                            <i class="fas fa-info-circle"></i> لا يوجد موردون معتمدون حالياً.
+                        <td colspan="4" style="text-align: center; color: #999; padding: 40px;">
+                            <i class="fas fa-info-circle" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>
+                            لا يوجد موردون معتمدون حالياً في النظام.
                         </td>
                     </tr>
                     {% endfor %}
